@@ -18,7 +18,9 @@ import { EntryDetailsComponent } from './entry-details/entry-details.component';
 import { EntryConfirmComponent } from './entry-confirm/entry-confirm.component';
 
 const appRoutes: Routes = [
-    { path: '', component: AppComponent },
+    { path: '', component: MeetListComponent },
+    { path: 'enter', component: EntrantDetailsComponent },
+    { path: '**', component: MeetListComponent }
 ];
 
 @NgModule({
@@ -29,7 +31,7 @@ const appRoutes: Routes = [
         MeetListItemComponent,
         EntrantDetailsComponent,
         EntryDetailsComponent,
-        EntryConfirmComponent,
+        EntryConfirmComponent
     ],
     imports: [
         BrowserModule,

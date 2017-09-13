@@ -1,0 +1,94 @@
+<div class="row">
+    <h1>Meet List</h1>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <ngb-accordion activeIds="open">
+            <ngb-panel id="open" title="Open and Current Meets">
+                <ng-template ngbPanelContent>
+
+                    <app-meet-list-item *ngFor="let m of meets; let i = index"
+                        [meet]="m"
+                        [index]="i">
+                    </app-meet-list-item>
+
+                        <!--<div class="card">-->
+                            <!--<div class="card-header">-->
+                                <!--<h2 class="card-title">-->
+                                    <!--Meet Name 2-->
+                                <!--</h2>-->
+                            <!--</div>-->
+                            <!--<div class="card-body">-->
+                                <!--<p>Monday 27/02/2017</p>-->
+                                <!--<button type="button" class="btn btn-primary">Enter Meet</button>-->
+                            <!--</div>-->
+                            <!--<div class="card-footer">-->
+                                <!--Deadline Friday 20/02/2017-->
+                            <!--</div>-->
+                        <!--</div>-->
+
+                        <!--<div class="card">-->
+                            <!--<div class="card-header">-->
+                                <!--<h2 class="card-title">-->
+                                    <!--Meet Name 3-->
+                                <!--</h2>-->
+                            <!--</div>-->
+                            <!--<div class="card-body">-->
+                                <!--<p>Monday 27/02/2017</p>-->
+                                <!--<button type="button" class="btn btn-primary">Enter Meet</button>-->
+                            <!--</div>-->
+                            <!--<div class="card-footer">-->
+                                <!--Deadline Friday 20/02/2017-->
+                            <!--</div>-->
+                        <!--</div>-->
+
+                        <!--<div class="card">-->
+                            <!--<div class="card-header">-->
+                                <!--<h2 class="card-title">-->
+                                    <!--Meet Name 4-->
+                                <!--</h2>-->
+                            <!--</div>-->
+                            <!--<div class="card-body">-->
+                                <!--<p>Monday 27/02/2017</p>-->
+                                <!--<button type="button" class="btn btn-primary">Enter Meet</button>-->
+                            <!--</div>-->
+                            <!--<div class="card-footer">-->
+                                <!--Deadline Friday 20/02/2017-->
+                            <!--</div>-->
+                        <!--</div>-->
+
+                </ng-template>
+            </ngb-panel>
+            <ngb-panel id="upcoming" title="Upcoming Meets">
+                <ng-template ngbPanelContent>
+                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3
+                    wolf moon officia
+                    aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3
+                    wolf moon tempor,
+                    sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim
+                    keffiyeh helvetica,
+                    craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice
+                    lomo. Leggings
+                    occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of
+                    them accusamus
+                    labore sustainable VHS.
+                </ng-template>
+            </ngb-panel>
+            <ngb-panel id="past" title="Past Meets">
+                <ng-template ngbPanelContent>
+                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3
+                    wolf moon officia
+                    aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3
+                    wolf moon tempor,
+                    sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim
+                    keffiyeh helvetica,
+                    craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice
+                    lomo. Leggings
+                    occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of
+                    them accusamus
+                    labore sustainable VHS.
+                </ng-template>
+            </ngb-panel>
+        </ngb-accordion>
+    </div>
+</div>

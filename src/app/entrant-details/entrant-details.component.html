@@ -1,0 +1,174 @@
+<h1>Step 1</h1>
+<h2>Entrant Details</h2>
+<form>
+    <fieldset class="qe-fieldset">
+        <div class="card text-white bg-info mb-3 qe-info">
+            <svg><use xlink:href="#entypo-star" /></svg>
+            We need this information so we can contact you if there are any issues or questions about the
+            entry you are lodging.
+        </div>
+        <div class="form-group row">
+            <legend class="col-form-legend col-sm-2">Is this entry for you or for someone else?</legend>
+            <div class="col-sm-9">
+                <div class="form-check">
+                    <label for="who-me">
+                        <input class="form-check-label" type="radio" name="who" id="who-me" value="who-me" checked/>
+                        Me
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label for="who-else">
+                        <input class="form-check-label" type="radio" name="who" id="who-else" value="who-else" checked/>
+                        Someone else
+                    </label>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend class="col-form-legend">
+            Your Details
+        </legend>
+        <div class="card">
+            We need this information so we can contact you if there are any issues or questions about the
+            entry you are lodging.
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="user-firstname">First Name:</label>
+            <input class="form-control col-sm-10" type="text" name="user-firstname" id="user-firstname"/>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="user-surname">Surname:</label>
+            <input class="form-control col-sm-10" type="text" name="user-lastname" id="user-surname"/>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="user-email">Email:</label>
+            <input class="form-control col-sm-10" type="text" name="user-email" id="user-email"/>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="user-phone">Phone:</label>
+            <input class="form-control col-sm-10" type="text" name="user-phone" id="user-phone"/>
+        </div>
+
+    </fieldset>
+    <fieldset class="form-group">
+        <legend class="col-form-legend">
+            Entrant Details
+        </legend>
+        <div class="card">
+            We need this information so we can contact the entrant, keep event records and to
+            put the entrant into the correct competition age group.
+        </div>
+        <div class="row">
+            <label class="form-control-label" for="entrant-firstname">First Name:</label>
+            <input class="form-control" type="text" name="entrant-firstname" id="entrant-firstname"/>
+        </div>
+        <div class="row">
+            <label class="form-control-label" for="user-surname">Surname:</label>
+            <input class="form-control" type="text" name="entrant-lastname" id="entrant-surname"/>
+        </div>
+        <div class="row">
+            <label class="form-control-label" for="user-email">Email:</label>
+            <input class="form-control" type="text" name="entrant-email" id="entrant-email"/>
+        </div>
+        <div class="row">
+            <label class="form-control-label" for="entrant-phone">Phone:</label>
+            <input class="form-control" type="text" name="entrant-phone" id="entrant-phone"/>
+        </div>
+        <div class="row">
+            <label class="form-control-label" for="entrant-dob">Date of Birth:</label>
+            <input class="form-control" type="text" name="entrant-dob" id="entrant-dob"/>
+        </div>
+
+        <legend>Sex:</legend>
+        <div class="form-check">
+            <label for="entrant-male">
+                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-male" value="male"
+                       checked/>
+                Male
+            </label>
+        </div>
+        <div class="form-check">
+            <label for="entrant-female">
+                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-female" value="female"
+                       checked/>
+                Female
+            </label>
+        </div>
+
+        <legend>Multiclass:</legend>
+        <div class="card">
+            <p>
+                If you are a Multi Class swimmer with a classification, please select your classification. If
+                you do not already have a classification you will need apply for one before you can enter an
+                event as a Multi Class swimmer.
+            </p>
+            <p>
+                If you do not know what this means, please leave the default option of "No Classification"
+                selected.
+            </p>
+        </div>
+        <div class="row">
+            <label class="form-control-label" for="entrant-classification">Classification:</label>
+            <select class="form-control" id="entrant-classification" name="entrant-classification">
+                <option value="">No Classification</option>
+            </select>
+        </div>
+
+    </fieldset>
+
+    <fieldset class="form-group">
+        <legend class="col-form-legend">
+            Membership Details
+        </legend>
+
+        <legend>Member Type:</legend>
+        <div class="form-check">
+            <label for="entrant-male">
+                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-male" value="male"
+                       checked/>
+                Masters Swimming Australia member
+            </label>
+        </div>
+        <div class="form-check">
+            <label for="entrant-female">
+                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-female" value="female"
+                       checked/>
+                International Masters Swimming Member
+            </label>
+        </div>
+        <div class="form-check">
+            <label for="entrant-female">
+                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-female" value="female"
+                       checked/>
+                Non-Member/Guest Swimmer
+            </label>
+        </div>
+    </fieldset>
+
+    <fieldset class="form-group">
+        <legend class="col-form-legend">
+            Club Details
+        </legend>
+        <div class="row">
+            <label for="not-affiliated" class="form-control-label">I am not associated with a club: </label>
+            <input class="form-control" type="checkbox" name="not-affiliated" id="not-affiliated"/>
+        </div>
+        <div class="row">
+            <label for="club-name" class="form-control-label">Club Name:</label>
+            <input class="form-control" type="text" name="club-name" id="club-name"/>
+        </div>
+        <div class="row">
+            <label for="club-code" class="form-control-label">Club Code:</label>
+            <input class="form-control" type="text" name="club-code" id="club-code"/>
+        </div>
+
+        <div class="row">
+            <label for="club-country" class="form-control-label">Club Country:</label>
+            <input class="form-control" type="text" name="club-country" id="club-country"/>
+        </div>
+
+    </fieldset>
+
+
+</form>
