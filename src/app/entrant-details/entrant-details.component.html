@@ -1,103 +1,143 @@
 <h1>Step 1</h1>
 <h2>Entrant Details</h2>
-<form>
+<form [formGroup]="entrantDetailsForm">
     <fieldset class="qe-fieldset">
-        <div class="card text-white bg-info mb-3 qe-info">
-            <svg><use xlink:href="#entypo-star" /></svg>
+        <app-info-card>
             We need this information so we can contact you if there are any issues or questions about the
             entry you are lodging.
-        </div>
+        </app-info-card>
         <div class="form-group row">
             <legend class="col-form-legend col-sm-2">Is this entry for you or for someone else?</legend>
             <div class="col-sm-9">
                 <div class="form-check">
                     <label for="who-me">
-                        <input class="form-check-label" type="radio" name="who" id="who-me" value="who-me" checked/>
+                        <input class="form-check-label" type="radio"
+                               id="who-me" value="who_me"
+                               formControlName="who" checked/>
                         Me
                     </label>
                 </div>
                 <div class="form-check">
                     <label for="who-else">
-                        <input class="form-check-label" type="radio" name="who" id="who-else" value="who-else" checked/>
+                        <input class="form-check-label" type="radio"
+                               id="who-else" value="who_else"
+                               formControlName="who"/>
                         Someone else
                     </label>
                 </div>
             </div>
         </div>
     </fieldset>
-    <fieldset>
-        <legend class="col-form-legend">
-            Your Details
-        </legend>
-        <div class="card">
+    <fieldset class="qe-fieldset" *ngIf="entrantDetailsForm.value.who === 'who_else'">
+        <h3>
+          Your Details
+        </h3>
+        <div class="card qe-info">
             We need this information so we can contact you if there are any issues or questions about the
             entry you are lodging.
         </div>
         <div class="form-group row">
             <label class="form-control-label col-sm-2" for="user-firstname">First Name:</label>
-            <input class="form-control col-sm-10" type="text" name="user-firstname" id="user-firstname"/>
+            <input class="form-control col-sm-6" type="text" formControlName="user_firstname" id="user-firstname"/>
         </div>
         <div class="form-group row">
             <label class="form-control-label col-sm-2" for="user-surname">Surname:</label>
-            <input class="form-control col-sm-10" type="text" name="user-lastname" id="user-surname"/>
+            <input class="form-control col-sm-6" type="text" formControlName="user_surname" id="user-surname"/>
         </div>
         <div class="form-group row">
             <label class="form-control-label col-sm-2" for="user-email">Email:</label>
-            <input class="form-control col-sm-10" type="text" name="user-email" id="user-email"/>
+            <input class="form-control col-sm-6" type="text" formControlName="user_email" id="user-email"/>
         </div>
         <div class="form-group row">
             <label class="form-control-label col-sm-2" for="user-phone">Phone:</label>
-            <input class="form-control col-sm-10" type="text" name="user-phone" id="user-phone"/>
+            <input class="form-control col-sm-6" type="text" formControlName="user_phone" id="user-phone"/>
         </div>
 
     </fieldset>
-    <fieldset class="form-group">
-        <legend class="col-form-legend">
-            Entrant Details
-        </legend>
-        <div class="card">
+    <fieldset class="qe-fieldset">
+        <h3>
+          Entrant Details
+        </h3>
+        <div class="card qe-info">
             We need this information so we can contact the entrant, keep event records and to
             put the entrant into the correct competition age group.
         </div>
-        <div class="row">
-            <label class="form-control-label" for="entrant-firstname">First Name:</label>
-            <input class="form-control" type="text" name="entrant-firstname" id="entrant-firstname"/>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="entrant-firstname">First Name:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="entrant_firstname" id="entrant-firstname"/>
         </div>
-        <div class="row">
-            <label class="form-control-label" for="user-surname">Surname:</label>
-            <input class="form-control" type="text" name="entrant-lastname" id="entrant-surname"/>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="entrant-surname">Surname:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="entrant_surname" id="entrant-surname"/>
         </div>
-        <div class="row">
-            <label class="form-control-label" for="user-email">Email:</label>
-            <input class="form-control" type="text" name="entrant-email" id="entrant-email"/>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="entrant-email">Email:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="entrant_email" id="entrant-email"/>
         </div>
-        <div class="row">
-            <label class="form-control-label" for="entrant-phone">Phone:</label>
-            <input class="form-control" type="text" name="entrant-phone" id="entrant-phone"/>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="entrant-phone">Phone:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="entrant_phone" id="entrant-phone"/>
         </div>
-        <div class="row">
-            <label class="form-control-label" for="entrant-dob">Date of Birth:</label>
-            <input class="form-control" type="text" name="entrant-dob" id="entrant-dob"/>
-        </div>
-
-        <legend>Sex:</legend>
-        <div class="form-check">
-            <label for="entrant-male">
-                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-male" value="male"
-                       checked/>
-                Male
-            </label>
-        </div>
-        <div class="form-check">
-            <label for="entrant-female">
-                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-female" value="female"
-                       checked/>
-                Female
-            </label>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="entrant-dob">Date of Birth:</label>
+            <input class="form-control col-sm-4" type="text" formControlName="entrant_dob" id="entrant-dob"/>
         </div>
 
-        <legend>Multiclass:</legend>
-        <div class="card">
+        <div class="row">
+            <legend class="col-form-legend col-sm-2">Sex:</legend>
+            <div class="col-sm-10">
+                <div class="form-check">
+                    <label for="entrant-male">
+                        <input class="form-check-label" type="radio" formControlName="entrant_gender" id="entrant-male"
+                               value="male"
+                               checked/>
+                        Male
+                    </label>
+                </div>
+                <div class="form-check col-sm10">
+                    <label for="entrant-female">
+                        <input class="form-check-label" type="radio" formControlName="entrant_gender" id="entrant-female"
+                               value="female"
+                               />
+                        Female
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </fieldset>
+
+    <fieldset class="qe-fieldset">
+        <h3>
+            Emergency Contact Details
+        </h3>
+        <div class="card qe-info">
+            We need this information in case of a medical emergency, so we can contact an appropriate
+            person on your behalf
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="emergency-firstname">First Name:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="emergency_firstname" id="emergency-firstname"/>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="emergency-surname">Surname:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="emergency_surname" id="emergency-surname"/>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="emergency-email">Email:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="emergency_email" id="emergency-email"/>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="emergency-phone">Phone:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="emergency_phone" id="emergency-phone"/>
+        </div>
+
+    </fieldset>
+
+    <fieldset class="qe-fieldset">
+
+        <h3>Multiclass</h3>
+        <div class="card qe-info">
             <p>
                 If you are a Multi Class swimmer with a classification, please select your classification. If
                 you do not already have a classification you will need apply for one before you can enter an
@@ -108,67 +148,88 @@
                 selected.
             </p>
         </div>
-        <div class="row">
-            <label class="form-control-label" for="entrant-classification">Classification:</label>
-            <select class="form-control" id="entrant-classification" name="entrant-classification">
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="entrant_classification">Classification:</label>
+            <select class="form-control col-sm-4" id="entrant_classification" formControlName="entrant_classification">
                 <option value="">No Classification</option>
             </select>
         </div>
 
     </fieldset>
 
-    <fieldset class="form-group">
-        <legend class="col-form-legend">
-            Membership Details
-        </legend>
-
-        <legend>Member Type:</legend>
-        <div class="form-check">
-            <label for="entrant-male">
-                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-male" value="male"
-                       checked/>
-                Masters Swimming Australia member
-            </label>
+    <fieldset class="qe-fieldset">
+        <h3>
+            Masters Membership Details
+        </h3>
+        <div class="form-group row">
+            <legend class="col-form-legend col-sm-2">Member Type:</legend>
+            <div class="col-sm-8">
+                <div class="form-check">
+                    <label for="member-type-msa">
+                        <input class="form-check-label" type="radio" formControlName="member_type" id="member-type-msa" value="msa"
+                               checked/>
+                        Masters Swimming Australia member
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label for="member-type-im">
+                        <input class="form-check-label" type="radio" formControlName="member_type" id="member-type-im"
+                               value="international" />
+                        International Masters Swimming Member
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label for="member-type-guest">
+                        <input class="form-check-label" type="radio" formControlName="member_type" id="member-type-guest"
+                               value="guest"
+                               />
+                        Guest Swimmer
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label for="member-type-non-member">
+                        <input class="form-check-label" type="radio" formControlName="member_type" id="member-type-non-member"
+                               value="non_member"
+                               />
+                        Non-Member
+                    </label>
+                </div>
+            </div>
         </div>
-        <div class="form-check">
-            <label for="entrant-female">
-                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-female" value="female"
-                       checked/>
-                International Masters Swimming Member
+        <div class="form-group row" *ngIf="entrantDetailsForm.value.member_type !== 'non_member'">
+            <label for="member-number" class="form-control-label col-sm-2">
+                Membership Number:
             </label>
-        </div>
-        <div class="form-check">
-            <label for="entrant-female">
-                <input class="form-check-label" type="radio" name="entrant-gender" id="entrant-female" value="female"
-                       checked/>
-                Non-Member/Guest Swimmer
-            </label>
+            <input type="text" class="form-control col-sm-4" id="member-number" formControlName="member_number" />
         </div>
     </fieldset>
 
-    <fieldset class="form-group">
-        <legend class="col-form-legend">
+    <fieldset class="qe-fieldset">
+        <h3>
             Club Details
-        </legend>
-        <div class="row">
-            <label for="not-affiliated" class="form-control-label">I am not associated with a club: </label>
-            <input class="form-control" type="checkbox" name="not-affiliated" id="not-affiliated"/>
-        </div>
-        <div class="row">
-            <label for="club-name" class="form-control-label">Club Name:</label>
-            <input class="form-control" type="text" name="club-name" id="club-name"/>
-        </div>
-        <div class="row">
-            <label for="club-code" class="form-control-label">Club Code:</label>
-            <input class="form-control" type="text" name="club-code" id="club-code"/>
+        </h3>
+        <div class="form-group row">
+            <label for="not-affiliated" class="form-control-label col-sm-2">I am not associated with a club: </label>
+            <input class="form-control col-sm-10" type="checkbox" formControlName="not_affiliated" id="not-affiliated"ß/>
         </div>
 
-        <div class="row">
-            <label for="club-country" class="form-control-label">Club Country:</label>
-            <input class="form-control" type="text" name="club-country" id="club-country"/>
+        <div *ngIf="!entrantDetailsForm.value.not_affiliated">
+          <div class="form-group row">
+            <label for="club-name" class="form-control-label col-sm-2">Club Name:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="club_name" id="club-name"/>
+          </div>
+          <div class="form-group row">
+            <label for="club-code" class="form-control-label col-sm-2">Club Code:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="club_code" id="club-code"/>
+          </div>
+          <div class="form-group row">
+            <label for="club-country" class="form-control-label col-sm-2">Club Country:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="club_country" id="club-country"/>
+          </div>
         </div>
 
     </fieldset>
 
+  <app-workflow-nav next="/enter-step2"></app-workflow-nav>
 
 </form>

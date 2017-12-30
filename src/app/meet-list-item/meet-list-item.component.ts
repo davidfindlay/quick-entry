@@ -17,7 +17,7 @@ export class MeetListItemComponent implements OnInit {
 
     ngOnInit() {
 
-        console.log(this.meet);
+        // console.log(this.meet);
 
     }
 

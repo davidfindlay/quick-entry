@@ -1,8 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
 fieldset.qe-fieldset {
-    padding: 5px;
+    padding: 1em;
     border: 2px groove;
+    margin-bottom: 1em;
 }
 
 .card.qe-info {

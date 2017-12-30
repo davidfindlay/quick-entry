@@ -6,18 +6,22 @@ import {Event} from "./event";
 
 export class Meet {
 
-    private open: string;
-    private close: string;
-    private name: string;
-
-    private maxindividualevents: number;
-    private maxrelayevents: number;
-    private maxevents: number;
-
-    private surveyed: string;   // TODO: change to records
-
-    // Sub objects
-    private sessions: Session[];
-    private events: Event[];
+    private id;
+    private meetname;
+    private startdate;
+    private enddate;
+    private deadline;
+    private contactname;
+    private contactemail;
+    private contactphone;
+    private meetfee;
+    private mealfee;
+    private location;
+    private status;
+    private maxevents;
+    private mealsincluded;
+    private mealname;
+    private massagefee;
+    private programfee;
 
 }

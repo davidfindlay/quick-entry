@@ -10,17 +10,22 @@ import {Meet} from '../models/meet';
 export class MeetListComponent implements OnInit {
 
     meets: Meet[];
+    meetSub;
 
     constructor(private meetService: MeetService) {
     }
 
     ngOnInit() {
 
-        this.meetService.getMeets().subscribe(
-            meets => {
-                this.meets = meets;
-                console.log(this.meets);
-            });
+        this.meets = this.meetService.getMeets();
+
+        this.meetSub = this.meetService.meetsChanged
+            .subscribe((meets: Meet[]) => {
+            this.meets = meets;
+        });
+
+        console.log('Meet List Component has: ' + this.meets);
+
     }
 
 }
