@@ -1,16 +1,54 @@
 <div class="card">
   <div class="card-header">
     <h2 class="card-title">
-      {{meet.name}}
+      {{meet.meetname}}
     </h2>
     <div>
       {{getMeetDates()}}
     </div>
   </div>
   <div class="card-body">
-    <button type="button" class="btn btn-primary" routerLink="enter">Enter Meet</button>
+
+    <div class="eventlist" *ngIf="meet.events.length > 0">
+      <h3>Event List:</h3>
+
+      <div class="container">
+        <ul class="list-group row">
+          <li class="list-group-item col-4" *ngFor="let e of this.meet.events; let i = index ">
+            <span class="badge badge-primary badge-pill">{{e.prognumber}}{{e.progsuffix}}</span>
+            {{e.distance}} {{e.discipline}}
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="contact">
+      <h3>Contact Details:</h3>
+      <table>
+        <tr>
+          <th>Name: </th>
+          <td>{{meet.contactname}}</td>
+        </tr>
+        <tr>
+          <th>Phone: </th>
+          <td><a href="tel:{{meet.contactphone}}">{{meet.contactphone}}</a></td>
+        </tr>
+        <tr>
+          <th>Email: </th>
+          <td><a href="mailto:{{meet.contactemail}}">{{meet.contactemail}}</a></td>
+        </tr>
+      </table>
+    </div>
+
+    <button type="button" class="btn btn-primary" routerLink="enter" *ngIf="isOpen()">Enter Meet</button>
   </div>
   <div class="card-footer">
-    Closes {{getMeetDeadline()}} (TODO: Add time remaining)
+    <span *ngIf="isOpen()">
+      Closes {{getMeetDeadline()}}
+    </span>
+    <span *ngIf="!isOpen()">
+      Closed {{getMeetDeadline()}}
+    </span>
   </div>
 </div>

@@ -1,49 +1,22 @@
 <div class="row">
-    <h1>Meet List</h1>
+    <h1>Available Meets</h1>
+</div>
+<div class="card qe-info">
+    Here's a list of all the meets currently open for entries. If you can't see the meet you're intending to enter,
+    check that the deadline hasn't expired. Meets are usually opened two weeks before the deadline.
 </div>
 <div class="row">
     <div class="col-md-12">
-        <ngb-accordion activeIds="open">
-            <ngb-panel id="open" title="Open and Current Meets">
-                <ng-template ngbPanelContent>
 
-                    <app-meet-list-item *ngFor="let m of meets; let i = index"
-                        [meet]="m"
-                        [index]="i">
-                    </app-meet-list-item>
+        <div *ngIf="openMeets.length === 0" async>
+            There are currently no meets available for entry. Please check Future Meets or
+            try again later.
+        </div>
 
-                </ng-template>
-            </ngb-panel>
-            <ngb-panel id="upcoming" title="Upcoming Meets">
-                <ng-template ngbPanelContent>
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3
-                    wolf moon officia
-                    aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3
-                    wolf moon tempor,
-                    sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim
-                    keffiyeh helvetica,
-                    craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice
-                    lomo. Leggings
-                    occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of
-                    them accusamus
-                    labore sustainable VHS.
-                </ng-template>
-            </ngb-panel>
-            <ngb-panel id="past" title="Past Meets">
-                <ng-template ngbPanelContent>
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3
-                    wolf moon officia
-                    aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3
-                    wolf moon tempor,
-                    sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim
-                    keffiyeh helvetica,
-                    craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice
-                    lomo. Leggings
-                    occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of
-                    them accusamus
-                    labore sustainable VHS.
-                </ng-template>
-            </ngb-panel>
-        </ngb-accordion>
+        <app-meet-list-item *ngFor="let m of openMeets; let i = index"
+            [meet]="m"
+            [index]="i">
+        </app-meet-list-item>
+
     </div>
 </div>

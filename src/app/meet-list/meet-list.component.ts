@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {MeetService} from '../meet.service';
 import {Meet} from '../models/meet';
 
@@ -9,7 +9,9 @@ import {Meet} from '../models/meet';
 })
 export class MeetListComponent implements OnInit {
 
-    meets: Meet[];
+    openMeets: Meet[];
+    futureMeets: Meet[];
+    pastMeets: Meet[];
     meetSub;
 
     constructor(private meetService: MeetService) {
@@ -17,14 +19,14 @@ export class MeetListComponent implements OnInit {
 
     ngOnInit() {
 
-        this.meets = this.meetService.getMeets();
-
         this.meetSub = this.meetService.meetsChanged
             .subscribe((meets: Meet[]) => {
-            this.meets = meets;
-        });
+                this.openMeets = this.meetService.getOpenMeets();
+                this.futureMeets = this.meetService.getFutureMeets();
+                this.pastMeets = this.meetService.getPastMeets();
 
-        console.log('Meet List Component has: ' + this.meets);
+                console.log('Length: ' + this.openMeets.length);
+        });
 
     }
 

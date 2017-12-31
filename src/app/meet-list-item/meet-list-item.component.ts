@@ -25,35 +25,16 @@ export class MeetListItemComponent implements OnInit {
     getMeetDates(): string {
 
         let formattedDate = '';
-        let day1 = '';
-        let lastday = '';
+        let startdate = '';
+        let enddate = '';
 
-        this.meet.sessions.forEach(session => {
-                if (day1 === '') {
-                    day1 = session.date;
-                }
-
-                if (lastday === '') {
-                    lastday = session.date;
-                }
-
-                if (session.date < day1) {
-                    day1 = session.date;
-                }
-
-                if (session.date > lastday) {
-                    lastday = session.date;
-                }
-            }
-        );
-
-        if (day1 === lastday) {
-            formattedDate = moment(day1).format('dddd') + ' ' + moment(day1).format('LL');
+        if (startdate === enddate) {
+            formattedDate = moment(this.meet.startdate).format('dddd') + ' ' + moment(this.meet.startdate).format('LL');
         } else {
-            formattedDate = moment(day1).format('dddd') + ' '
-                + moment(day1).format('LL') + ' to '
-                + moment(lastday).format('dddd') + ' '
-                + moment(lastday).format('LL');
+            formattedDate = moment(this.meet.startdate).format('dddd') + ' '
+                + moment(this.meet.startdate).format('LL') + ' to '
+                + moment(this.meet.enddate).format('dddd') + ' '
+                + moment(this.meet.enddate).format('LL');
         }
 
         return(formattedDate);
@@ -63,10 +44,24 @@ export class MeetListItemComponent implements OnInit {
     // Returns pretty formatted deadline of meet
     getMeetDeadline(): string {
 
-        const formattedDeadline = moment(this.meet.close).format('dddd') + ' ' + moment(this.meet.close).format('LL');
+        const formattedDeadline = moment(this.meet.deadline).format('dddd') + ' ' + moment(this.meet.deadline).format('LL');
 
         return(formattedDeadline);
 
+    }
+
+    // Determines whether meet is open or not
+    isOpen(): boolean {
+
+        const closedstart = moment(this.meet.deadline, 'YYYY-MM-DD', true).add(1, 'days');
+
+        if (moment() >= closedstart) {
+            return false;
+        } else {
+            if (this.meet.status === 1) {
+                return true;
+            }
+        }
     }
 
 }

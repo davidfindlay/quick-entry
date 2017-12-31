@@ -6,22 +6,22 @@ import {Event} from "./event";
 
 export class Meet {
 
-    private id;
-    private meetname;
-    private startdate;
-    private enddate;
-    private deadline;
-    private contactname;
-    private contactemail;
-    private contactphone;
-    private meetfee;
-    private mealfee;
-    private location;
-    private status;
-    private maxevents;
-    private mealsincluded;
-    private mealname;
-    private massagefee;
-    private programfee;
-
+    public id;
+    public meetname;
+    public startdate;
+    public enddate;
+    public deadline;
+    public contactname;
+    public contactemail;
+    public contactphone;
+    public meetfee;
+    public mealfee;
+    public location;
+    public status;
+    public maxevents;
+    public mealsincluded;
+    public mealname;
+    public massagefee;
+    public programfee;
+    public events: Event[];
 }

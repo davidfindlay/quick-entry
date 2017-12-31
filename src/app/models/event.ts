@@ -5,11 +5,13 @@
 export class Event {
 
     private id: number;
-    private session: number;
     private type: string;
-    private course: string;
-    private strokecode: string;
     private discipline: string;
+    private legs: string;
     private distance: string;
+    private prognumber: string;
+    private progsuffix: string;
+    private eventfee: string;
+    private deadline: string;
 
 }
