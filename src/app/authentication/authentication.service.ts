@@ -7,8 +7,8 @@ import {TokenStorage} from './token.service';
 import {Router} from '@angular/router';
 import {NgxSpinnerService} from 'ngx-spinner';
 import * as jwt_decode from 'jwt-decode';
-import {EnvironmentSpecificService} from "../environment-specific.service";
-import {EnvSpecific} from "../models/env-specific";
+import {EnvironmentSpecificService} from '../environment-specific.service';
+import {EnvSpecific} from '../models/env-specific';
 
 interface AccessData {
   access: string;
