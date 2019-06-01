@@ -1,4 +1,4 @@
-export class MemberDetails {
+export class MembershipDetails {
 
   // Field for determining if this is a third party entry
 

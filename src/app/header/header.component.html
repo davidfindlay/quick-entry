@@ -5,12 +5,12 @@
             [attr.aria-expanded]="!isExpanded">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand" href="#">Quick Entry</a>
+    <a class="navbar-brand" routerLink="">Quick Entry</a>
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault" [ngbCollapse]="!isExpanded">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-link" routerLink="">Home</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" routerLink="login" *ngIf="!users">Log In</a>

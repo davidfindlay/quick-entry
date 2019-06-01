@@ -10,8 +10,6 @@ import {Meet} from '../models/meet';
 export class MeetListComponent implements OnInit {
 
     openMeets: Meet[];
-    futureMeets: Meet[];
-    pastMeets: Meet[];
     meetSub;
 
     constructor(private meetService: MeetService) {
@@ -19,15 +17,33 @@ export class MeetListComponent implements OnInit {
 
     ngOnInit() {
 
+        let openMeets: Meet[];
+
+        if (openMeets = this.meetService.getOpenMeets()) {
+            this.openMeets = openMeets;
+            this.sortMeets();
+        }
+
         this.meetSub = this.meetService.meetsChanged
             .subscribe((meets: Meet[]) => {
                 this.openMeets = this.meetService.getOpenMeets();
-                this.futureMeets = this.meetService.getFutureMeets();
-                this.pastMeets = this.meetService.getPastMeets();
-
-                console.log('Length: ' + this.openMeets.length);
+              this.sortMeets();
         });
 
     }
+
+  sortMeets() {
+    this.openMeets.sort(this.dateCompare);
+  }
+
+  dateCompare(a, b) {
+    if (a.deadline < b.deadline) {
+      return 1;
+    }
+    if (a.deadline > b.deadline) {
+      return -1;
+    }
+    return 0;
+  }
 
 }

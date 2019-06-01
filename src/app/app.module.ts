@@ -2,6 +2,8 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {EnvironmentSpecificResolver} from './environment-specific-resolver';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import {Routes,
     RouterModule} from '@angular/router';
@@ -18,20 +20,30 @@ import { EntryDetailsComponent } from './entry-details/entry-details.component';
 import { EntryConfirmComponent } from './entry-confirm/entry-confirm.component';
 import { InfoCardComponent } from './info-card/info-card.component';
 import { LoginComponent } from './login/login.component';
-import {AuthenticationService} from "./authentication.service";
-import {AuthGuard} from "./guards/auth.guard";
-import {UserService} from "./user.service";
-import {BaseRequestOptions, HttpModule} from "@angular/http";
 
 import { ConfirmCancelComponent } from './confirm-cancel/confirm-cancel.component';
 import { WorkflowNavComponent } from './workflow-nav/workflow-nav.component';
-import {TokenInterceptor} from "./token.interceptor";
+import {AuthenticationModule} from './authentication';
+import {AuthenticationService} from "./authentication.service";
+import {UserService} from "./user.service";
+import {EntryService} from "./entry.service";
+import {EnvironmentSpecificService} from "./environment-specific.service";
+import { MembershipClubDetailsComponent } from './membership-club-details/membership-club-details.component';
+import { ClassificationMedicalDetailsComponent } from './classification-medical-details/classification-medical-details.component';
+import { EntryPaymentComponent } from './entry-payment/entry-payment.component';
+import { EntryConfirmationComponent } from './entry-confirmation/entry-confirmation.component';
+import { EntryDetailsEventComponent } from './entry-details-event/entry-details-event.component';
+import { EventSelectCheckboxComponent } from './event-select-checkbox/event-select-checkbox.component';
 
 const appRoutes: Routes = [
-    { path: '', component: MeetListComponent },
+    { path: '', component: MeetListComponent, resolve: { envSpecific: EnvironmentSpecificResolver } },
     { path: 'login', component: LoginComponent },
-    { path: 'enter', component: EntrantDetailsComponent },
-    { path: 'enter-step2', component: EntryDetailsComponent},
+    { path: 'enter/:meet/step1', component: EntrantDetailsComponent },
+    { path: 'enter/:meet/step2', component: MembershipClubDetailsComponent},
+  { path: 'enter/:meet/step3', component: ClassificationMedicalDetailsComponent},
+  { path: 'enter/:meet/step4', component: EntryDetailsComponent},
+  { path: 'enter/:meet/step5', component: EntryPaymentComponent},
+  { path: 'enter/:meet/confirmation', component: EntryConfirmationComponent},
     { path: '**', component: MeetListComponent }
 ];
 
@@ -47,29 +59,32 @@ const appRoutes: Routes = [
         InfoCardComponent,
         LoginComponent,
         ConfirmCancelComponent,
-        WorkflowNavComponent
+        WorkflowNavComponent,
+        MembershipClubDetailsComponent,
+        ClassificationMedicalDetailsComponent,
+        EntryPaymentComponent,
+        EntryConfirmationComponent,
+        EntryDetailsEventComponent,
+        EventSelectCheckboxComponent
     ],
     entryComponents: [ ConfirmCancelComponent ],
     imports: [
         BrowserModule,
         FormsModule,
+      FontAwesomeModule,
         ReactiveFormsModule,
         NgbModule.forRoot(),
         RouterModule.forRoot(appRoutes),
         HttpClientModule,
-        HttpModule
+        AuthenticationModule
     ],
     providers: [
+      EnvironmentSpecificService,
+      EnvironmentSpecificResolver,
         MeetService,
-        AuthGuard,
-        AuthenticationService,
         UserService,
-        BaseRequestOptions,
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: TokenInterceptor,
-            multi: true
-        }
+        AuthenticationService,
+        EntryService
     ],
     bootstrap: [AppComponent]
 })

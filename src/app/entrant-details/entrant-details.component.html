@@ -1,26 +1,86 @@
-<h1>Step 1</h1>
+<h1>Enter {{meetName}}</h1>
 <h2>Entrant Details</h2>
+
+<form [formGroup]="inlineLoginForm">
+    <fieldset class="qe-fieldset" *ngIf="isAnonymousEntry">
+
+        <div class="card mb-3 bg-info text-white">
+            <div class="card-body">
+                <div class="card-text">
+                    <p>
+                        If you have an MSQ Quick Entry or MSQ Entry Manager account, please
+                        Log In, so your personal details can be automatically added
+                        to your entry.
+                    </p>
+                    <p>
+                        If you don't have an account you can enter without one or you
+                        can register for an account.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" (click)="showLogin()"
+                    *ngIf="!displayLoginForm && isAnonymousEntry">Log In (optional)</button>
+        </div>
+
+        <div *ngIf="displayLoginForm">
+
+            <div class="form-group">
+                <div class="row">
+                    <label class="form-control-label col-sm-2" for="loginUsername">Username:</label>
+                    <input class="form-control col-sm-6" type="text" formControlName="loginUsername" id="loginUsername"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <label class="form-control-label col-sm-2" for="loginPassword">Password:</label>
+                    <input class="form-control col-sm-6" type="password" formControlName="loginPassword" id="loginPassword"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" (click)="login()">Log In</button>
+                <button type="submit" class="btn btn-secondary" (click)="cancelLogin()">Cancel</button>
+            </div>
+
+        </div>
+
+
+    </fieldset>
+</form>
 <form [formGroup]="entrantDetailsForm">
     <fieldset class="qe-fieldset">
-        <app-info-card>
-            We need this information so we can contact you if there are any issues or questions about the
-            entry you are lodging.
-        </app-info-card>
+        <div class="card mb-3 bg-info text-white">
+            <div class="card-body">
+                <div class="card-text">
+                    <p>
+                        You can lodge an entry on behalf of yourself or someone else.
+                    </p>
+                    <p>
+                        If you are lodging an entry for someone else, please ensure you fill out the
+                        "Your Details" section so we can contact you if we need to.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <div class="form-group row">
-            <legend class="col-form-legend col-sm-2">Is this entry for you or for someone else?</legend>
-            <div class="col-sm-9">
+            <p class="col-form-legend col-md-6">Is this entry for you or for someone else?
+                (required) </p>
+            <div class="col-md-6">
                 <div class="form-check">
                     <label for="who-me">
                         <input class="form-check-label" type="radio"
-                               id="who-me" value="who_me"
-                               formControlName="who" checked/>
+                               id="who-me" value="me"
+                               formControlName="who" />
                         Me
                     </label>
                 </div>
                 <div class="form-check">
                     <label for="who-else">
                         <input class="form-check-label" type="radio"
-                               id="who-else" value="who_else"
+                               id="who-else" value="else"
                                formControlName="who"/>
                         Someone else
                     </label>
@@ -28,67 +88,86 @@
             </div>
         </div>
     </fieldset>
-    <fieldset class="qe-fieldset" *ngIf="entrantDetailsForm.value.who === 'who_else'">
-        <h3>
-          Your Details
-        </h3>
-        <div class="card qe-info">
-            We need this information so we can contact you if there are any issues or questions about the
-            entry you are lodging.
-        </div>
-        <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="user-firstname">First Name:</label>
-            <input class="form-control col-sm-6" type="text" formControlName="user_firstname" id="user-firstname"/>
-        </div>
-        <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="user-surname">Surname:</label>
-            <input class="form-control col-sm-6" type="text" formControlName="user_surname" id="user-surname"/>
-        </div>
-        <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="user-email">Email:</label>
-            <input class="form-control col-sm-6" type="text" formControlName="user_email" id="user-email"/>
-        </div>
-        <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="user-phone">Phone:</label>
-            <input class="form-control col-sm-6" type="text" formControlName="user_phone" id="user-phone"/>
-        </div>
-
-    </fieldset>
-    <fieldset class="qe-fieldset">
+    <fieldset class="qe-fieldset" *ngIf="isAnonymousEntry || isThirdPartyEntry">
         <h3>
           Entrant Details
         </h3>
-        <div class="card qe-info">
-            We need this information so we can contact the entrant, keep event records and to
-            put the entrant into the correct competition age group.
+        <div class="card mb-3 bg-info text-white">
+            <div class="card-body">
+                <p class="card-text" *ngIf="!isThirdPartyEntry">
+                    We need this information so we can contact you, keep event records and to
+                    put you into the correct competition age group.
+                </p>
+                <p class="card-text" *ngIf="isThirdPartyEntry">
+                    We need this information so we can contact the entrant, keep event records and to
+                    put the entrant into the correct competition age group.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <label class="form-control-label col-sm-2" for="entrantFirstName">First Name (required):</label>
+                <input class="form-control col-sm-6" type="text" formControlName="entrantFirstName"
+                       id="entrantFirstName" required/>
+            </div>
+            <div class="row justify-content-end no-gutters">
+                <div class="col-sm-10">
+                    <div class="card mb-3 bg-warning validation-msg" *ngIf="isInvalid('entrantFirstName')">
+                        First name must be supplied.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+            <label class="form-control-label col-sm-2" for="entrantSurname">Surname (required):</label>
+            <input class="form-control col-sm-6" type="text" formControlName="entrantSurname" id="entrantSurname"/>
+            </div>
+            <div class="row justify-content-end no-gutters">
+                <div class="col-sm-10">
+                    <div class="card mb-3 bg-warning validation-msg" *ngIf="isInvalid('entrantSurname')">
+                        Surname must be supplied.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+            <label class="form-control-label col-sm-2" for="entrantEmail">Email (required):</label>
+            <input class="form-control col-sm-8" type="text" formControlName="entrantEmail" id="entrantEmail"/>
+            </div>
+            <div class="row justify-content-end no-gutters">
+                <div class="col-sm-10">
+                    <div class="card mb-3 bg-warning validation-msg" *ngIf="isInvalid('entrantEmail')">
+                        Email address must be supplied
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+            <label class="form-control-label col-sm-2" for="entrantPhone">Phone (required):</label>
+            <input class="form-control col-sm-6" type="text" formControlName="entrantPhone" id="entrantPhone"/>
+            </div>
+            <div class="row justify-content-end no-gutters">
+                <div class="col-sm-10">
+                    <div class="card mb-3 bg-warning validation-msg" *ngIf="isInvalid('entrantPhone')">
+                        Phone number must be supplied
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="entrant-firstname">First Name:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="entrant_firstname" id="entrant-firstname"/>
-        </div>
-        <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="entrant-surname">Surname:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="entrant_surname" id="entrant-surname"/>
-        </div>
-        <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="entrant-email">Email:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="entrant_email" id="entrant-email"/>
-        </div>
-        <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="entrant-phone">Phone:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="entrant_phone" id="entrant-phone"/>
-        </div>
-        <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="entrant-dob">Date of Birth:</label>
-            <input class="form-control col-sm-4" type="text" formControlName="entrant_dob" id="entrant-dob"/>
+            <label class="form-control-label col-sm-2" for="entrantDob">Date of Birth (dd/mm/yyyy) (required):</label>
+            <input class="form-control col-sm-4" type="date" formControlName="entrantDob" id="entrantDob"/>
         </div>
 
         <div class="row">
-            <legend class="col-form-legend col-sm-2">Sex:</legend>
+            <p class="col-form-legend col-sm-2">Sex (required):</p>
             <div class="col-sm-10">
                 <div class="form-check">
                     <label for="entrant-male">
-                        <input class="form-check-label" type="radio" formControlName="entrant_gender" id="entrant-male"
+                        <input class="form-check-label" type="radio" formControlName="entrantGender" id="entrant-male"
                                value="male"
                                checked/>
                         Male
@@ -96,7 +175,7 @@
                 </div>
                 <div class="form-check col-sm10">
                     <label for="entrant-female">
-                        <input class="form-check-label" type="radio" formControlName="entrant_gender" id="entrant-female"
+                        <input class="form-check-label" type="radio" formControlName="entrantGender" id="entrant-female"
                                value="female"
                                />
                         Female
@@ -107,129 +186,136 @@
 
     </fieldset>
 
-    <fieldset class="qe-fieldset">
+    <fieldset class="qe-fieldset" id="sectionYourDetails" *ngIf="isThirdPartyEntry">
+        <h3>
+            Your Details
+        </h3>
+        <div class="card mb-3 bg-info text-white">
+            <div class="card-body">
+                <p class="card-text">
+                    We need this information so we can contact you if there are any issues or questions
+                    about the entry you are lodging.
+                </p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="userFirstName">First Name (required):</label>
+            <input class="form-control col-sm-6" type="text" formControlName="userFirstName" id="userFirstName"/>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="userSurname">Surname (required):</label>
+            <input class="form-control col-sm-6" type="text" formControlName="userSurname" id="userSurname"/>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="userEmail">Email (required):</label>
+            <input class="form-control col-sm-6" type="text" formControlName="userEmail" id="userEmail"/>
+        </div>
+        <div class="form-group row">
+            <label class="form-control-label col-sm-2" for="userPhone">Phone (required):</label>
+            <input class="form-control col-sm-6" type="text" formControlName="userPhone" id="userPhone"/>
+        </div>
+
+    </fieldset>
+
+    <fieldset class="qe-fieldset" *ngIf="isAnonymousEntry || isThirdPartyEntry">
         <h3>
             Emergency Contact Details
         </h3>
-        <div class="card qe-info">
-            We need this information in case of a medical emergency, so we can contact an appropriate
-            person on your behalf
+        <div class="card mb-3 bg-info text-white">
+            <div class="card-body">
+                <p class="card-text" *ngIf="isAnonymousEntry && !isThirdPartyEntry">
+                    We need this information in case of a medical emergency, so we can contact an appropriate
+                    person on your behalf
+                </p>
+                <p class="card-text" *ngIf="isThirdPartyEntry">
+                    We need this information in case of a medical emergency, so we can contact an appropriate
+                    person on behalf of the entrant.
+                </p>
+            </div>
         </div>
         <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="emergency-firstname">First Name:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="emergency_firstname" id="emergency-firstname"/>
+            <label class="form-control-label col-sm-2" for="emergencyFirstName">First Name (required):</label>
+            <input class="form-control col-sm-10" type="text" formControlName="emergencyFirstName" id="emergencyFirstName"/>
         </div>
         <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="emergency-surname">Surname:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="emergency_surname" id="emergency-surname"/>
+            <label class="form-control-label col-sm-2" for="emergencySurname">Surname (required):</label>
+            <input class="form-control col-sm-10" type="text" formControlName="emergencySurname" id="emergencySurname"/>
         </div>
         <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="emergency-email">Email:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="emergency_email" id="emergency-email"/>
+            <label class="form-control-label col-sm-2" for="emergencyEmail">Email:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="emergencyEmail" id="emergencyEmail"/>
         </div>
         <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="emergency-phone">Phone:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="emergency_phone" id="emergency-phone"/>
+            <label class="form-control-label col-sm-2" for="emergencyPhone">Phone (required):</label>
+            <input class="form-control col-sm-10" type="text" formControlName="emergencyPhone" id="emergencyPhone"/>
         </div>
 
     </fieldset>
+</form>
 
-    <fieldset class="qe-fieldset">
-
-        <h3>Multiclass</h3>
-        <div class="card qe-info">
-            <p>
-                If you are a Multi Class swimmer with a classification, please select your classification. If
-                you do not already have a classification you will need apply for one before you can enter an
-                event as a Multi Class swimmer.
-            </p>
-            <p>
-                If you do not know what this means, please leave the default option of "No Classification"
-                selected.
-            </p>
-        </div>
-        <div class="form-group row">
-            <label class="form-control-label col-sm-2" for="entrant_classification">Classification:</label>
-            <select class="form-control col-sm-4" id="entrant_classification" formControlName="entrant_classification">
-                <option value="">No Classification</option>
-            </select>
-        </div>
-
-    </fieldset>
-
-    <fieldset class="qe-fieldset">
+<form [formGroup]="inlineRegisterForm">
+    <fieldset class="qe-fieldset" *ngIf="isAnonymousEntry">
         <h3>
-            Masters Membership Details
+            Register an Account (Optional)
         </h3>
-        <div class="form-group row">
-            <legend class="col-form-legend col-sm-2">Member Type:</legend>
-            <div class="col-sm-8">
-                <div class="form-check">
-                    <label for="member-type-msa">
-                        <input class="form-check-label" type="radio" formControlName="member_type" id="member-type-msa" value="msa"
-                               checked/>
-                        Masters Swimming Australia member
-                    </label>
-                </div>
-                <div class="form-check">
-                    <label for="member-type-im">
-                        <input class="form-check-label" type="radio" formControlName="member_type" id="member-type-im"
-                               value="international" />
-                        International Masters Swimming Member
-                    </label>
-                </div>
-                <div class="form-check">
-                    <label for="member-type-guest">
-                        <input class="form-check-label" type="radio" formControlName="member_type" id="member-type-guest"
-                               value="guest"
-                               />
-                        Guest Swimmer
-                    </label>
-                </div>
-                <div class="form-check">
-                    <label for="member-type-non-member">
-                        <input class="form-check-label" type="radio" formControlName="member_type" id="member-type-non-member"
-                               value="non_member"
-                               />
-                        Non-Member
-                    </label>
+        <div class="card mb-3 bg-info text-white">
+            <div class="card-body">
+                <div class="card-tex">
+                    <p>
+                        If you create an account you won't have to enter your personal details every time
+                        you enter a meet.
+                    </p>
+                    <p>
+                        The details you've entered will be saved while you register.
+                    </p>
                 </div>
             </div>
         </div>
-        <div class="form-group row" *ngIf="entrantDetailsForm.value.member_type !== 'non_member'">
-            <label for="member-number" class="form-control-label col-sm-2">
-                Membership Number:
+      <div class="form-group row">
+        <p class="col-form-legend col-md-6">Do you want to register an account?
+          (optional) </p>
+        <div class="col-md-6">
+          <div class="form-check">
+            <label for="registerYes">
+              <input class="form-check-label" type="radio"
+                     id="registerYes" value="yes"
+                     formControlName="register" />
+              Yes
             </label>
-            <input type="text" class="form-control col-sm-4" id="member-number" formControlName="member_number" />
+          </div>
+          <div class="form-check">
+            <label for="registerNo">
+              <input class="form-check-label" type="radio"
+                     id="registerNo" value="no"
+                     formControlName="register"/>
+              No
+            </label>
+          </div>
         </div>
-    </fieldset>
-
-    <fieldset class="qe-fieldset">
-        <h3>
-            Club Details
-        </h3>
+      </div>
+      <div *ngIf="entrantDetailsForm.value.register === 'yes'">
+      <div class="form-group row">
+            <label for="usernameRegister" class="form-control-label col-sm-2">Username:</label>
+            <input class="form-control col-sm-10" type="text" formControlName="usernameRegister" id="usernameRegister" value="{{usernameRegister}}" />
+        </div>
         <div class="form-group row">
-            <label for="not-affiliated" class="form-control-label col-sm-2">I am not associated with a club: </label>
-            <input class="form-control col-sm-10" type="checkbox" formControlName="not_affiliated" id="not-affiliated"ß/>
+            <label for="password" class="form-control-label col-sm-2">Password:</label>
+            <input class="form-control col-sm-10" type="password" formControlName="password" id="password"/>
         </div>
-
-        <div *ngIf="!entrantDetailsForm.value.not_affiliated">
-          <div class="form-group row">
-            <label for="club-name" class="form-control-label col-sm-2">Club Name:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="club_name" id="club-name"/>
-          </div>
-          <div class="form-group row">
-            <label for="club-code" class="form-control-label col-sm-2">Club Code:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="club_code" id="club-code"/>
-          </div>
-          <div class="form-group row">
-            <label for="club-country" class="form-control-label col-sm-2">Club Country:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="club_country" id="club-country"/>
-          </div>
+        <div class="form-group row">
+            <label for="confirmpassword" class="form-control-label col-sm-2">Confirm Password:</label>
+            <input class="form-control col-sm-10" type="password" formControlName="confirmpassword" id="confirmpassword"/>
         </div>
+        <div class="form-group">
+            <p>
+                <button type="submit" class="btn btn-primary" routerLink="/register">Register</button>
+            </p>
+        </div>
+      </div>
 
     </fieldset>
-
-  <app-workflow-nav next="/enter-step2"></app-workflow-nav>
-
 </form>
+
+  <app-workflow-nav next="/enter/{{meet_id}}/step2" [nextActivated]="formValidSubject.asObservable()" (submitEvent)="onSubmit($event)"></app-workflow-nav>
+
+

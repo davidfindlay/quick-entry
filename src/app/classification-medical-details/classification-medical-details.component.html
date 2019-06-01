@@ -1,0 +1,231 @@
+<h1>Enter {{meetName}}</h1>
+<h2>Disability and Medical Details</h2>
+
+<form [formGroup]="medicalDetailsForm">
+
+  <fieldset class="qe-fieldset">
+
+    <h3>Disability Classification</h3>
+
+    <div class="card mb-3 bg-info text-white">
+      <div class="card-body">
+        <p>
+          If you are a swimmer with a disabiity classification, please select your classification. If
+          you do not already have a classification you will need apply for one before you can enter an
+          event as a disabled swimmer.
+        </p>
+        <p>
+          If you do not know what this means, please leave the default option of "No Classification"
+          selected.
+        </p>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-form-legend col-md-6">Do you have a Classification?
+        (required)
+      </label>
+      <div class="col-md-6">
+        <div class="form-check">
+          <label for="classification_no">
+            <input class="form-check-label" type="radio"
+                   id="classification_no" value="no"
+                   formControlName="classification"/>
+            No Classification
+          </label>
+        </div>
+        <div class="form-check">
+          <label for="classification_provisional">
+            <input class="form-check-label" type="radio"
+                   id="classification_provisional" value="provisional"
+                   formControlName="classification"/>
+            Provisional Classification
+          </label>
+        </div>
+        <div class="form-check">
+          <label for="classification_approved">
+            <input class="form-check-label" type="radio"
+                   id="classification_approved" value="classified"
+                   formControlName="classification"/>
+            Approved Classification
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf="medicalDetailsForm.value.classification !== 'no'">
+      <label for="class-freestyle" class="form-control-label col-sm-6">Freestyle, Butterfly, Backstroke Class: </label>
+      <select id="class-freestyle" class="form-control col-sm-6" formControlName="classFreestyle">
+        <option value="S1">S1</option>
+        <option value="S2">S2</option>
+        <option value="S3">S3</option>
+        <option value="S4">S4</option>
+        <option value="S5">S5</option>
+        <option value="S6">S6</option>
+        <option value="S7">S7</option>
+        <option value="S8">S8</option>
+        <option value="S9">S9</option>
+        <option value="S10">S10</option>
+        <option value="S11">S11</option>
+        <option value="S12">S12</option>
+        <option value="S13">S13</option>
+        <option value="S14">S14</option>
+        <option value="S15">S15</option>
+      </select>
+    </div>
+    <div class="form-group row" *ngIf="medicalDetailsForm.value.classification !== 'no'">
+    <label for="class-breaststroke" class="form-control-label col-sm-6">Breaststroke Class: </label>
+    <select id="class-breaststroke" class="form-control col-sm-6" formControlName="classBreaststroke">
+      <option value="SB1">SB1</option>
+      <option value="SB2">SB2</option>
+      <option value="SB3">SB3</option>
+      <option value="SB4">SB4</option>
+      <option value="SB5">SB5</option>
+      <option value="SB6">SB6</option>
+      <option value="SB7">SB7</option>
+      <option value="SB8">SB8</option>
+      <option value="SB9">SB9</option>
+      <option value="SB10">SB10</option>
+      <option value="SB11">SB11</option>
+      <option value="SB12">SB12</option>
+      <option value="SB13">SB13</option>
+      <option value="SB14">SB14</option>
+      <option value="SB15">SB15</option>
+    </select>
+  </div>
+    <div class="form-group row" *ngIf="medicalDetailsForm.value.classification !== 'no'">
+      <label for="class-medley" class="form-control-label col-sm-6">Individual Medley Class: </label>
+      <select id="class-medley" class="form-control col-sm-6" formControlName="classMedley">
+        <option value="SM1">SM1</option>
+        <option value="SM2">SM2</option>
+        <option value="SM3">SM3</option>
+        <option value="SM4">SM4</option>
+        <option value="SM5">SM5</option>
+        <option value="SM6">SM6</option>
+        <option value="SM7">SM7</option>
+        <option value="SM8">SM8</option>
+        <option value="SM9">SM9</option>
+        <option value="SM10">SM10</option>
+        <option value="SM11">SM11</option>
+        <option value="SM12">SM12</option>
+        <option value="SM13">SM13</option>
+        <option value="SM14">SM14</option>
+        <option value="SM15">SM15</option>
+      </select>
+    </div>
+
+  </fieldset>
+
+  <fieldset class="qe-fieldset">
+
+    <h3>Medical</h3>
+
+    <div class="card mb-3 bg-info text-white">
+      <div class="card-body">
+        <div class="card-text">
+          <p>
+            If you have a medical condition that may affect your swimming please declare it here. Medical conditions
+            we need to know about are conditions that may affect your ability to swim a stroke according to the rules
+            or which may be important to your safety.
+          </p>
+          <p>
+            Please note this information will be provided to the Meet Director, the referees and other meet officials
+            for the purpose of correctly judging your stroke and for safety purposes.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-form-legend col-sm-6">Do you have a medical condition that affects your swimming technique?
+      (Not covered by a disability classification)</label>
+      <div class="col-sm-6">
+        <div class="form-check">
+          <label for="medical-dispensation-no">
+            <input class="form-check-label" type="radio" formControlName="dispensation" id="medical-dispensation-no" value="false"
+                   checked/>
+            No
+          </label>
+        </div>
+        <div class="form-check">
+          <label for="medical-dispensation-yes">
+            <input class="form-check-label" type="radio" formControlName="dispensation" id="medical-dispensation-yes"
+                   value="true" />
+            Yes
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group row" *ngIf="medicalDetailsForm.value.dispensation === 'true'">
+      <label class="col-form-legend col-sm-6">Do you have a medical certificate for this condition?</label>
+      <div class="col-sm-6">
+        <div class="form-check">
+          <label for="medical-certificate-no">
+            <input class="form-check-label" type="radio" formControlName="medicalCertificate" id="medical-certificate-no" value="false"
+                   checked/>
+            No
+          </label>
+        </div>
+        <div class="form-check">
+          <label for="medical-certificate-yes">
+            <input class="form-check-label" type="radio" formControlName="medicalCertificate" id="medical-certificate-yes"
+                   value="true" />
+            Yes
+          </label>
+        </div>
+
+      </div>
+    </div>
+    <div class="row justify-content-end no-gutters" *ngIf="hasMedicalCert">
+      <div class="col-sm-10">
+        <div class="card mb-3 bg-info text-white">
+          Please bring your medical certificate to present to the Meet Referee.
+        </div>
+      </div>
+    </div>
+
+    <div class="row justify-content-end no-gutters" *ngIf="noMedicalCert">
+      <div class="col-sm-10">
+        <div class="card mb-3 bg-info text-white">
+          A medical certificate is usually required for a technique dispensation. Please contact the Meet Director or
+          Meet Referee to discuss your condition.
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-form-legend col-sm-6">Do you have a medical condition that may affect your health and safety at
+        the meet?</label>
+      <div class="col-sm-6">
+        <div class="form-check">
+          <label for="medical-condition-no">
+            <input class="form-check-label" type="radio" formControlName="medicalCondition" id="medical-condition-no" value="false"
+                   checked/>
+            No
+          </label>
+        </div>
+        <div class="form-check">
+          <label for="medical-condition-yes">
+            <input class="form-check-label" type="radio" formControlName="medicalCondition" id="medical-condition-yes"
+                   value="true" />
+            Yes
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group" *ngIf="medicalDetailsForm.value.medicalCondition === 'true'">
+      <div class="row">
+        <label for="member-number" class="form-control-label col-sm-4">
+          Medical Condition Details
+          (required):
+        </label>
+        <textarea class="form-control col-sm-8" rows="4" id="member-number" formControlName="medicalDetails"></textarea>
+      </div>
+    </div>
+
+  </fieldset>
+
+  <app-workflow-nav next="/enter/{{meet_id}}/step4" previous="/enter/{{meet_id}}/step2"
+                    [nextActivated]="formValidSubject.asObservable()" (submitEvent)="onSubmit($event)"></app-workflow-nav>
+
+</form>

@@ -2,18 +2,18 @@
  * Created by david on 7/9/17.
  */
 
-export class Event {
+export class MeetEvent {
 
-    private id: number;
-    private meet_id: number;
-    private type: string;
-    private discipline: string;
-    private legs: string;
-    private distance: string;
-    private eventname: string;
-    private prognumber: string;
-    private progsuffix: string;
-    private eventfee: string;
-    private deadline: string;
+    id: number;
+    meet_id: number;
+    type: string;
+    discipline: string;
+    legs: string;
+    distance: string;
+    eventname: string;
+    prognumber: string;
+    progsuffix: string;
+    eventfee: string;
+    deadline: string;
 
 }

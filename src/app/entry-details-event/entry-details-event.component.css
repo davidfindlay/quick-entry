@@ -1,0 +1,22 @@
+.eventNumber {
+  font-size: xx-large;
+  text-align: center;
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+.eventName {
+  font-size: x-large;
+  font-weight: bold;
+}
+
+.eventSelect {
+  font-size: xx-large;
+  text-align: center;
+  font-weight: bold;
+}
+
+.eventSelect input {
+  margin-top: 0;
+  padding-top: 0;
+}

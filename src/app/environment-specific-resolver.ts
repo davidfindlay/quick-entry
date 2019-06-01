@@ -6,7 +6,7 @@ import { EnvironmentSpecificService } from './environment-specific.service';
 import {Injectable} from '@angular/core';
 
 @Injectable()
-export class EnvironmentSpecficResolver implements Resolve<EnvSpecific> {
+export class EnvironmentSpecificResolver implements Resolve<EnvSpecific> {
   constructor(private envSpecificSvc: EnvironmentSpecificService, private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<EnvSpecific> {

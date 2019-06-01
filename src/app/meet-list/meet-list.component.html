@@ -1,14 +1,19 @@
 <div class="row">
     <h1>Available Meets</h1>
 </div>
-<div class="card qe-info">
-    Here's a list of all the meets currently open for entries. If you can't see the meet you're intending to enter,
-    check that the deadline hasn't expired. Meets are usually opened two weeks before the deadline.
+<div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+        <p class="card-text">
+            Here's a list of all the meets currently open for entries. If you can't see the
+            meet you're intending to enter,
+            check that the deadline hasn't expired. Meets are usually opened two weeks before the deadline.
+        </p>
+    </div>
 </div>
 <div class="row">
     <div class="col-md-12">
 
-        <div *ngIf="openMeets.length === 0" async>
+        <div *ngIf="openMeets && openMeets.length === 0">
             There are currently no meets available for entry. Please check Future Meets or
             try again later.
         </div>

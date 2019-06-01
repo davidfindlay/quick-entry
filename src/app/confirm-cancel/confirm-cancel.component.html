@@ -1,0 +1,15 @@
+<div class="modal-header">
+  <h5 class="modal-title">Cancel Entry?</h5>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <p>Cancelling will lose the information you've filled into this entry.</p>
+  <p>Are you sure you wish to cancel?</p>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="yes()">Yes</button>
+  <button type="button" class="btn btn-success" (click)="no()">No</button>
+</div>
+

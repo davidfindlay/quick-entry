@@ -1,11 +1,55 @@
-<h1>Step 2</h1>
+<h1>Step 4</h1>
 <h2>Entry Details</h2>
-<form>
+<form [formGroup]="entryDetailsForm">
+
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <h4 class="card-title">
+        Entry Instructions
+      </h4>
+      <p class="card-text">
+        Please check the rules for the meet shown below. Select the checkbox beside each event you wish to enter.
+      </p>
+      <p class="card-text">
+        Most events will require you to provide a seed time, which is the time you expect to achieve in the event. This
+        seed time will be used to put you in a heat with swimmers who expect to swim a similar time. You may supply your
+        own time, or if you have swum in previous MSQ meets you can click one of the preset options:
+      </p>
+      <ul>
+        <li>PB: This automatically loads your age group Personal Best time for this event</li>
+        <li>LT: This automatically loads the last time you swam in the event</li>
+        <li>Other options are available by clicking the arrow</li>
+      </ul>
+      <p class="card-text">
+        If you supply no time you'll be placed in the slowest heat of the event. Note: you can supply a seed time even
+        if
+        it's the first time you've competed in this event. Just choose a time you've recorded in training.
+      </p>
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <h4 class="card-title">
+        Meet Rules:
+      </h4>
+      <p class="card-text">
+        You may enter 5 events.
+      </p>
+    </div>
+  </div>
 
   <fieldset class="qe-fieldset">
 
+      <div *ngFor="let e of meetEvents; let i = index">
+        <app-entry-details-event [meetEvent]="e" [index]="i">
+        </app-entry-details-event>
+      </div>
+
   </fieldset>
 
-  <app-workflow-nav next="/enter-step3" previous="/enter"></app-workflow-nav>
+  <app-workflow-nav next="/enter/{{meet_id}}/step3" previous="/enter/{{meet_id}}/step1"
+                    [nextActivated]="formValidSubject.asObservable()"
+                    (submitEvent)="onSubmit($event)"></app-workflow-nav>
 
 </form>

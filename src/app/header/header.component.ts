@@ -5,6 +5,7 @@ import {UserService} from '../user.service';
 import {AuthenticationService} from '../authentication.service';
 import {Subscription} from 'rxjs/Subscription';
 import {Http, Headers, RequestOptions, Response} from '@angular/http';
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-header',
@@ -17,8 +18,7 @@ export class HeaderComponent implements OnInit {
   users: User;
   userSubscription: Subscription;
 
-  constructor(private http: Http,
-              private userService: UserService,
+  constructor(private userService: UserService,
               private authenticationService: AuthenticationService) {
   }
 

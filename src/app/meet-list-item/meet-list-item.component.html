@@ -8,19 +8,12 @@
     </div>
   </div>
   <div class="card-body">
-
-    <div class="eventlist" *ngIf="meet.events.length > 0">
-      <h3>Event List:</h3>
-
-      <div class="container">
-        <ul class="list-group row">
-          <li class="list-group-item col-4" *ngFor="let e of this.meet.events; let i = index ">
-            <span class="badge badge-primary badge-pill">{{e.prognumber}}{{e.progsuffix}}</span>
-            {{e.distance}} {{e.discipline}}
-          </li>
-        </ul>
-      </div>
-
+    <div class="location">
+      <h3>Location:</h3>
+      <p>
+        <a href="https://maps.google.com/?q={{meet.location}}" target="_blank">{{meet.location}}
+          <i class="fa fa-external-link" aria-hidden="true"></i></a>
+      </p>
     </div>
 
     <div class="contact">
@@ -32,16 +25,19 @@
         </tr>
         <tr>
           <th>Phone: </th>
-          <td><a href="tel:{{meet.contactphone}}">{{meet.contactphone}}</a></td>
+          <td><a href="tel:{{meet.phone.phonenumber}}">{{meet.phone.phonenumber}}</a></td>
         </tr>
         <tr>
           <th>Email: </th>
-          <td><a href="mailto:{{meet.contactemail}}">{{meet.contactemail}}</a></td>
+          <td><a href="mailto:{{meet.email.address}}">{{meet.email.address}}</a></td>
         </tr>
       </table>
     </div>
 
-    <button type="button" class="btn btn-primary" routerLink="enter" *ngIf="isOpen()">Enter Meet</button>
+    <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen()">Enter Meet</button>
+    <div class="card" *ngIf="!isOpen()">
+      This meet is not yet open. Please try again later.
+    </div>
   </div>
   <div class="card-footer">
     <span *ngIf="isOpen()">

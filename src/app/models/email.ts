@@ -1,7 +1,5 @@
-export class Phone {
+export class Email {
     public id;
-    public phonetype;
-    public countrycode;
-    public areacode;
-    public phonenumber;
+    public emailtype;
+    public address;
 }
