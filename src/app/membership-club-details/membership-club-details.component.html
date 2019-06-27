@@ -386,11 +386,12 @@
         </div>
         <div class="form-group row">
           <label for="club-name" class="form-control-label col-sm-2">Club Name:</label>
-          <input class="form-control col-sm-10" type="text" formControlName="club_name" id="club-name"/>
+          <input class="form-control col-sm-10" type="text" formControlName="club_name" id="club-name"
+                 [ngbTypeahead]="clubSearch" (selectItem)="clubSelected($event)" />
         </div>
         <div class="form-group row">
           <label for="club-code" class="form-control-label col-sm-2">Club Code:</label>
-          <input class="form-control col-sm-10" type="text" formControlName="club_code" id="club-code"/>
+          <input class="form-control col-sm-2" type="text" formControlName="club_code" id="club-code"/>
         </div>
       </div>
 

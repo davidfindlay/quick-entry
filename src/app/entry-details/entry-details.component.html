@@ -39,17 +39,24 @@
     </div>
   </div>
 
-  <fieldset class="qe-fieldset">
-
-      <div *ngFor="let e of meetEvents; let i = index">
+  <div class="card">
+    <div class="card-header">
+      <h2>Event List</h2>
+    </div>
+    <div class="card-body">
+      <div *ngFor="let e of this.meet.events; let i = index">
         <app-entry-details-event [meetEvent]="e" [index]="i">
         </app-entry-details-event>
       </div>
+    </div>
+  </div>
 
-  </fieldset>
+  <app-entry-details-totals [meetId]="meet_id"></app-entry-details-totals>
 
   <app-workflow-nav next="/enter/{{meet_id}}/step3" previous="/enter/{{meet_id}}/step1"
                     [nextActivated]="formValidSubject.asObservable()"
                     (submitEvent)="onSubmit($event)"></app-workflow-nav>
 
 </form>
+
+

@@ -4,8 +4,6 @@ import {User} from '../models/user';
 import {UserService} from '../user.service';
 import {AuthenticationService} from '../authentication.service';
 import {Subscription} from 'rxjs/Subscription';
-import {Http, Headers, RequestOptions, Response} from '@angular/http';
-import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-header',

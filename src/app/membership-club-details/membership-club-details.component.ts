@@ -9,7 +9,13 @@ import {Meet} from "../models/meet";
 import {EntrantDetails} from "../models/entrant-details";
 import {MembershipDetails} from "../models/membership-details";
 import {EntryService} from "../entry.service";
-import {Subject} from "rxjs";
+import {Observable, Subject} from "rxjs";
+import {debounceTime, map, pluck} from "rxjs/operators";
+import {distinctUntilChanged} from "rxjs/operators";
+import {ClubsService} from "../clubs.service";
+import {debuglog} from "util";
+import {tap} from "rxjs/internal/operators/tap";
+import {concatMap} from "rxjs-compat/operator/concatMap";
 
 @Component({
   selector: 'app-membership-club-details',
@@ -25,6 +31,8 @@ export class MembershipClubDetailsComponent implements OnInit {
   meetName: string;
   memberDetailsForm: FormGroup;
 
+  clubs: string[];
+
   isThirdPartyEntry = false;
   isAnonymousEntry = true;
   isGuestEntry = false;
@@ -36,6 +44,13 @@ export class MembershipClubDetailsComponent implements OnInit {
   currentMemberships;
   previousMemberships;
 
+  clubSearch = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term.length < 2 ? [] : this.clubsService.findClubName(term)),
+    );
+
   constructor(private fb: FormBuilder,
               private route: ActivatedRoute,
               private router: Router,
@@ -43,13 +58,16 @@ export class MembershipClubDetailsComponent implements OnInit {
               private userService: UserService,
               private meetService: MeetService,
               private entryService: EntryService,
-              private authenticationService: AuthenticationService) {
+              private authenticationService: AuthenticationService,
+              private clubsService: ClubsService) {
     location.onPopState(() => {
 
       console.log('back pressed');
 
     });
   }
+
+
 
   ngOnInit() {
     this.createForm();
@@ -61,6 +79,26 @@ export class MembershipClubDetailsComponent implements OnInit {
       this.meetName = this.meet.meetname;
     }
 
+    const existingEntry = this.getExistingEntry();
+
+    if (existingEntry != null) {
+      console.log('Got existing entry');
+      console.log(existingEntry);
+      this.memberDetailsForm.patchValue(existingEntry);
+    }
+
+  }
+
+  getExistingEntry() {
+    const entry = this.entryService.getEntry(this.meet_id);
+    console.log(entry);
+    if (entry !== undefined && entry !== null) {
+      const membershipDetails = entry.membershipDetails;
+      if (membershipDetails !== undefined && membershipDetails != null) {
+        return membershipDetails;
+      }
+    }
+    return null;
   }
 
   createForm() {
@@ -118,5 +156,18 @@ export class MembershipClubDetailsComponent implements OnInit {
     console.log(memberDetails);
 
     this.entryService.setMemberDetails(this.meet_id, memberDetails);
+  }
+
+  clubSelected($event) {
+    let clubcode = '';
+    const clubs = this.clubsService.findClub($event.item);
+
+    if (clubs != null) {
+      if (clubs.length > 0) {
+        clubcode = clubs[0].code;
+      }
+    }
+
+    this.memberDetailsForm.controls['club_code'].patchValue(clubcode, {});
   }
 }

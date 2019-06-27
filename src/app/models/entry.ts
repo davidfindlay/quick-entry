@@ -110,7 +110,7 @@ export class Entry {
     this._entrantDetails = value;
   }
 
-  get memberershipDetails(): MembershipDetails {
+  get membershipDetails(): MembershipDetails {
     return this._membershipDetails;
   }
 

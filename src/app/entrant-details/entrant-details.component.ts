@@ -9,7 +9,7 @@ import {AuthenticationService} from '../authentication.service';
 import {Entry} from '../models/entry';
 import {EntryService} from '../entry.service';
 import {EntrantDetails} from '../models/entrant-details';
-import {Subject} from "rxjs";
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-entrant-details',
@@ -65,6 +65,8 @@ export class EntrantDetailsComponent implements OnInit {
     this.formValidSubject.next(false);
 
     this.meet_id = +this.route.snapshot.paramMap.get('meet');
+    this.meetService.loadMeetDetails(this.meet_id);
+
     this.meet = this.meetService.getMeet(this.meet_id);
 
     if (this.meet) {
@@ -78,6 +80,15 @@ export class EntrantDetailsComponent implements OnInit {
     console.log('Meet: ' + this.meetName);
 
     this.createForm();
+
+    const existingEntry = this.getExistingEntry();
+
+    if (existingEntry != null) {
+      console.log('Got existing entry');
+      console.log(existingEntry);
+      this.entrantDetailsForm.patchValue(existingEntry);
+      this.entrantDetailsForm.updateValueAndValidity();
+    }
 
     if (this.authenticationService.getUser() == null) {
       this.isAnonymousEntry = true;
@@ -119,6 +130,18 @@ export class EntrantDetailsComponent implements OnInit {
 
     });
 
+  }
+
+  getExistingEntry() {
+    const entry = this.entryService.getEntry(this.meet_id);
+    console.log(entry);
+    if (entry !== undefined && entry !== null) {
+      const entrantDetails = entry.entrantDetails;
+      if (entrantDetails !== undefined && entrantDetails != null) {
+        return entrantDetails;
+      }
+    }
+    return null;
   }
 
   loadMembershipData() {

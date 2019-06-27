@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InfoCardComponent } from './info-card.component';
+import { SeedtimeHelperComponent } from './seedtime-helper.component';
 
-describe('InfoCardComponent', () => {
-  let component: InfoCardComponent;
-  let fixture: ComponentFixture<InfoCardComponent>;
+describe('SeedtimeHelperComponent', () => {
+  let component: SeedtimeHelperComponent;
+  let fixture: ComponentFixture<SeedtimeHelperComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ InfoCardComponent ]
+      declarations: [ SeedtimeHelperComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(InfoCardComponent);
+    fixture = TestBed.createComponent(SeedtimeHelperComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

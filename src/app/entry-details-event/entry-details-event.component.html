@@ -1,23 +1,23 @@
 <div class="card card-block mb-3" [formGroup]="eventEntryForm">
-  <div class="row  align-items-center no-gutters">
+  <div class="row align-items-center no-gutters">
     <div class="col-md-2 h-100 eventSelect">
       <button type="button" [className]="enterClass" (click)="clickEnter()" (mouseenter)="mouseEnter()"
-              (mouseleave)="mouseLeave()" id="btnEnter">
-        <fa-icon [icon]="btnIconClass"></fa-icon> {{enterText}}</button>
+              (mouseleave)="mouseLeave()" id="btnEnter" aria-label="eventAriaLabel">
+        <fa-icon [icon]="btnIconClass" *ngIf="btnIconClass != null"></fa-icon>
+        {{enterText}}</button>
     </div>
     <div class="col-md-1 eventNumber h-100">
       {{meetEvent.prognumber}}
     </div>
     <div class="col-md-9 h-100">
       <div class="card-body">
-        <label for="event_{{meetEvent.id}}" class="form-check-label">
           <span class="eventName">
-          <span *ngIf="meetEvent.legs && meetEvent.legs">{{meetEvent.legs}}x</span>{{meetEvent.distance}} {{meetEvent.discipline}}
+          <span *ngIf="meetEvent.legs > 1">{{meetEvent.legs}}x</span>{{meetEvent.distance}}
+            {{meetEvent.discipline}}
             </span>
-          <br/>{{meetEvent.type}}
-        </label>
+        <br/>{{meetEvent.type}}
 
-        <div class="card mb-3 bg-info text-white" *ngIf="meetEvent.type === 'Mixed Postal' && eventSelected()">
+        <div class="card mb-3 bg-info text-white" *ngIf="meetEvent.type.includes('Postal') && eventSelected()">
           <div class="card-body">
             <p class="card-text">
               No seed time is required for this event. Please ensure you lodge a postal form
@@ -35,13 +35,26 @@
           </div>
         </div>
 
-        <div class="input-group" *ngIf="eventSelected() && meetEvent.type === 'Seeded Individual Mixed Timed Finals'">
-          <label for="event_{{meetEvent.id}}_seedtime" class="col-sm-2 col-form-label">Seed Time:</label>
-          <input type="text" class="form-control col-sm-4" id="event_{{meetEvent.id}}_seedtime" formControlName="seedtime">
-          <div class="input-group-append">
-            <button class="btn btn-outline-info">PB</button>
-            <button class="btn btn-outline-info">LT</button>
-            <button class="btn btn-outline-info">More</button>
+        <div class="form-group row mt-2"
+             *ngIf="eventSelected() && meetEvent.type.includes('Finals')">
+
+          <label for="seedTime" class="col-sm-3 col-form-label">Seed Time:</label>
+
+          <div class="input-group col-sm-9">
+            <input type="text" class="form-control" id="seedTime" formControlName="seedTime"
+                   ngbTooltip triggers="manual" #seedTimeTip="ngbTooltip" placement="bottom"
+                   (blur)="fixSeedTime()">
+            <div class="input-group-append">
+              <button class="btn btn-outline-info" placement="bottom" ngbTooltip="Personal Best"
+                      (click)="clickPersonalBest()" *ngIf="historyAvailable">PB
+              </button>
+              <button class="btn btn-outline-info" placement="bottom" ngbTooltip="Last Result Time"
+                      (click)="clickLastTime()" *ngIf="historyAvailable">LT
+              </button>
+              <button class="btn btn-outline-info" placement="bottom" ngbTooltip="More Options"
+                      (click)="clickMore()">More
+              </button>
+            </div>
           </div>
         </div>
 
@@ -49,4 +62,3 @@
     </div>
   </div>
 </div>
-

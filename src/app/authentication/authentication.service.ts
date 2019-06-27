@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {tap, map, switchMap, catchError, timeout} from 'rxjs/operators';
 import { AuthService } from 'ngx-auth';
@@ -9,6 +8,7 @@ import {NgxSpinnerService} from 'ngx-spinner';
 import * as jwt_decode from 'jwt-decode';
 import {EnvironmentSpecificService} from '../environment-specific.service';
 import {EnvSpecific} from '../models/env-specific';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 
 interface AccessData {
   access: string;

@@ -1,0 +1,9 @@
+.eventTotals {
+  font-size: x-large;
+  font-weight: bold;
+}
+
+#eventTotalCard {
+  position: fixed;
+  bottom: 20px;
+}

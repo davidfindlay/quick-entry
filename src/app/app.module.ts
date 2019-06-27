@@ -18,22 +18,25 @@ import { MeetListItemComponent } from './meet-list-item/meet-list-item.component
 import { EntrantDetailsComponent } from './entrant-details/entrant-details.component';
 import { EntryDetailsComponent } from './entry-details/entry-details.component';
 import { EntryConfirmComponent } from './entry-confirm/entry-confirm.component';
-import { InfoCardComponent } from './info-card/info-card.component';
 import { LoginComponent } from './login/login.component';
 
 import { ConfirmCancelComponent } from './confirm-cancel/confirm-cancel.component';
 import { WorkflowNavComponent } from './workflow-nav/workflow-nav.component';
 import {AuthenticationModule} from './authentication';
-import {AuthenticationService} from "./authentication.service";
-import {UserService} from "./user.service";
-import {EntryService} from "./entry.service";
-import {EnvironmentSpecificService} from "./environment-specific.service";
+import {AuthenticationService} from './authentication.service';
+import {UserService} from './user.service';
+import {EntryService} from './entry.service';
+import {EnvironmentSpecificService} from './environment-specific.service';
 import { MembershipClubDetailsComponent } from './membership-club-details/membership-club-details.component';
 import { ClassificationMedicalDetailsComponent } from './classification-medical-details/classification-medical-details.component';
 import { EntryPaymentComponent } from './entry-payment/entry-payment.component';
 import { EntryConfirmationComponent } from './entry-confirmation/entry-confirmation.component';
 import { EntryDetailsEventComponent } from './entry-details-event/entry-details-event.component';
 import { EventSelectCheckboxComponent } from './event-select-checkbox/event-select-checkbox.component';
+import { TimePipe } from './time.pipe';
+import { SeedtimeHelperComponent } from './seedtime-helper/seedtime-helper.component';
+import {NgxDatatableModule} from '@swimlane/ngx-datatable';
+import { EntryDetailsTotalsComponent } from './entry-details-totals/entry-details-totals.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent, resolve: { envSpecific: EnvironmentSpecificResolver } },
@@ -56,7 +59,6 @@ const appRoutes: Routes = [
         EntrantDetailsComponent,
         EntryDetailsComponent,
         EntryConfirmComponent,
-        InfoCardComponent,
         LoginComponent,
         ConfirmCancelComponent,
         WorkflowNavComponent,
@@ -65,26 +67,31 @@ const appRoutes: Routes = [
         EntryPaymentComponent,
         EntryConfirmationComponent,
         EntryDetailsEventComponent,
-        EventSelectCheckboxComponent
+        EventSelectCheckboxComponent,
+        TimePipe,
+        SeedtimeHelperComponent,
+        EntryDetailsTotalsComponent
     ],
-    entryComponents: [ ConfirmCancelComponent ],
-    imports: [
-        BrowserModule,
-        FormsModule,
-      FontAwesomeModule,
-        ReactiveFormsModule,
-        NgbModule.forRoot(),
-        RouterModule.forRoot(appRoutes),
-        HttpClientModule,
-        AuthenticationModule
-    ],
+    entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    FontAwesomeModule,
+    ReactiveFormsModule,
+    NgbModule.forRoot(),
+    RouterModule.forRoot(appRoutes),
+    HttpClientModule,
+    AuthenticationModule,
+    NgxDatatableModule
+  ],
     providers: [
       EnvironmentSpecificService,
       EnvironmentSpecificResolver,
         MeetService,
         UserService,
         AuthenticationService,
-        EntryService
+        EntryService,
+      TimePipe
     ],
     bootstrap: [AppComponent]
 })

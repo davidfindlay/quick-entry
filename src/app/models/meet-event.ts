@@ -10,6 +10,8 @@ export class MeetEvent {
     discipline: string;
     legs: string;
     distance: string;
+    metres: number;
+    course: string;
     eventname: string;
     prognumber: string;
     progsuffix: string;

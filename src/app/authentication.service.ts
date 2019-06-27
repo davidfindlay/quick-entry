@@ -1,14 +1,13 @@
 import {Injectable} from '@angular/core';
-import {Http, Headers, Response} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Subject} from 'rxjs/Subject';
 import {User} from './models/user';
 import { AuthService } from 'ngx-auth';
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
-import {EnvironmentSpecificService} from "./environment-specific.service";
-import {EnvSpecific} from "./models/env-specific";
+import {HttpClient, HttpErrorResponse, HttpResponse} from '@angular/common/http';
+import {EnvironmentSpecificService} from './environment-specific.service';
+import {EnvSpecific} from './models/env-specific';
 
 
 @Injectable()
@@ -46,13 +45,13 @@ export class AuthenticationService implements AuthService {
   login(username: string, password: string): Observable<boolean> {
     return this.http.post(this.api + 'auth/login',
         JSON.stringify({username: username, password: password}))
-        .map((response: Response) => {
+        .map((response: any) => {
         // Login successful if there's a JWT in the response
             console.log(response);
 
 
-        const token = response.json() && response.json().token;
-        const user = response.json() && response.json().user;
+        const token = response.token;
+        const user = response.user;
 
         if (token) {
           // Set token

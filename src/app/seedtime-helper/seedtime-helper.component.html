@@ -1,0 +1,125 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">{{distance}} {{course}} {{discipline}}</h4>
+  <button type="button" class="close" aria-label="Close" (click)="clickCancel()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <h4 class="card-title">
+        Seed Times
+      </h4>
+      <p class="card-text">
+        Your seed time should be the time you expect to swim in this event. Your seed time or entry time is used to
+        place you in a heat with other competitors who expect to swim a similar time to you.
+      </p>
+      <p class="card-text">
+        You can enter your own time, or choose from a list of personal bests and recent result times from your MSA
+        Results Portal records.
+      </p>
+    </div>
+  </div>
+
+  <form [formGroup]="seedTimeForm">
+    <div class="card">
+      <div class="card-header">
+        <h4>
+          Enter a time
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col" id="hoursInput" *ngIf="showHours">
+            <label for="hours">Hours:</label>
+            <input type="text" id="hours" class="form-control" formControlName="hours" />
+          </div>
+          <div class="col">
+            <label for="minutes">Minutes:</label>
+            <input type="text" id="minutes" class="form-control" formControlName="minutes" />
+          </div>
+          <div class="col">
+            <label for="seconds">Seconds:</label>
+            <input type="text" id="seconds" class="form-control" formControlName="seconds" />
+          </div>
+          <div class="col">
+            <label for="millis">Milliseconds:</label>
+            <input type="text" id="millis" class="form-control" formControlName="millis" placeholder="00"/>
+          </div>
+        </div>
+        <div class="row p-1 m-1">
+          <strong>Formatted Time:</strong>
+          {{formattedTime}}
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="card" *ngIf="historyAvailable">
+    <div class="card-header">
+      <h4>
+        Select a Previous Time:
+      </h4>
+    </div>
+    <div class="card-body">
+      <ngb-tabset>
+        <ngb-tab title="Personal Bests">
+          <ng-template ngbTabContent>
+<ngx-datatable [rows]="pbRows" [columns]="cols" limit="5" [selected]="selectedPb" [selectionType]="'single'" (select)='onSelect($event)'>
+  <ngx-datatable-column name="Date">
+    <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+     {{row['event_date'] | date: 'd/L/yyyy'}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Age Group">
+    <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+      {{row['age_min']}} - {{row['age_max']}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Location">
+    <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+      {{row['location']}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Time">
+    <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+      {{row['seconds'] | time}}
+    </ng-template>
+  </ngx-datatable-column>
+</ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+        <ngb-tab>
+          <ng-template ngbTabTitle>Recent Results</ng-template>
+          <ng-template ngbTabContent>
+            <ngx-datatable [rows]="recentRows" [columns]="cols" limit="5" [selected]="selectedRecent" [selectionType]="'single'" (select)='onSelect($event)'>
+              <ngx-datatable-column name="Date">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                  {{row['event_date'] | date: 'd/L/yyyy'}}
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Age Group">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                  {{row['age_min']}} - {{row['age_max']}}
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Location">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                  {{row['location']}}
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Time">
+                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                  {{row['seconds'] | time}}
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+      </ngb-tabset>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" (click)="clickUseTime()">Use this time</button>
+  <button class="btn btn-danger" (click)="clickCancel()">Cancel</button>
+</div>
