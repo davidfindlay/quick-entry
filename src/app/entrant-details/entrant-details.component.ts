@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {PlatformLocation} from '@angular/common';
 import {UserService} from '../user.service';
 import {Subscription} from 'rxjs/Subscription';
@@ -9,7 +9,8 @@ import {AuthenticationService} from '../authentication.service';
 import {Entry} from '../models/entry';
 import {EntryService} from '../entry.service';
 import {EntrantDetails} from '../models/entrant-details';
-import {Subject} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
+import {Behavior} from "popper.js";
 
 @Component({
   selector: 'app-entrant-details',
@@ -18,7 +19,7 @@ import {Subject} from 'rxjs';
 })
 export class EntrantDetailsComponent implements OnInit {
 
-  private formValidSubject: Subject<boolean> = new Subject<boolean>();
+  private formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   meet_id: number;
   meet;
@@ -84,10 +85,7 @@ export class EntrantDetailsComponent implements OnInit {
     const existingEntry = this.getExistingEntry();
 
     if (existingEntry != null) {
-      console.log('Got existing entry');
-      console.log(existingEntry);
       this.entrantDetailsForm.patchValue(existingEntry);
-      this.entrantDetailsForm.updateValueAndValidity();
     }
 
     if (this.authenticationService.getUser() == null) {
@@ -134,7 +132,6 @@ export class EntrantDetailsComponent implements OnInit {
 
   getExistingEntry() {
     const entry = this.entryService.getEntry(this.meet_id);
-    console.log(entry);
     if (entry !== undefined && entry !== null) {
       const entrantDetails = entry.entrantDetails;
       if (entrantDetails !== undefined && entrantDetails != null) {

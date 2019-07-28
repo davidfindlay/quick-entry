@@ -27,6 +27,7 @@ export class EntryService {
   }
 
   getEntry(meetId: number) {
+    console.log(this.entries);
     if (this.entries) {
       return this.entries.find(x => x.meetId === meetId, 10);
     }
@@ -35,7 +36,7 @@ export class EntryService {
 
   loadSavedEntries() {
     // TODO: load entries from local storage
-
+    this.entries = JSON.parse(localStorage.getItem('entries'));
   }
 
   setMemberDetails(meetId: number, membershipDetails: MembershipDetails) {

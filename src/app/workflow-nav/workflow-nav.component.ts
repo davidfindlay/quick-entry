@@ -3,7 +3,7 @@ import {PlatformLocation} from '@angular/common';
 import {Router} from '@angular/router';
 import {ConfirmCancelComponent} from '../confirm-cancel/confirm-cancel.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {Observable} from "rxjs";
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-workflow-nav',
@@ -25,6 +25,7 @@ export class WorkflowNavComponent implements OnInit {
 
   ngOnInit() {
     this.nextActivated.subscribe((nextActivate) => {
+      console.log('Activate Next');
       this.btnNextDisable = !nextActivate;
     });
   }

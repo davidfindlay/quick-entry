@@ -146,4 +146,8 @@ export class SeedtimeHelperComponent implements OnInit {
   onSelect(event) {
     console.log(event);
   }
+
+  onActivate(event) {
+    console.log(event);
+  }
 }

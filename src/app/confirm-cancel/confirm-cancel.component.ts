@@ -15,17 +15,17 @@ export class ConfirmCancelComponent implements OnInit {
   }
 
   close() {
-    console.log("close click");
+    console.log('close click');
     this.activeModal.dismiss();
   }
 
   yes() {
-    console.log("yes click");
+    console.log('yes click');
     this.activeModal.close('yes');
   }
 
   no() {
-    console.log("no click");
+    console.log('no click');
     this.activeModal.dismiss();
   }
 }
