@@ -38,10 +38,10 @@ export class MeetListComponent implements OnInit {
 
   dateCompare(a, b) {
     if (a.deadline < b.deadline) {
-      return 1;
+      return -1;
     }
     if (a.deadline > b.deadline) {
-      return -1;
+      return 1;
     }
     return 0;
   }

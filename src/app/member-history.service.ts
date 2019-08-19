@@ -36,6 +36,7 @@ export class MemberHistoryService {
       const historyDownload = this.getHistory(member_no);
       if (historyDownload !== undefined && historyDownload !== null) {
         historyDownload.subscribe((results: any[]) => {
+          console.log('Got history and stored it');
           this.storeResults(results);
         });
       }
@@ -76,6 +77,7 @@ export class MemberHistoryService {
     this.historyDownloading = false;
     this.results = storeResults;
     this.resultsAvailable.next(true);
+    console.log(this.results);
   }
 
   isHistoryAvailable(member_no: number, distance: number, discipline: string, course?: string): boolean {

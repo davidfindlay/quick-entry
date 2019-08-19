@@ -25,7 +25,6 @@ export class WorkflowNavComponent implements OnInit {
 
   ngOnInit() {
     this.nextActivated.subscribe((nextActivate) => {
-      console.log('Activate Next');
       this.btnNextDisable = !nextActivate;
     });
   }

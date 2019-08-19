@@ -136,7 +136,7 @@ export class MeetService {
 
         // Is the deadline expired?
         if (moment() < closedstart) {
-          if (meet.status === 1) {
+          if (meet.status === 1 || meet.status === 2) {
             meetsArray.push(meet);
           }
         }

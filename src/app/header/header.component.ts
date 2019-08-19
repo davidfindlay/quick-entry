@@ -16,6 +16,8 @@ export class HeaderComponent implements OnInit {
   users: User;
   userSubscription: Subscription;
 
+  isExpanded = false;
+
   constructor(private userService: UserService,
               private authenticationService: AuthenticationService) {
   }

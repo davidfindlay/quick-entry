@@ -70,8 +70,6 @@ export class ClassificationMedicalDetailsComponent implements OnInit {
     });
 
     // Set initial value
-    console.log(this.medicalDetailsForm.valid);
-
     if (this.medicalDetailsForm.valid) {
       this.formValidSubject.next(true);
     } else {

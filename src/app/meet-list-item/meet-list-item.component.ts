@@ -59,7 +59,7 @@ export class MeetListItemComponent implements OnInit {
         if (moment() >= closedstart) {
             return false;
         } else {
-            if (this.meet.status === 1) {
+            if (this.meet.status === 1 || this.meet.status === 2) {
                 return true;
             }
         }
