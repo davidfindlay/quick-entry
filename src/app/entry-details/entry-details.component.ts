@@ -16,7 +16,7 @@ import {Entry} from "../models/entry";
 })
 export class EntryDetailsComponent implements OnInit {
 
-  private formValidSubject: Subject<boolean> = new Subject<boolean>();
+  public formValidSubject: Subject<boolean> = new Subject<boolean>();
 
     entryDetailsForm: FormGroup;
 
