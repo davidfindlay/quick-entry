@@ -23,14 +23,17 @@ export class MeetService {
     console.log(this.envSpecificSvc);
 
     if (this.envSpecificSvc.envSpecific == null) {
+      console.log('Requesting environment load');
       this.envSpecificSvc.loadEnvironment();
 
       this.envSpecificSvc.subscribe(this, () => {
+        console.log('Got environment');
         this.api = this.envSpecificSvc.envSpecific.api;
         this.init();
       });
 
     } else {
+      console.log('Already should have environment');
       this.api = this.envSpecificSvc.envSpecific.api;
       this.init();
     }
@@ -44,18 +47,23 @@ export class MeetService {
 
     const year = (new Date()).getFullYear();
 
-    this.http.get<Meet[]>(this.api + 'meets?year=' + year)
-      .subscribe(data => {
-          console.log('got meets');
-          this.meets = data;
-          this.meetsChanged.next(this.meets.slice());
-          // Store meet data
-          localStorage.setItem('meets', JSON.stringify(data));
-        },
-        err => {
-          console.log('Meet service error:');
-          console.log(err);
-        });
+    if (this.api !== undefined && this.api !== null) {
+
+      this.http.get<Meet[]>(this.api + 'meets?year=' + year)
+        .subscribe(data => {
+            console.log('got meets');
+            this.meets = data;
+            this.meetsChanged.next(this.meets.slice());
+            // Store meet data
+            localStorage.setItem('meets', JSON.stringify(data));
+          },
+          err => {
+            console.log('Meet service error:');
+            console.log(err);
+          });
+    } else {
+      console.log('Can\'t update meets as environment is undefined or null');
+    }
 
   }
 

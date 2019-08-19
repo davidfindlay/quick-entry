@@ -1,52 +1,84 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Result} from "./models/result";
-import {Observable} from "rxjs";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 
 import * as moment from 'moment';
 import {of} from "rxjs/internal/observable/of";
+import {EnvironmentSpecificService} from "./environment-specific.service";
+import {EnvSpecific} from "./models/env-specific";
 
 @Injectable({
   providedIn: 'root'
 })
 export class MemberHistoryService {
 
+  private resultsPortal;
+
   private results: Result[];
+  private historyDownloading = false;
 
+  resultsAvailable = new BehaviorSubject<boolean>(false);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              private envSpecificSvc: EnvironmentSpecificService) {
+    envSpecificSvc.subscribe(this, this.setResultsPortal);
+  }
+
+  setResultsPortal(caller: any, es: EnvSpecific) {
+    const thisCaller = caller as MemberHistoryService;
+    thisCaller.resultsPortal = es.resultsPortal;
   }
 
   downloadHistory(member_no: number) {
-    this.http.get('http://localhost:8000/history/' + member_no + '/').subscribe((results: any[]) => {
-
-      const storeResults: Result[] = [];
-
-      results.forEach((result) => {
-        const resultObj = <Result>{
-          swimmer_name: result.swimmer_name,
-          age: result.age,
-          age_min: result.age_min,
-          age_max: result.age_max,
-          gender: result.gender,
-          club_code: result.club_code,
-          discipline: result.discipline,
-          msa_id: result.msa_id,
-          course: result.course === 'LC' ? 'LCM' : 'SCM',
-          final_time: result.final_time,
-          event_date: moment(result.event_date, 'DD.MM.YYYY').toDate(),
-          location: result.location,
-          seconds: parseFloat(result.seconds),
-          distance: parseInt(result.distance, 10)
-        };
-        storeResults.push(resultObj)
-      });
-
-      this.results = storeResults;
-    });
+    if (this.results === undefined || this.results === null || this.results.length === 0) {
+      console.log('downloadHistory of ' + member_no);
+      const historyDownload = this.getHistory(member_no);
+      if (historyDownload !== undefined && historyDownload !== null) {
+        historyDownload.subscribe((results: any[]) => {
+          this.storeResults(results);
+        });
+      }
+    }
   }
 
-  isHistoryAvailable(member_no: number, distance: number, discipline: string, course?: string): Observable<boolean> {
+  getHistory(member_no) {
+    if (this.historyDownloading) {
+      return;
+    } else {
+      this.historyDownloading = true;
+    }
+    return this.http.get( this.resultsPortal + 'history/' + member_no + '/');
+  }
+
+  storeResults(results) {
+    const storeResults: Result[] = [];
+
+    results.forEach((result) => {
+      const resultObj = <Result>{
+        swimmer_name: result.swimmer_name,
+        age: result.age,
+        age_min: result.age_min,
+        age_max: result.age_max,
+        gender: result.gender,
+        club_code: result.club_code,
+        discipline: result.discipline,
+        msa_id: result.msa_id,
+        course: result.course === 'LC' ? 'LCM' : 'SCM',
+        final_time: result.final_time,
+        event_date: moment(result.event_date, 'DD.MM.YYYY').toDate(),
+        location: result.location,
+        seconds: parseFloat(result.seconds),
+        distance: parseInt(result.distance, 10)
+      };
+      storeResults.push(resultObj);
+    });
+    this.historyDownloading = false;
+    this.results = storeResults;
+    this.resultsAvailable.next(true);
+  }
+
+  isHistoryAvailable(member_no: number, distance: number, discipline: string, course?: string): boolean {
     const matching = this.filterResults(distance, discipline, course);
 
     if (this.results === undefined || this.results === null) {
@@ -54,9 +86,9 @@ export class MemberHistoryService {
     }
 
     if (matching !== null && matching.length > 0) {
-      return of(true);
+      return true;
     } else {
-      return of(false);
+      return false;
     }
 
   }
@@ -166,7 +198,7 @@ export class MemberHistoryService {
       discipline = 'IM';
     }
 
-    console.log('Searching for last result in ' + distance + ' ' + course + ' ' + discipline + '.');
+    // console.log('Searching for last result in ' + distance + ' ' + course + ' ' + discipline + '.');
 
     if (this.results !== undefined && this.results !== null) {
 

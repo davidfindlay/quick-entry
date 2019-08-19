@@ -64,57 +64,43 @@
       <ngb-tabset>
         <ngb-tab title="Personal Bests">
           <ng-template ngbTabContent>
-<ngx-datatable [rows]="pbRows" [columns]="cols" limit="5"
-               [selected]="selectedPb" [selectionType]="'single'" (activate)="onActivate($event)" (select)='onSelect($event)'>
-  <ngx-datatable-column name="Date">
-    <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-     {{row['event_date'] | date: 'd/L/yyyy'}}
-    </ng-template>
-  </ngx-datatable-column>
-  <ngx-datatable-column name="Age Group">
-    <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-      {{row['age_min']}} - {{row['age_max']}}
-    </ng-template>
-  </ngx-datatable-column>
-  <ngx-datatable-column name="Location">
-    <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-      {{row['location']}}
-    </ng-template>
-  </ngx-datatable-column>
-  <ngx-datatable-column name="Time">
-    <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-      {{row['seconds'] | time}}
-    </ng-template>
-  </ngx-datatable-column>
-</ngx-datatable>
+            <table class="col-sm-12">
+              <thead>
+              <tr>
+                <th>Event Date</th>
+                <th>Age Group</th>
+                <th>Location</th>
+                <th>Time</th>
+              </tr>
+              </thead>
+              <tr *ngFor="let pb of pbRows" (click)="selectResultRow(pb.seconds)" class="resultRow">
+                <td>{{pb.event_date | date: 'dd/MM/yyyy'}}</td>
+                <td>{{pb.age_min}}-{{pb.age_max}}</td>
+                <td>{{pb.location}}</td>
+                <td>{{pb.seconds | time}}</td>
+              </tr>
+            </table>
           </ng-template>
         </ngb-tab>
         <ngb-tab>
           <ng-template ngbTabTitle>Recent Results</ng-template>
           <ng-template ngbTabContent>
-            <ngx-datatable [rows]="recentRows" [columns]="cols" limit="5" [selected]="selectedRecent"
-                           [selectionType]="'single'" (select)='onSelect($event)'>
-              <ngx-datatable-column name="Date">
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                  {{row['event_date'] | date: 'd/L/yyyy'}}
-                </ng-template>
-              </ngx-datatable-column>
-              <ngx-datatable-column name="Age Group">
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                  {{row['age_min']}} - {{row['age_max']}}
-                </ng-template>
-              </ngx-datatable-column>
-              <ngx-datatable-column name="Location">
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                  {{row['location']}}
-                </ng-template>
-              </ngx-datatable-column>
-              <ngx-datatable-column name="Time">
-                <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
-                  {{row['seconds'] | time}}
-                </ng-template>
-              </ngx-datatable-column>
-            </ngx-datatable>
+            <table class="col-sm-12">
+              <thead>
+              <tr>
+                <th>Event Date</th>
+                <th>Age Group</th>
+                <th>Location</th>
+                <th>Time</th>
+              </tr>
+              </thead>
+              <tr *ngFor="let pb of recentRows" (click)="selectResultRow(pb.seconds)" class="resultRow">
+                <td>{{pb.event_date | date: 'dd/MM/yyyy'}}</td>
+                <td>{{pb.age_min}}-{{pb.age_max}}</td>
+                <td>{{pb.location}}</td>
+                <td>{{pb.seconds | time}}</td>
+              </tr>
+            </table>
           </ng-template>
         </ngb-tab>
       </ngb-tabset>

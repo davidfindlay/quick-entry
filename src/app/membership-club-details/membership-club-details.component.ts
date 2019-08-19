@@ -1,21 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from "@angular/router";
 import {PlatformLocation} from "@angular/common";
 import {UserService} from "../user.service";
 import {MeetService} from "../meet.service";
-import {AuthenticationService} from "../authentication.service";
+import {AuthenticationService} from "../authentication/authentication.service";
 import {Meet} from "../models/meet";
-import {EntrantDetails} from "../models/entrant-details";
 import {MembershipDetails} from "../models/membership-details";
 import {EntryService} from "../entry.service";
-import {Observable, Subject} from "rxjs";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {debounceTime, map, pluck} from "rxjs/operators";
 import {distinctUntilChanged} from "rxjs/operators";
 import {ClubsService} from "../clubs.service";
-import {debuglog} from "util";
-import {tap} from "rxjs/internal/operators/tap";
-import {concatMap} from "rxjs-compat/operator/concatMap";
 
 @Component({
   selector: 'app-membership-club-details',
@@ -24,7 +20,7 @@ import {concatMap} from "rxjs-compat/operator/concatMap";
 })
 export class MembershipClubDetailsComponent implements OnInit {
 
-  private formValidSubject: Subject<boolean> = new Subject<boolean>();
+  private formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   meet_id: number;
   meet: Meet;
@@ -36,13 +32,17 @@ export class MembershipClubDetailsComponent implements OnInit {
   isThirdPartyEntry = false;
   isAnonymousEntry = true;
   isGuestEntry = false;
+  isMemberEntry = false;
 
   showMemberNumberField = true;
   showClubDetailsSection = true;
   showClubCountryField = false;
 
+  member;
   currentMemberships;
   previousMemberships;
+
+  currentEntry;
 
   clubSearch = (text$: Observable<string>) =>
     text$.pipe(
@@ -86,6 +86,27 @@ export class MembershipClubDetailsComponent implements OnInit {
       console.log(existingEntry);
       this.memberDetailsForm.patchValue(existingEntry);
     }
+
+    if (this.userService.isMember()) {
+      console.log('this is a member entry');
+      this.isMemberEntry = true;
+    }
+
+    this.currentEntry = this.entryService.getEntry(this.meet_id);
+
+    if (this.currentEntry.entrantDetails.who === 'else') {
+      this.isThirdPartyEntry = true;
+    }
+
+    if (this.userService.isMember()) {
+      this.isMemberEntry = true;
+
+      this.member = this.userService.getMember();
+      this.currentMemberships = this.userService.getCurrentMemberships();
+      this.previousMemberships = this.userService.getPreviousMemberships();
+    }
+
+    this.clubsService.loadClubs();
 
   }
 
@@ -135,6 +156,17 @@ export class MembershipClubDetailsComponent implements OnInit {
       }
     });
 
+    this.memberDetailsForm.controls['club_selector'].valueChanges.subscribe(val => {
+      const clubId = parseInt(val, 10);
+      const clubDetails = this.clubsService.getClubById(clubId);
+      if (clubDetails !== null) {
+        this.memberDetailsForm.patchValue({
+          club_code: clubDetails.code,
+          club_name: clubDetails.clubname
+        });
+      }
+    });
+
     // Supply initial values
     this.memberDetailsForm.patchValue({
       member_type: 'msa',
@@ -151,9 +183,28 @@ export class MembershipClubDetailsComponent implements OnInit {
   }
 
   onSubmit($event) {
-    console.log('onSubmit received event: ' + $event);
+    console.log($event);
+    switch ($event) {
+      case 'cancel':
+        this.entryService.deleteEntry(this.meet_id);
+        break;
+      case 'saveAndExit':
+        this.saveEntry();
+        break;
+      case 'submit':
+        this.saveEntry();
+        break;
+    }
+  }
+
+  saveEntry() {
+    console.log('Save Entry');
     const memberDetails: MembershipDetails = Object.assign({}, this.memberDetailsForm.value);
-    console.log(memberDetails);
+
+    if (this.userService.isLoggedIn() && ! this.isThirdPartyEntry) {
+      const member = this.userService.getMember();
+      memberDetails.member_number = member.number;
+    }
 
     this.entryService.setMemberDetails(this.meet_id, memberDetails);
   }

@@ -12,7 +12,7 @@ import {Subscription} from 'rxjs/Subscription';
 })
 export class HeaderComponent implements OnInit {
 
-    displayName: string;
+  displayName: string;
   users: User;
   userSubscription: Subscription;
 
@@ -22,11 +22,11 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
 
-      // Get initial state
-      this.users = this.userService.getUsers();
-      this.updateDisplayName();
+    // Get initial state
+    this.users = this.userService.getUsers();
+    this.updateDisplayName();
 
-      // Maintain state
+    // Maintain state
     this.userSubscription = this.userService.userChanged
       .subscribe((user: User) => {
         this.users = this.userService.getUsers();
@@ -45,15 +45,15 @@ export class HeaderComponent implements OnInit {
   }
 
   updateDisplayName() {
-      if (this.users) {
-          if (this.users.firstname !== '') {
-              this.displayName = this.users.firstname + ' ' + this.users.surname;
-          } else {
-              this.displayName = this.users.username;
-          }
+    if (this.users) {
+      if (this.users.firstname !== '') {
+        this.displayName = this.users.firstname + ' ' + this.users.surname;
       } else {
-          this.displayName = '';
+        this.displayName = this.users.username;
       }
+    } else {
+      this.displayName = '';
+    }
   }
 
 }

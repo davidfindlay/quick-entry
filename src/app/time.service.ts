@@ -5,8 +5,7 @@ import {Injectable} from '@angular/core';
 })
 export class TimeService {
 
-  static rewriteTimeEM(timeString: string): string {
-
+  static timeStringToSeconds(timeString) {
     let seconds;
 
     // Handle where user has separated with .'s instead of :
@@ -100,6 +99,13 @@ export class TimeService {
 
 
     }
+
+    return seconds;
+  }
+
+  static rewriteTimeEM(timeString: string): string {
+
+    const seconds = TimeService.timeStringToSeconds(timeString);
 
     let timeMin = Math.floor(seconds / 60);
     let timeHours = 0;

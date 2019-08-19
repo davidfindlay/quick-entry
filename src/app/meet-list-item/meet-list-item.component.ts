@@ -1,5 +1,6 @@
 import {Component, OnInit, Input} from '@angular/core';
 import * as moment from 'moment';
+import {EntryService} from "../entry.service";
 
 @Component({
     selector: 'app-meet-list-item',
@@ -12,7 +13,7 @@ export class MeetListItemComponent implements OnInit {
     @Input() meet;
     @Input() index: number;
 
-    constructor() {
+    constructor(private entryService: EntryService) {
     }
 
     ngOnInit() {
@@ -62,6 +63,17 @@ export class MeetListItemComponent implements OnInit {
                 return true;
             }
         }
+    }
+
+    hasEntry() {
+      const meetId = this.meet.id;
+      const entry = this.entryService.getEntry(meetId);
+
+      if (entry !== undefined && entry !== null) {
+        return true;
+      } else {
+        return false;
+      }
     }
 
 }

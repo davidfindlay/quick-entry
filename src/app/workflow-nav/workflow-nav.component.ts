@@ -36,7 +36,7 @@ export class WorkflowNavComponent implements OnInit {
       this.clickCancel();
     } else {
       this.router.navigate([this.previous]);
-        this.submitEvent.emit('submit');
+      this.submitEvent.emit('submit');
     }
   }
 
@@ -47,7 +47,7 @@ export class WorkflowNavComponent implements OnInit {
         console.log(result);
         if (result === 'yes') {
           this.router.navigate(['/']);
-            this.submitEvent.emit('cancel');
+          this.submitEvent.emit('cancel');
         }
       },
       (reason) => {
@@ -61,7 +61,8 @@ export class WorkflowNavComponent implements OnInit {
   }
 
   clickSaveAndExit() {
-
+    this.router.navigate(['/']);
+    this.submitEvent.emit('submit');
   }
 
 }

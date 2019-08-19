@@ -5,12 +5,12 @@ import {UserService} from '../user.service';
 import {Subscription} from 'rxjs/Subscription';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MeetService} from '../meet.service';
-import {AuthenticationService} from '../authentication.service';
+import {AuthenticationService} from '../authentication/authentication.service';
 import {Entry} from '../models/entry';
 import {EntryService} from '../entry.service';
 import {EntrantDetails} from '../models/entrant-details';
 import {BehaviorSubject, Subject} from 'rxjs';
-import {Behavior} from "popper.js";
+import {Behavior} from 'popper.js';
 
 @Component({
   selector: 'app-entrant-details',
@@ -34,9 +34,6 @@ export class EntrantDetailsComponent implements OnInit {
 
   member;
   memberSub: Subscription;
-
-  currentMemberships;
-  previousMemberships;
 
   usernameRegister;
 
@@ -99,35 +96,46 @@ export class EntrantDetailsComponent implements OnInit {
       this.isMemberEntry = true;
 
       this.member = this.userService.getMember();
-      this.currentMemberships = this.userService.getCurrentMemberships();
-      this.previousMemberships = this.userService.getPreviousMemberships();
     }
 
-    this.memberSub = this.userService.memberChanged.subscribe(member => {
+    // Get details from user account
+    if (this.userService.isLoggedIn()) {
+      this.prefillFromUser();
+    }
 
-      if (this.userService.isMember()) {
+  }
 
-        this.member = member;
-        this.currentMemberships = this.userService.getCurrentMemberships();
-        this.previousMemberships = this.userService.getPreviousMemberships();
+  prefillFromUser() {
+    const userDetails = this.userService.getUsers();
 
-        let firstMembership = 0;
+    let gender = '';
+    if (userDetails.gender === 'M') {
+      gender = 'male';
+    } else {
+      gender = 'female';
+    }
 
-        if (this.currentMemberships.length > 0) {
-          firstMembership = this.currentMemberships[0].club_id;
-        } else if (this.previousMemberships.length > 0) {
-          firstMembership = this.previousMemberships[0].club_id;
-        }
-
-        // Supply initial values
-        this.entrantDetailsForm.patchValue({
-          club_selector: firstMembership
-        });
-
-      }
-
-    });
-
+    if (this.entrantDetailsForm.controls.who.value === 'me') {
+      this.entrantDetailsForm.patchValue({
+        entrantFirstName: userDetails.firstname,
+        entrantSurname: userDetails.surname,
+        entrantDob: userDetails.dob,
+        entrantGender: gender,
+        entrantEmail: userDetails.email,
+        entrantPhone: userDetails.phone,
+        emergencyFirstName: userDetails.emergency_firstname,
+        emergencySurname: userDetails.emergency_surname,
+        emergencyPhone: userDetails.emergency_phone,
+        emergencyEmail: userDetails.emergency_email
+      });
+    } else {
+      this.entrantDetailsForm.patchValue({
+        userFirstName: userDetails.firstname,
+        userSurname: userDetails.surname,
+        userEmail: userDetails.email,
+        userPhone: userDetails.phone
+      });
+    }
   }
 
   getExistingEntry() {
@@ -177,7 +185,7 @@ export class EntrantDetailsComponent implements OnInit {
       entrantDob: ['', Validators.required],
       entrantGender: ['', Validators.required],
       emergencyFirstName: ['', Validators.required],
-      emergencySurname: ['', Validators.required],
+      emergencySurname: [''],
       emergencyEmail: '',
       emergencyPhone: ['', Validators.required]
     });
@@ -267,7 +275,19 @@ export class EntrantDetailsComponent implements OnInit {
 
   onSubmit($event) {
     console.log('onSubmit received event: ' + $event);
-    this.saveEntry();
+
+    switch ($event) {
+      case 'cancel':
+        this.entryService.deleteEntry(this.meet_id);
+        break;
+      case 'saveAndExit':
+        this.saveEntry();
+        break;
+      case 'submit':
+        this.saveEntry();
+        break;
+    }
+
   }
 
   showLogin() {
@@ -281,16 +301,22 @@ export class EntrantDetailsComponent implements OnInit {
   login() {
     console.log('User log in!');
 
-    this.authenticationService.login(this.entrantDetailsForm.value.login_username,
-      this.entrantDetailsForm.value.login_password)
+    this.authenticationService.login(this.inlineLoginForm.value.loginUsername,
+      this.inlineLoginForm.value.loginPassword)
       .subscribe(result => {
-          if (result === true) {
-            // login successful
-            console.log('successful login');
-            this.isAnonymousEntry = false;
+        console.log(result);
+          if (result !== undefined && result !== null) {
+            if (result.access_token !== null) {
+              // login successful
+              console.log('successful login');
+              this.isAnonymousEntry = false;
 
-            if (this.userService.isMember()) {
-              this.isMemberEntry = true;
+              if (result.user.member !== null) {
+                console.log('is member entry');
+                this.isMemberEntry = true;
+
+              }
+              this.prefillFromUser();
             }
           }
         },

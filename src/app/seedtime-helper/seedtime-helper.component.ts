@@ -7,6 +7,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {TimeService} from '../time.service';
 import {EventEmitter} from '@angular/core';
 import {DatatableComponent} from "@swimlane/ngx-datatable";
+import {TimePipe} from "../time.pipe";
 
 @Component({
   selector: 'app-seedtime-helper',
@@ -19,6 +20,8 @@ export class SeedtimeHelperComponent implements OnInit {
   @Input() inDistance: Observable<number>;
   @Input() inDiscipline: Observable<string>;
   @Input() inCourse: Observable<string>;
+
+  @Input() timeIn: number;
 
   @Output() timeEntered = new EventEmitter();
 
@@ -65,7 +68,8 @@ export class SeedtimeHelperComponent implements OnInit {
 
   constructor(public activeModal: NgbActiveModal,
               private fb: FormBuilder,
-              private memberHistoryService: MemberHistoryService) {
+              private memberHistoryService: MemberHistoryService,
+              private timePipe: TimePipe) {
   }
 
   ngOnInit() {
@@ -77,6 +81,7 @@ export class SeedtimeHelperComponent implements OnInit {
       millis: ''
     });
 
+
     forkJoin({
       distance: this.inDistance,
       discipline: this.inDiscipline,
@@ -86,22 +91,17 @@ export class SeedtimeHelperComponent implements OnInit {
       this.discipline = eventDetails.discipline;
       this.course = eventDetails.course;
       this.shouldShowHours();
-      console.log('Seedtime helper for ' + this.distance + ' ' + this.discipline + ' ' + this.course);
 
       this.memberHistoryService.getPersonalBest(this.memberNo, this.distance, this.discipline, this.course).subscribe((pbs) => {
         if (pbs !== null && pbs.length !== 0) {
-          this.pbRows = pbs;
+          this.pbRows = pbs.slice(0, 5);
           this.historyAvailable = true;
-
-          console.log(this.pbRows);
         }
       });
       this.memberHistoryService.getRecentResults(this.memberNo, this.distance, this.discipline, this.course).subscribe((recent) => {
         if (recent !== null && recent.length !== 0) {
-          this.recentRows = recent;
+          this.recentRows = recent.slice(0, 5);
           this.historyAvailable = true;
-
-          console.log(this.recentRows);
         }
       });
 
@@ -113,18 +113,17 @@ export class SeedtimeHelperComponent implements OnInit {
       const seconds = parseInt(inputData.seconds, 10) || 0;
       const millis = parseInt(inputData.millis, 10) || 0;
 
-      console.log(hours + ' ' + minutes + ' ' + seconds + ' ' + millis);
-
       this.seconds = ((parseInt(inputData.hours, 10) || 0) * 3600) +
         ((parseInt(inputData.minutes, 10) || 0) * 60) +
         (parseInt(inputData.seconds, 10) || 0) +
         ((parseInt(inputData.millis, 10) || 0) / 100);
-      console.log(this.seconds);
       this.formattedTime = TimeService.formatTime(this.seconds);
     });
 
 
-    //
+    if (this.timeIn !== null) {
+      this.setTime(this.timeIn);
+    }
   }
 
   shouldShowHours() {
@@ -143,11 +142,42 @@ export class SeedtimeHelperComponent implements OnInit {
     this.activeModal.close();
   }
 
-  onSelect(event) {
-    console.log(event);
+  selectResultRow(seconds) {
+    this.setTime(seconds);
   }
 
-  onActivate(event) {
-    console.log(event);
+  setTime(value) {
+    const hours = Math.floor(value / 3600);
+    const remainder = value % 3600;
+    const minutes = Math.floor(remainder / 60);
+    const seconds = Math.floor(remainder % 60);
+    const millis = parseFloat(((remainder % 60) - seconds).toFixed(2)) * 100;
+
+    let hoursStr = '';
+    if (hours !== 0) {
+      hoursStr = hours.toString(10);
+    }
+
+    let minStr = '';
+    if (minutes !== 0) {
+      minStr = minutes.toString(10);
+    }
+
+    let millisStr = '';
+    if (millis < 10) {
+      millisStr = '0' + millis.toString(10);
+    } else {
+      millisStr = millis.toString(10);
+    }
+
+    this.seedTimeForm.patchValue(
+      {
+        hours: hoursStr,
+        minutes: minStr,
+        seconds: seconds,
+        millis: millisStr
+      }
+    )
   }
 }
+

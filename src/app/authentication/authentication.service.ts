@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {tap, map, switchMap, catchError, timeout} from 'rxjs/operators';
 import { AuthService } from 'ngx-auth';
 import {TokenStorage} from './token.service';
@@ -9,10 +9,13 @@ import * as jwt_decode from 'jwt-decode';
 import {EnvironmentSpecificService} from '../environment-specific.service';
 import {EnvSpecific} from '../models/env-specific';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {User} from '../models/user';
 
 interface AccessData {
-  access: string;
-  refresh: string;
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  user: User;
 }
 
 @Injectable()
@@ -21,7 +24,9 @@ export class AuthenticationService implements AuthService {
   private api: string;
 
   private interruptedUrl: string;
-  private userId: number;
+  private user: User;
+
+  public authenticationChanged = new BehaviorSubject<User>(null);
 
   constructor(
     private http: HttpClient,
@@ -52,13 +57,8 @@ export class AuthenticationService implements AuthService {
     return this.tokenStorage
       .getAccessToken()
       .pipe(map((token) => {
-        if (token != null) {
-          const user_id = this.decodeUserId(token);
-          if (user_id != null) {
-            return true;
-          } else {
-            return false;
-          }
+        if (token !== null) {
+          return true;
         }
       }));
   }
@@ -140,7 +140,6 @@ export class AuthenticationService implements AuthService {
     return this.http.post(this.api + `login/`, {'username': username, 'password': password})
       .pipe(tap((tokens: AccessData) => {
         this.saveAccessData(tokens);
-        this.decodeUserId(tokens.access);
       }));
   }
 
@@ -149,6 +148,8 @@ export class AuthenticationService implements AuthService {
    */
   public logout(): void {
     this.tokenStorage.clear();
+    this.user = null;
+    this.authenticationChanged.next(null);
   }
 
   /**
@@ -157,22 +158,19 @@ export class AuthenticationService implements AuthService {
    * @private
    * @param {AccessData} data
    */
-  private saveAccessData({access, refresh}: AccessData) {
+  private saveAccessData(access_data: AccessData) {
 
-    if (access == null && refresh == null) {
+    if (access_data.access_token == null) {
       console.log('Clear tokens cause new ones are null');
       this.tokenStorage.clear();
       return;
     }
 
-    if (access != null) {
+    if (access_data.access_token !== null) {
       console.log('Store access token');
-      this.tokenStorage.setAccessToken(access);
-    }
-
-    if (refresh != null) {
-      console.log('Store refresh token');
-      this.tokenStorage.setRefreshToken(refresh);
+      this.tokenStorage.setAccessToken(access_data.access_token);
+      this.user = access_data.user;
+      this.authenticationChanged.next(this.user);
     }
   }
 
@@ -184,21 +182,8 @@ export class AuthenticationService implements AuthService {
     this.interruptedUrl = url;
   }
 
-  public decodeUserId(accessToken) {
-
-    try {
-      console.log(accessToken);
-      const tokenDecode = jwt_decode(accessToken);
-      this.userId = tokenDecode.user_id;
-      return this.userId;
-    } catch (err) {
-      return;
-    }
-
-  }
-
-  public getUserId() {
-    return this.userId;
+  public getUser() {
+    return this.user;
   }
 
 }

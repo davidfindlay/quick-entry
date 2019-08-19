@@ -26,4 +26,6 @@ export class Entry {
   // Events
   entryEvents: EntryEvent[];
 
+  validEvents: boolean;
+
 }

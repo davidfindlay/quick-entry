@@ -21,16 +21,15 @@ export class LoginComponent implements OnInit {
     ngOnInit() {
         // reset login status
         this.authenticationService.logout();
+
     }
 
     login() {
         this.loading = true;
         this.authenticationService.login(this.model.username, this.model.password)
             .subscribe(result => {
-                if (result === true) {
-                    // login successful
-                    this.router.navigate(['/']);
-                }
+                console.log('Logged in');
+                this.router.navigate(['/']);
             },
             err => {
                 // login failed

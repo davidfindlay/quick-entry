@@ -3,14 +3,15 @@ import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
-import {AuthenticationService} from './authentication.service';
+import {AuthenticationService} from './authentication/authentication.service';
 import {User} from './models/user';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {HttpClient} from '@angular/common/http';
 import * as moment from 'moment';
-import {EnvironmentSpecificService} from "./environment-specific.service";
-import {EnvSpecific} from "./models/env-specific";
+import {EnvironmentSpecificService} from './environment-specific.service';
+import {EnvSpecific} from './models/env-specific';
+import {BehaviorSubject} from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -18,8 +19,8 @@ export class UserService {
   api: string;
 
     authSub: Subscription;
-    userChanged = new Subject<User>();
-    memberChanged = new Subject();
+    userChanged = new BehaviorSubject<User>(null);
+    memberChanged = new BehaviorSubject<User>(null);
 
     user;
     member;
@@ -51,9 +52,11 @@ export class UserService {
                 console.log('authentication changed');
                 this.user = user;
                 this.userChanged.next(this.user);
-                if (this.user) {
+                if (this.user !== null) {
                     this.loadMember();
-                }
+                } else {
+                  this.member = null;
+              }
             });
 
     }
@@ -88,7 +91,7 @@ export class UserService {
     }
 
     isMember() {
-        if (this.member !== null && this.member !== undefined) {
+        if (this.member !== undefined && this.member !== null) {
             return true;
         } else {
             return false;
@@ -156,5 +159,13 @@ export class UserService {
 
     getPreviousMemberships() {
         return this.previousMemberships;
+    }
+
+    isLoggedIn() {
+      if (this.user !== undefined && this.user !== null) {
+        return true;
+      } else {
+        return false;
+      }
     }
 }

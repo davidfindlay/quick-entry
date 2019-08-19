@@ -66,21 +66,27 @@ export class EntryDetailsEventComponent implements OnInit {
       seedTime: ''
     });
 
-    this.isMemberHistoryAvailable();
+    // Download member history if it's not already available
+    if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
+      this.memberHistoryService.downloadHistory(this.memberNo);
+      this.memberHistoryService.resultsAvailable.subscribe((resultsAvailable) => {
+        // Once results are available, check if there's a previous result for this event
+        if (resultsAvailable) {
+          this.isMemberHistoryAvailable();
+        }
+      });
+    }
 
     this.eventEntryForm.valueChanges.subscribe((entryDetails) => {
-      this.entryService.updateEventEntry(this.meetEvent, entryDetails.seedTime);
+      this.entryService.updateEventEntry(this.meetEvent, TimeService.timeStringToSeconds(entryDetails.seedTime));
     });
 
   }
 
   isMemberHistoryAvailable() {
     if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
-      this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.metres,
-        this.meetEvent.discipline, this.meetEvent.course).subscribe((historyAvailable) => {
-        console.log(this.meetEvent.prognumber + ' ' + historyAvailable);
-        this.historyAvailable = historyAvailable;
-      });
+      this.historyAvailable = this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.metres,
+        this.meetEvent.discipline, this.meetEvent.course)
     } else {
       this.historyAvailable = false;
     }
@@ -99,6 +105,12 @@ export class EntryDetailsEventComponent implements OnInit {
     modalRef.componentInstance.inDistance = of(this.meetEvent.metres);
     modalRef.componentInstance.inDiscipline = of(this.meetEvent.discipline);
     modalRef.componentInstance.inCourse = of(this.meetEvent.course);
+
+    if (this.eventEntryForm.controls['seedTime'].value !== '') {
+      modalRef.componentInstance.timeIn = TimeService.timeStringToSeconds(this.eventEntryForm.controls['seedTime'].value);
+    } else {
+      modalRef.componentInstance.timeIn = null
+    }
 
     modalRef.componentInstance.timeEntered.subscribe(timeEntered => {
       this.eventEntryForm.controls['seedTime'].setValue(timeEntered);
@@ -123,6 +135,8 @@ export class EntryDetailsEventComponent implements OnInit {
       this.btnIconClass = null;
       this.eventAriaLabel = 'Enter event ' + this.meetEvent.prognumber + this.meetEvent.progsuffix + ' '
         + this.meetEvent.distance + ' ' + this.meetEvent.discipline;
+
+      this.entryService.removeEventEntry(this.meetEvent);
     }
   }
 

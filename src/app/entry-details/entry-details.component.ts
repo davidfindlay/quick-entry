@@ -6,6 +6,8 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {FormArray, FormBuilder, FormGroup} from "@angular/forms";
 import {Subject} from "rxjs";
 import {Meet} from "../models/meet";
+import {EntryService} from "../entry.service";
+import {Entry} from "../models/entry";
 
 @Component({
     selector: 'app-entry-details',
@@ -29,7 +31,8 @@ export class EntryDetailsComponent implements OnInit {
                 private router: Router,
                 private location: PlatformLocation,
                 private userService: UserService,
-                private meetService: MeetService) {
+                private meetService: MeetService,
+                private entryService: EntryService) {
     }
 
     ngOnInit() {
@@ -45,6 +48,16 @@ export class EntryDetailsComponent implements OnInit {
         console.log(this.meet);
 
         this.createForm();
+
+        // Monitor changes to the entry
+      this.entryService.entriesChanged.subscribe((entries: Entry[]) => {
+        const meetEntry = entries.filter(x => x.meetId === this.meet_id);
+        console.log(meetEntry);
+        if (meetEntry !== null && meetEntry.length === 1) {
+          console.log(meetEntry);
+          this.formValidSubject.next(meetEntry[0].validEvents);
+        }
+      });
 
     }
 
@@ -70,8 +83,22 @@ export class EntryDetailsComponent implements OnInit {
         this.entryDetailsForm = this.fb.group({events: eventArray}) ;
     }
 
-    onSubmit(event) {
-      console.log('onSubmit');
+    onSubmit($event) {
+      switch ($event) {
+        case 'cancel':
+          this.entryService.deleteEntry(this.meet_id);
+          break;
+        case 'saveAndExit':
+          this.saveEntry();
+          break;
+        case 'submit':
+          this.saveEntry();
+          break;
+      }
+    }
+
+    saveEntry() {
+      this.entryService.storeEntries();
     }
 
 }

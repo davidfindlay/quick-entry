@@ -2,7 +2,7 @@
 <h2>Membership and Club Details</h2>
 
 <form [formGroup]="memberDetailsForm">
-  <fieldset class="qe-fieldset" *ngIf="true">
+  <fieldset class="qe-fieldset" *ngIf="!isMemberEntry || isThirdPartyEntry">
     <h3>
       Masters Membership Details
     </h3>
@@ -106,25 +106,24 @@
         </div>
       </div>
 
-      <div class="form-group row" *ngIf="!isAnonymousEntry">
+      <div class="form-group row" *ngIf="isMemberEntry && !isThirdPartyEntry">
         <label for="club-selector" class="form-control-label col-sm-2">Club: </label>
         <select id="club-selector" class="form-control col-sm-10" formControlName="club_selector">
           <optgroup label="Current Memberships">
-            <option value="{{m.club_id}}" *ngFor="let m of currentMemberships" async>
-              {{m.clubname}} ({{m.code}})
+            <option value="{{m.club.id}}" *ngFor="let m of currentMemberships" async>
+              {{m.club.clubname}} ({{m.club.code}})
             </option>
             <option value="other">Other - My club isn't listed</option>
           </optgroup>
           <optgroup label="Previous Memberships">
-            <option value="{{m.club_id}}" *ngFor="let m of previousMemberships" async>
-              {{m.clubname}} ({{m.code}})
+            <option value="{{m.club.id}}" *ngFor="let m of previousMemberships" async>
+              {{m.club.clubname}} ({{m.club.code}})
             </option>
           </optgroup>
         </select>
       </div>
 
-      <div *ngIf="isAnonymousEntry
-                || memberDetailsForm.value.club_selector === 'other' || isThirdPartyEntry">
+      <div *ngIf="!isMemberEntry || isThirdPartyEntry || this.memberDetailsForm.controls.club_selector.value === 'other'">
         <div class="form-group row" *ngIf="showClubCountryField">
           <label for="club-country" class="form-control-label col-sm-2">Club Country:</label>
 

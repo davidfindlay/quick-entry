@@ -23,7 +23,6 @@ import { LoginComponent } from './login/login.component';
 import { ConfirmCancelComponent } from './confirm-cancel/confirm-cancel.component';
 import { WorkflowNavComponent } from './workflow-nav/workflow-nav.component';
 import {AuthenticationModule} from './authentication';
-import {AuthenticationService} from './authentication.service';
 import {UserService} from './user.service';
 import {EntryService} from './entry.service';
 import {EnvironmentSpecificService} from './environment-specific.service';
@@ -37,6 +36,7 @@ import { TimePipe } from './time.pipe';
 import { SeedtimeHelperComponent } from './seedtime-helper/seedtime-helper.component';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import { EntryDetailsTotalsComponent } from './entry-details-totals/entry-details-totals.component';
+import {NgxPayPalModule} from "ngx-paypal";
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent, resolve: { envSpecific: EnvironmentSpecificResolver } },
@@ -82,14 +82,14 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes),
     HttpClientModule,
     AuthenticationModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    NgxPayPalModule,
   ],
     providers: [
       EnvironmentSpecificService,
       EnvironmentSpecificResolver,
         MeetService,
         UserService,
-        AuthenticationService,
         EntryService,
       TimePipe
     ],

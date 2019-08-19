@@ -57,7 +57,7 @@
                     <p>
                         You can lodge an entry on behalf of yourself or someone else.
                     </p>
-                    <p>
+                    <p *ngIf="isThirdPartyEntry && isAnonymousEntry">
                         If you are lodging an entry for someone else, please ensure you fill out the
                         "Your Details" section so we can contact you if we need to.
                     </p>
@@ -186,7 +186,7 @@
 
     </fieldset>
 
-    <fieldset class="qe-fieldset" id="sectionYourDetails" *ngIf="isThirdPartyEntry">
+    <fieldset class="qe-fieldset" id="sectionYourDetails" *ngIf="isThirdPartyEntry && isAnonymousEntry">
         <h3>
             Your Details
         </h3>
