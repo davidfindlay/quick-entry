@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 
 import {User} from '../models/user';
 import {UserService} from '../user.service';
-import {AuthenticationService} from '../authentication.service';
+import {AuthenticationService} from '../authentication/authentication.service';
 import {Subscription} from 'rxjs/Subscription';
 
 @Component({
