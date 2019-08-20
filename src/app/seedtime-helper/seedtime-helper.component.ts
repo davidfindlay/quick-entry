@@ -28,9 +28,9 @@ export class SeedtimeHelperComponent implements OnInit {
   // @ViewChild(DatatableComponent) pbTable: DatatableComponent;
   // @ViewChild(DatatableComponent) recentTable: DatatableComponent;
 
-  private distance: number;
-  private discipline: string;
-  private course: string;
+  public distance: number;
+  public discipline: string;
+  public course: string;
 
   closeResult: string;
   seedTimeForm: FormGroup;
