@@ -1,4 +1,6 @@
-# QuickEntry
+[![Build Status](https://travis-ci.org/davidfindlay/quick-entry.svg?branch=master)](https://travis-ci.org/davidfindlay/quick-entry)
+
+#QuickEntry
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.0.
 
