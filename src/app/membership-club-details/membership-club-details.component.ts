@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from "@angular/router";
-import {PlatformLocation} from "@angular/common";
-import {UserService} from "../user.service";
-import {MeetService} from "../meet.service";
-import {AuthenticationService} from "../authentication/authentication.service";
-import {Meet} from "../models/meet";
-import {MembershipDetails} from "../models/membership-details";
-import {EntryService} from "../entry.service";
-import {BehaviorSubject, Observable, Subject} from "rxjs";
-import {debounceTime, map, pluck} from "rxjs/operators";
-import {distinctUntilChanged} from "rxjs/operators";
-import {ClubsService} from "../clubs.service";
+import {ActivatedRoute, Router} from '@angular/router';
+import {PlatformLocation} from '@angular/common';
+import {UserService} from '../user.service';
+import {MeetService} from '../meet.service';
+import {AuthenticationService} from '../authentication/authentication.service';
+import {Meet} from '../models/meet';
+import {MembershipDetails} from '../models/membership-details';
+import {EntryService} from '../entry.service';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {debounceTime, map, pluck} from 'rxjs/operators';
+import {distinctUntilChanged} from 'rxjs/operators';
+import {ClubsService} from '../clubs.service';
 
 @Component({
   selector: 'app-membership-club-details',
@@ -20,7 +20,7 @@ import {ClubsService} from "../clubs.service";
 })
 export class MembershipClubDetailsComponent implements OnInit {
 
-  private formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   meet_id: number;
   meet: Meet;
@@ -66,7 +66,6 @@ export class MembershipClubDetailsComponent implements OnInit {
 
     });
   }
-
 
 
   ngOnInit() {
@@ -201,7 +200,7 @@ export class MembershipClubDetailsComponent implements OnInit {
     console.log('Save Entry');
     const memberDetails: MembershipDetails = Object.assign({}, this.memberDetailsForm.value);
 
-    if (this.userService.isLoggedIn() && ! this.isThirdPartyEntry) {
+    if (this.userService.isLoggedIn() && !this.isThirdPartyEntry) {
       const member = this.userService.getMember();
       memberDetails.member_number = member.number;
     }

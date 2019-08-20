@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient} from '@angular/common/http';
 import {Club} from './models/club';
-import {filter} from "rxjs/internal/operators/filter";
-import {EnvironmentSpecificService} from "./environment-specific.service";
-import {EnvSpecific} from "./models/env-specific";
+import {EnvironmentSpecificService} from './environment-specific.service';
+import {EnvSpecific} from './models/env-specific';
 
 @Injectable({
   providedIn: 'root'

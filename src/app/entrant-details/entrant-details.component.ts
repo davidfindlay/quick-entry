@@ -19,7 +19,7 @@ import {Behavior} from 'popper.js';
 })
 export class EntrantDetailsComponent implements OnInit {
 
-  private formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   meet_id: number;
   meet;

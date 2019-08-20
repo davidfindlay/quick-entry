@@ -12,8 +12,11 @@ import {Observable} from 'rxjs';
 })
 export class WorkflowNavComponent implements OnInit {
 
+  // tslint:disable-next-line:no-input-rename
   @Input('previous') previous: string;
+  // tslint:disable-next-line:no-input-rename
   @Input('next') next: string;
+  // tslint:disable-next-line:no-input-rename
   @Input('nextActivated') nextActivated: Observable<boolean>;
   btnNextDisable = true;
 

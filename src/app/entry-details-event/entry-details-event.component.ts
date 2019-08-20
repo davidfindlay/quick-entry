@@ -2,15 +2,14 @@ import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {MeetEvent} from '../models/meet-event';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
-import {MemberHistoryService} from "../member-history.service";
-import {TimePipe} from "../time.pipe";
-import {NgbModal, NgbTooltip} from "@ng-bootstrap/ng-bootstrap";
+import {MemberHistoryService} from '../member-history.service';
+import {TimePipe} from '../time.pipe';
+import {NgbModal, NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
-import {TimeService} from "../time.service";
+import {TimeService} from '../time.service';
 import {SeedtimeHelperComponent} from '../seedtime-helper/seedtime-helper.component';
-import {of} from "rxjs/internal/observable/of";
-import {EntryService} from "../entry.service";
-import {Subject} from "rxjs";
+import {of} from 'rxjs/internal/observable/of';
+import {EntryService} from '../entry.service';
 
 @Component({
   selector: 'app-entry-details-event',

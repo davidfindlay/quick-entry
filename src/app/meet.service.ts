@@ -5,9 +5,9 @@ import 'rxjs/Rx';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import * as moment from 'moment';
-import {EnvironmentSpecificService} from "./environment-specific.service";
-import {EnvSpecific} from "./models/env-specific";
-import {MeetEvent} from "./models/meet-event";
+import {EnvironmentSpecificService} from './environment-specific.service';
+import {EnvSpecific} from './models/env-specific';
+import {MeetEvent} from './models/meet-event';
 
 @Injectable()
 export class MeetService {

@@ -8,7 +8,7 @@ export class MeetEvent {
     meet_id: number;
     type: string;
     discipline: string;
-    legs: string;
+    legs: number;
     distance: string;
     metres: number;
     course: string;

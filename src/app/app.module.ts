@@ -36,7 +36,7 @@ import { TimePipe } from './time.pipe';
 import { SeedtimeHelperComponent } from './seedtime-helper/seedtime-helper.component';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import { EntryDetailsTotalsComponent } from './entry-details-totals/entry-details-totals.component';
-import {NgxPayPalModule} from "ngx-paypal";
+import {NgxPayPalModule} from 'ngx-paypal';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent, resolve: { envSpecific: EnvironmentSpecificResolver } },

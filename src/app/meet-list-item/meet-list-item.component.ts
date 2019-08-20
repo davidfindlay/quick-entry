@@ -1,6 +1,6 @@
 import {Component, OnInit, Input} from '@angular/core';
 import * as moment from 'moment';
-import {EntryService} from "../entry.service";
+import {EntryService} from '../entry.service';
 
 @Component({
     selector: 'app-meet-list-item',
@@ -26,8 +26,8 @@ export class MeetListItemComponent implements OnInit {
     getMeetDates(): string {
 
         let formattedDate = '';
-        let startdate = '';
-        let enddate = '';
+        const startdate = '';
+        const enddate = '';
 
         if (startdate === enddate) {
             formattedDate = moment(this.meet.startdate).format('dddd') + ' ' + moment(this.meet.startdate).format('LL');

@@ -9,7 +9,6 @@ import {
 import {AuthenticationService} from './authentication.service';
 import {TokenStorage} from './token.service';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
-import {EnvironmentSpecificService} from "../environment-specific.service";
 
 export function factory(authenticationService: AuthenticationService) {
   return authenticationService;

@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EntrantDetailsComponent } from './entrant-details.component';
-import {By} from "@angular/platform-browser";
+import {By} from '@angular/platform-browser';
 
 describe('EntrantDetailsComponent', () => {
   let component: EntrantDetailsComponent;

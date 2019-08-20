@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {MeetService} from "../meet.service";
-import {UserService} from "../user.service";
-import {PlatformLocation} from "@angular/common";
-import {ActivatedRoute, Router} from "@angular/router";
-import {FormArray, FormBuilder, FormGroup} from "@angular/forms";
-import {Subject} from "rxjs";
-import {Meet} from "../models/meet";
-import {EntryService} from "../entry.service";
-import {Entry} from "../models/entry";
+import {MeetService} from '../meet.service';
+import {UserService} from '../user.service';
+import {PlatformLocation} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {Subject} from 'rxjs';
+import {Meet} from '../models/meet';
+import {EntryService} from '../entry.service';
+import {Entry} from '../models/entry';
 
 @Component({
     selector: 'app-entry-details',
@@ -16,7 +16,7 @@ import {Entry} from "../models/entry";
 })
 export class EntryDetailsComponent implements OnInit {
 
-  private formValidSubject: Subject<boolean> = new Subject<boolean>();
+  public formValidSubject: Subject<boolean> = new Subject<boolean>();
 
     entryDetailsForm: FormGroup;
 

@@ -18,7 +18,7 @@ import {MedicalDetails} from '../models/medical-details';
 })
 export class ClassificationMedicalDetailsComponent implements OnInit {
 
-  private formValidSubject: ReplaySubject<boolean> = new ReplaySubject<boolean>();
+  public formValidSubject: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
   meet_id: number;
   meet: Meet;

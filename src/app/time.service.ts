@@ -39,7 +39,7 @@ export class TimeService {
     }
 
     // Is there a colon in the time?
-    if (timeString.search(':') != -1) {
+    if (timeString.search(':') !== -1) {
 
       const timeArray = timeString.split(':');
 
