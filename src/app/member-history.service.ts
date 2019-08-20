@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {Result} from "./models/result";
-import {BehaviorSubject, Observable, Subject} from "rxjs";
+import {HttpClient} from '@angular/common/http';
+import {Result} from './models/result';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
 
 import * as moment from 'moment';
-import {of} from "rxjs/internal/observable/of";
-import {EnvironmentSpecificService} from "./environment-specific.service";
-import {EnvSpecific} from "./models/env-specific";
+import {of} from 'rxjs/internal/observable/of';
+import {EnvironmentSpecificService} from './environment-specific.service';
+import {EnvSpecific} from './models/env-specific';
 
 @Injectable({
   providedIn: 'root'
