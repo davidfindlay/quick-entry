@@ -6,8 +6,7 @@ import {forkJoin} from 'rxjs/internal/observable/forkJoin';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {TimeService} from '../time.service';
 import {EventEmitter} from '@angular/core';
-import {DatatableComponent} from "@swimlane/ngx-datatable";
-import {TimePipe} from "../time.pipe";
+import {TimePipe} from '../time.pipe';
 
 @Component({
   selector: 'app-seedtime-helper',

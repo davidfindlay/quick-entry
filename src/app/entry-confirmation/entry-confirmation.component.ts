@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import {Meet} from "../models/meet";
-import {FormBuilder} from "@angular/forms";
-import {ActivatedRoute, Router} from "@angular/router";
-import {PlatformLocation} from "@angular/common";
-import {UserService} from "../user.service";
+import {Meet} from '../models/meet';
+import {FormBuilder} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
+import {PlatformLocation} from '@angular/common';
+import {UserService} from '../user.service';
 import {MeetService} from '../meet.service';
 import {EntryService} from '../entry.service';
-import {Subject} from "rxjs";
+import {Subject} from 'rxjs';
 import {IPayPalConfig, ICreateOrderRequest, IPayPalButtonStyle} from 'ngx-paypal';
 
 @Component({
@@ -24,7 +24,7 @@ export class EntryConfirmationComponent implements OnInit {
 
   entry;
 
-  public payPalConfig ? : IPayPalConfig;
+  public payPalConfig ?: IPayPalConfig;
 
   constructor(private fb: FormBuilder,
               private route: ActivatedRoute,

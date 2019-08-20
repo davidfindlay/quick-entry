@@ -1,7 +1,7 @@
 import {Session} from './session';
-import {MeetEvent} from "./meet-event";
-import {Phone} from "./phone";
-import {Email} from "./email";
+import {MeetEvent} from './meet-event';
+import {Phone} from './phone';
+import {Email} from './email';
 
 /**
  * Created by david on 7/9/17.

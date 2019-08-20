@@ -1,13 +1,11 @@
 import {Injectable} from '@angular/core';
-import {Entry} from "./models/entry";
-import {MembershipDetails} from "./models/membership-details";
-import {MedicalDetails} from "./models/medical-details";
-import {MemberHistoryService} from "./member-history.service";
-import {Subject} from "rxjs";
-import {EntryEvent} from "./models/entryevent";
-import {setupTestingRouter} from "@angular/router/testing";
-import {Meet} from "./models/meet";
-import {MeetService} from "./meet.service";
+import {Entry} from './models/entry';
+import {MembershipDetails} from './models/membership-details';
+import {MedicalDetails} from './models/medical-details';
+import {MemberHistoryService} from './member-history.service';
+import {Subject} from 'rxjs';
+import {EntryEvent} from './models/entryevent';
+import {MeetService} from './meet.service';
 
 @Injectable()
 export class EntryService {
