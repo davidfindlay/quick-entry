@@ -4,7 +4,7 @@ import {User} from '../models/user';
 import {UserService} from '../user.service';
 import {AuthenticationService} from '../authentication/authentication.service';
 import {Subscription} from 'rxjs/Subscription';
-import {EntryService} from "../entry.service";
+import {EntryService} from '../entry.service';
 
 @Component({
   selector: 'app-header',
