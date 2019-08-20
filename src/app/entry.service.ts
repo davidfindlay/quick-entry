@@ -99,7 +99,6 @@ export class EntryService {
         seedtime: null
       });
       entry.validEvents = this.validateEntryEvents(entry);
-      console.log(entry);
       this.entriesChanged.next(this.entries);
     } else {
       console.error('Unable to add event to meet entry')
@@ -116,10 +115,7 @@ export class EntryService {
 
       // Remove the event from the events array
       // TODO: change to keep cancelled event but mark as cancelled
-      console.log('Remove ');
-      console.log(meetEvent);
       entry.entryEvents = entry.entryEvents.filter(x => x.event_id !== meetEvent.id);
-      console.log(entry.entryEvents);
 
       // this.entries = this.entries.filter(x => x.meetId !== entry.meetId);
       // this.entries.push(entry);
@@ -137,7 +133,6 @@ export class EntryService {
       }
 
       const entryEvent = entry.entryEvents.filter(x => x.event_id === meetEvent.id);
-      console.log(entry.entryEvents);
 
       if (entryEvent.length === 1) {
         entryEvent[0].seedtime = seedtime;
@@ -150,10 +145,10 @@ export class EntryService {
    */
   validateEntryEvents(meetEntry): boolean {
 
-    const meetDetails = this.meetService.getMeet(meetEntry.meet_id);
+    const meetDetails = this.meetService.getMeet(meetEntry.meetId);
 
     const minIndividualEvents = 1;
-    let maxIndividualEvents = null;
+    let maxIndividualEvents = 5;
 
     if (meetDetails !== undefined && meetDetails !== null) {
       maxIndividualEvents = meetDetails.maxevents;
@@ -162,31 +157,53 @@ export class EntryService {
     const entry = this.getEntry(meetEntry.meetId);
     if (entry) {
       if (entry.entryEvents === undefined) {
-        console.log('No entry events found');
         return false;
       }
 
-      // TODO: actually separate individual events
-      if (entry.entryEvents.length < minIndividualEvents) {
-        console.log('Less than minimum individual events');
+      const eventCount = this.getIndividualEventCount(entry);
+
+      if (eventCount < minIndividualEvents) {
         return false;
       }
 
-      // TODO: actually separate individual events
-      if (maxIndividualEvents !== null) {
-        if (entry.entryEvents.length > maxIndividualEvents) {
-          console.log('More than maximum individual events');
-          return false;
-        }
+      if (eventCount > maxIndividualEvents) {
+        return false;
       }
+
 
       return true;
     }
 
-
     console.log('Couldn\'t find entry');
 
     return false;
+  }
+
+  getIndividualEventCount(meetEntry) {
+    let eventCount = 0;
+    const meetDetails = this.meetService.getMeet(meetEntry.meetId);
+
+    for (const event of meetDetails.events) {
+      if (event.legs === 1) {
+        for (const eventEntry of meetEntry.entryEvents) {
+          if (eventEntry.event_id === event.id) {
+            eventCount++;
+          }
+        }
+      }
+    }
+
+    return eventCount;
+  }
+
+  getEntryCost(meetEntry) {
+    // TODO: Add additional rules
+    const meetDetails = this.meetService.getMeet(meetEntry.meetId);
+    if (meetDetails !== undefined && meetDetails !== null) {
+      return meetDetails.meetfee;
+    } else {
+      return null;
+    }
   }
 
   deleteEntry(meetId: number) {
@@ -194,6 +211,12 @@ export class EntryService {
     console.log('Delete entries to ' + meetId);
     this.entries = this.entries.filter(x => x.meetId !== meetId);
     console.log(this.entries);
+    this.storeEntries();
+  }
+
+  clear() {
+    console.log('Clear unsaved entries');
+    this.entries = [];
     this.storeEntries();
   }
 

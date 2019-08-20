@@ -52,9 +52,7 @@ export class EntryDetailsComponent implements OnInit {
         // Monitor changes to the entry
       this.entryService.entriesChanged.subscribe((entries: Entry[]) => {
         const meetEntry = entries.filter(x => x.meetId === this.meet_id);
-        console.log(meetEntry);
         if (meetEntry !== null && meetEntry.length === 1) {
-          console.log(meetEntry);
           this.formValidSubject.next(meetEntry[0].validEvents);
         }
       });

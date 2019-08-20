@@ -36,6 +36,9 @@ export class AuthenticationService implements AuthService {
     private envSpecificSvc: EnvironmentSpecificService
   ) {
     envSpecificSvc.subscribe(this, this.setApi);
+
+    // Check if we have token
+
   }
 
   setApi(caller: any, es: EnvSpecific) {

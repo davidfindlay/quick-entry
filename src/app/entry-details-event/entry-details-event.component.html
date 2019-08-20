@@ -12,10 +12,12 @@
     <div class="col-md-9 h-100">
       <div class="card-body">
           <span class="eventName">
+            <span *ngIf="hasEventName()">{{meetEvent.eventname}}: </span>
           <span *ngIf="meetEvent.legs > 1">{{meetEvent.legs}}x</span>{{meetEvent.distance}}
             {{meetEvent.discipline}}
             </span>
         <br/>{{meetEvent.type}}
+        <span *ngIf="meetEvent.exhibition"><br />Exhibition Event</span>
 
         <div class="card mb-3 bg-info text-white" *ngIf="meetEvent.type.includes('Postal') && eventSelected()">
           <div class="card-body">
@@ -35,8 +37,24 @@
           </div>
         </div>
 
+        <div class="card mb-3 bg-warning text-white" *ngIf="meetEvent.timesrequired && entry.seconds === 0">
+          <div class="card-body">
+            <p class="card-text">
+              The rules for this event require you to supply a valid seed time. No time(NT) is not allowed.
+            </p>
+          </div>
+        </div>
+
+        <div class="card mb-3 bg-info text-white" *ngIf="meetEvent.freetime">
+          <div class="card-body">
+            <p class="card-text">
+              The rules for this event require you to select one of the Personal Bests or Recent Times supplied. Click PB, LT or More.
+            </p>
+          </div>
+        </div>
+
         <div class="form-group row mt-2"
-             *ngIf="eventSelected() && meetEvent.type.includes('Finals')">
+             *ngIf="eventSelected() && meetEvent.type.includes('Finals') && !isRelay()">
 
           <label for="seedTime" class="col-sm-3 col-form-label">Seed Time:</label>
 

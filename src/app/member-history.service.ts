@@ -172,6 +172,13 @@ export class MemberHistoryService {
     }
 
     if (results.length > 0) {
+
+      results.sort((a, b) => {
+        const datea = new Date(a.event_date);
+        const dateb = new Date(b.event_date);
+        return datea > dateb ? -1 : datea < dateb ? 1 : 0;
+      });
+
       return of(results);
     } else {
       return of(null);

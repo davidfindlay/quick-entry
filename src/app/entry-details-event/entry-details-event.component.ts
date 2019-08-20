@@ -80,6 +80,11 @@ export class EntryDetailsEventComponent implements OnInit {
       this.entryService.updateEventEntry(this.meetEvent, TimeService.timeStringToSeconds(entryDetails.seedTime));
     });
 
+    // Freetime not available
+    if (this.meetEvent.freetime) {
+      this.eventEntryForm.controls['seedTime'].disable();
+    }
+
   }
 
   isMemberHistoryAvailable() {
@@ -183,6 +188,19 @@ export class EntryDetailsEventComponent implements OnInit {
     });
   }
 
+  hasEventName() {
+    if (this.meetEvent.eventname !== undefined && this.meetEvent.eventname !== null) {
+      if (this.meetEvent.eventname.trim() !== '') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isExhibition() {
+    console.log(this.meetEvent.exhibition);
+  }
+
   mouseEnter() {
     if (this.entered === true) {
       this.enterClass = 'btn btn-danger';
@@ -221,6 +239,14 @@ export class EntryDetailsEventComponent implements OnInit {
     }
 
     this.fixCount++;
+  }
+
+  isRelay() {
+    if (this.meetEvent.legs > 1) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
 }

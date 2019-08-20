@@ -17,5 +17,8 @@ export class MeetEvent {
     progsuffix: string;
     eventfee: string;
     deadline: string;
+    exhibition: boolean;
+    freetime: boolean;
+    timesrequired: boolean;
 
 }

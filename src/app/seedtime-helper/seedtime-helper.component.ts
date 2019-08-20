@@ -93,7 +93,7 @@ export class SeedtimeHelperComponent implements OnInit {
 
       this.memberHistoryService.getPersonalBest(this.memberNo, this.distance, this.discipline, this.course).subscribe((pbs) => {
         if (pbs !== null && pbs.length !== 0) {
-          this.pbRows = pbs.slice(0, 5);
+          this.pbRows = pbs.slice(0, 3);
           this.historyAvailable = true;
         }
       });
