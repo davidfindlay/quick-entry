@@ -1,6 +1,7 @@
 import {Component, OnInit, Input} from '@angular/core';
 import * as moment from 'moment';
 import {EntryService} from '../entry.service';
+import {Router} from '@angular/router';
 
 @Component({
     selector: 'app-meet-list-item',
@@ -13,7 +14,8 @@ export class MeetListItemComponent implements OnInit {
     @Input() meet;
     @Input() index: number;
 
-    constructor(private entryService: EntryService) {
+    constructor(private entryService: EntryService,
+                private router: Router) {
     }
 
     ngOnInit() {
@@ -75,5 +77,27 @@ export class MeetListItemComponent implements OnInit {
         return false;
       }
     }
+
+  /**
+   * Determine how far along existing entry is before opening it
+   */
+  openExistingEntry() {
+    const meetId = this.meet.id;
+    const entry = this.entryService.getEntry(meetId);
+
+    if (entry !== undefined && entry !== null) {
+      if (entry.entrantDetails === undefined) {
+        this.router.navigate(['enter', meetId, 'step1']);
+      } else if (entry.membershipDetails === undefined) {
+        this.router.navigate(['enter', meetId, 'step2']);
+      } else if (entry.medicalDetails === undefined) {
+        this.router.navigate(['enter', meetId, 'step3']);
+      } else {
+        this.router.navigate(['enter', meetId, 'step4']);
+      }
+    } else {
+      this.router.navigate(['enter', meetId, 'step1']);
+    }
+  }
 
 }

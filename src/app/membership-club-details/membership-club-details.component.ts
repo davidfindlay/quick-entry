@@ -79,16 +79,12 @@ export class MembershipClubDetailsComponent implements OnInit {
     }
 
     const existingEntry = this.getExistingEntry();
+    console.log(existingEntry);
 
     if (existingEntry != null) {
       console.log('Got existing entry');
       console.log(existingEntry);
       this.memberDetailsForm.patchValue(existingEntry);
-    }
-
-    if (this.userService.isMember()) {
-      console.log('this is a member entry');
-      this.isMemberEntry = true;
     }
 
     this.currentEntry = this.entryService.getEntry(this.meet_id);

@@ -329,7 +329,15 @@ export class EntrantDetailsComponent implements OnInit {
 
   saveEntry() {
     const entrantDetails: EntrantDetails = Object.assign({}, this.entrantDetailsForm.value);
-    this.entry = new Entry();
+
+    // Check for existing entry
+    const existingEntry = this.entryService.getEntry(this.meet_id);
+    if (existingEntry == null) {
+      this.entry = new Entry();
+    } else {
+      this.entry = existingEntry;
+    }
+
     this.entry.entrantDetails = entrantDetails;
     this.entry.meetId = this.meet_id;
     this.entryService.addEntry(this.entry);

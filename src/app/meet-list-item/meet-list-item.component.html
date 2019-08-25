@@ -35,7 +35,7 @@
     </div>
 
     <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && !hasEntry()">Enter Meet</button>
-    <button type="button" class="btn btn-warning" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && hasEntry()">Resume Incomplete Entry</button>
+    <button type="button" class="btn btn-warning" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry()">Resume Incomplete Entry</button>
     <div class="card" *ngIf="!isOpen()">
       This meet is not yet open. Please try again later.
     </div>
