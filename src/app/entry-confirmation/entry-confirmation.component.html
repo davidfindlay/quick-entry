@@ -214,14 +214,21 @@
 <div class="confirmationSection">
   <h3>Events Selected</h3>
   <table>
+    <thead>
+    <tr>
+      <th class="pr-4">Event</th>
+      <th class="pr-4">Description</th>
+      <th>Seed Time</th>
+    </tr>
+    </thead>
     <tr *ngFor="let event of entry.entryEvents">
-      <td>
+      <td class="pr-4">
         {{event.program_no}}
       </td>
-      <td>
+      <td class="pr-4">
         {{event.distance}} {{event.discipline}}
       </td>
-      <td>
+      <td class="seedtimeCol">
         {{event.seedtime | time}}
       </td>
     </tr>
@@ -238,16 +245,16 @@
   <table>
     <thead>
     <tr>
-      <th>
+      <th class="pr-4">
         Qty
       </th>
-      <th>
+      <th class="pr-4">
         Item
       </th>
-      <th class="moneycol">
+      <th class="moneycol pr-4">
         Each
       </th>
-      <th class="moneycol">
+      <th class="moneycol pr-4">
         Subtotal
       </th>
     </tr>

@@ -52,7 +52,7 @@ export class EntryConfirmationComponent implements OnInit {
     }
 
     this.entry = this.entryService.getEntry(this.meet_id);
-
+    console.log(this.entry);
 
     this.paymentOptionForm = this.fb.group({
       paymentOption: ['paypal', Validators.required]
@@ -101,7 +101,9 @@ export class EntryConfirmationComponent implements OnInit {
   submit() {
     console.log('submit');
     this.entryService.storeIncompleteEntry(this.entryService.getEntry(this.meet_id));
-    this.entryService.finalise(this.entryService.getEntry(this.meet_id));
+    this.entryService.finalise(this.entryService.getEntry(this.meet_id)).subscribe((finalised) => {
+
+    });
   }
 
 

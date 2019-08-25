@@ -112,8 +112,8 @@ export class EntryService {
         entry_id: null,
         program_no: (meetEvent.prognumber + meetEvent.progsuffix),
         event_id: meetEvent.id,
-        discipline: meetEvent.discipline,
-        distance: meetEvent.distance,
+        discipline: meetEvent.event_discipline.discipline,
+        distance: meetEvent.event_distance.distance,
         classification: null,
         seedtime: null
       });
@@ -322,9 +322,7 @@ export class EntryService {
 
   finalise(meetEntry) {
     console.log('finalise');
-    return this.http.post(environment.api + 'entry_finalise/' + meetEntry.incompleteId, {}).subscribe((entry: any) => {
-      console.log(entry);
-    });
+    return this.http.post(environment.api + 'entry_finalise/' + meetEntry.incompleteId, {});
   }
 
 }
