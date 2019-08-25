@@ -1,6 +1,8 @@
 /**
  * Created by david on 7/9/17.
  */
+import {EventType} from './event-type';
+import {EventDistance} from './event-distance';
 
 export class MeetEvent {
 
@@ -20,5 +22,8 @@ export class MeetEvent {
     exhibition: boolean;
     freetime: boolean;
     timesrequired: boolean;
+
+    event_type: EventType;
+    event_distance: EventDistance;
 
 }

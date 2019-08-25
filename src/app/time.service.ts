@@ -7,6 +7,10 @@ export class TimeService {
 
   static timeStringToSeconds(timeString: string) {
 
+    if (timeString === undefined || timeString === null) {
+      return 0;
+    }
+
     if (timeString === 'NT' || timeString.trim() === '') {
       return 0;
     }

@@ -34,8 +34,12 @@
         Meet Rules:
       </h4>
       <p class="card-text">
-        You may enter {{meet.maxevents}} events.
-      </p>
+        <ul>
+      <li>You may enter {{meet.maxevents}} individual events.</li>
+      <li *ngFor="let rule of rules">
+        {{rule}}
+      </li>
+    </ul>
     </div>
   </div>
 

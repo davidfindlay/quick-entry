@@ -311,27 +311,25 @@
     </ul>
     </div>
   </div>
-  <form>
-  <div class="fieldName col-sm-3">
-    Select Payment Option:
-  </div>
-  <div class="fieldValue">
-    <div class="form-check">
-      <input type="radio" name="paymentOption" class="form-check-input" value="paypal" id="paypal" />
-      <label for="paypal" class="form-check-label">Credit/Debit Card or PayPal Account</label>
-      <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+  <form [formGroup]="paymentOptionForm">
+    <div class="fieldName col-sm-3">
+      Select Payment Option:
     </div>
-    <div class="form-check">
-      <input type="radio" name="paymentOption" class="form-check-input" value="later" id="later" />
-      <label for="later" class="form-check-label">Pay Later</label>
+    <div class="fieldValue">
+      <div class="form-check">
+        <input type="radio" name="paymentOption" class="form-check-input" value="paypal" id="paypal" formControlName="paymentOption" />
+        <label for="paypal" class="form-check-label">Credit/Debit Card or PayPal Account</label>
+        <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+      </div>
+      <div class="form-check">
+        <input type="radio" name="paymentOption" class="form-check-input" value="later" id="later" formControlName="paymentOption" />
+        <label for="later" class="form-check-label">Pay Later</label>
+      </div>
+      <div class="form-check">
+        <input type="radio" name="paymentOption" class="form-check-input" value="club" id="club" formControlName="paymentOption" />
+        <label for="club" class="form-check-label">Pay via Club</label>
+      </div>
     </div>
-    <div class="form-check">
-      <input type="radio" name="paymentOption" class="form-check-input" value="club" id="club" />
-      <label for="club" class="form-check-label">Pay via Club</label>
-    </div>
-  </div>
-
-
   </form>
 </div>
 

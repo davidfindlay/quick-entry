@@ -24,6 +24,8 @@ export class EntryDetailsComponent implements OnInit {
     meet: Meet;
     meetName;
 
+    rules = [];
+
     isAnonymousEntry = true;
 
     constructor(private fb: FormBuilder,
@@ -56,6 +58,16 @@ export class EntryDetailsComponent implements OnInit {
           this.formValidSubject.next(meetEntry[0].validEvents);
         }
       });
+
+      if (this.meet.groups !== undefined && this.meet.groups !== null) {
+        for (const group of this.meet.groups) {
+          for (const rule of group.rules) {
+            if (!this.rules.includes(rule.rule)) {
+              this.rules.push(rule.rule);
+            }
+          }
+        }
+      }
 
     }
 

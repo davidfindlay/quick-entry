@@ -25,6 +25,9 @@ export class EntryDetailsEventComponent implements OnInit {
 
   eventEntryForm: FormGroup;
 
+  // Subscription to Entry Service not allowed events
+  eventsDisabledSubscription;
+
   enterClass = 'btn btn-outline-primary';
   enterText = 'Enter';
   btnIconClass = null;
@@ -38,10 +41,15 @@ export class EntryDetailsEventComponent implements OnInit {
 
   entered = false;
   fixCount = 0;
+  enterButtonDisabled = false;
 
   entry;
   memberNo = 0;
   historyAvailable = false;
+
+  seedTimeRequired = true;
+  seedTimeTooShort = false;
+  seedTimeTooLong = false;
 
   constructor(private fb: FormBuilder,
               private memberHistoryService: MemberHistoryService,
@@ -72,17 +80,37 @@ export class EntryDetailsEventComponent implements OnInit {
         // Once results are available, check if there's a previous result for this event
         if (resultsAvailable) {
           this.isMemberHistoryAvailable();
+          // Freetime not available
+          if (this.historyAvailable && this.meetEvent.freetime) {
+            this.eventEntryForm.controls.seedTime.disable();
+          }
         }
       });
     }
 
     this.eventEntryForm.valueChanges.subscribe((entryDetails) => {
-      this.entryService.updateEventEntry(this.meetEvent, TimeService.timeStringToSeconds(entryDetails.seedTime));
+      const newSeedTime = TimeService.timeStringToSeconds(entryDetails.seedTime);
+
+      if (this.isTimeReasonable(newSeedTime)) {
+        this.entryService.updateEventEntry(this.meetEvent, newSeedTime);
+      }
     });
 
-    // Freetime not available
-    if (this.meetEvent.freetime) {
-      this.eventEntryForm.controls['seedTime'].disable();
+    this.eventsDisabledSubscription = this.entryService.getDisabledEventsSubscription(this.meetEvent.meet_id).subscribe((disabledEvents) => {
+      // TODO: include rule reference
+      if (disabledEvents.includes(this.meetEvent.id)) {
+        if (!this.entered) {
+          this.enterButtonDisabled = true;
+        }
+      }
+    });
+
+    if (this.isRelay()) {
+      this.seedTimeRequired = false;
+    }
+
+    if (this.isPostal()) {
+      this.seedTimeRequired = false;
     }
 
   }
@@ -92,6 +120,7 @@ export class EntryDetailsEventComponent implements OnInit {
       this.historyAvailable = this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.metres,
         this.meetEvent.discipline, this.meetEvent.course)
     } else {
+      console.log('No member history for this event');
       this.historyAvailable = false;
     }
   }
@@ -247,6 +276,38 @@ export class EntryDetailsEventComponent implements OnInit {
     } else {
       return false;
     }
+  }
+
+  isPostal() {
+    if (this.meetEvent.event_type.typename.includes('Postal')) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  isTimeReasonable(newSeedTime) {
+    const minTime = (this.meetEvent.event_distance.metres / 25) * 7;
+    const maxTime = (this.meetEvent.event_distance.metres / 25) * 80;
+
+    if (newSeedTime !== 0) {
+      if (newSeedTime < minTime) {
+        this.seedTimeTooShort = true;
+        this.seedTimeTooLong = false;
+        return false;
+      } else if (newSeedTime > maxTime) {
+        this.seedTimeTooLong = true;
+        this.seedTimeTooShort = false;
+        return false;
+      } else {
+        this.seedTimeTooLong = false;
+        this.seedTimeTooShort = false;
+      }
+    } else {
+      this.seedTimeTooLong = false;
+      this.seedTimeTooShort = false;
+    }
+    return true;
   }
 
 }

@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import {EnvironmentSpecificService} from './environment-specific.service';
 import {EnvSpecific} from './models/env-specific';
 import {MeetEvent} from './models/meet-event';
+import {EntryEvent} from './models/entryevent';
 
 @Injectable()
 export class MeetService {
@@ -98,29 +99,35 @@ export class MeetService {
   }
 
   loadMeetDetails(meet_id: number) {
-    this.http.get(this.api + 'meets/' + meet_id).subscribe((result) => {
-      const events: MeetEvent[] = [];
+    this.http.get(this.api + 'meets/' + meet_id).subscribe((result: Meet) => {
+      // const events: MeetEvent[] = [];
+      //
+      // result['events'].forEach((meetEvent) => {
+      //   const eventObj = <MeetEvent>{
+      //     id: meetEvent.id,
+      //     meet_id: meetEvent.meet_id,
+      //     type: meetEvent.event_type.typename,
+      //     discipline: meetEvent.event_discipline.discipline,
+      //     legs: meetEvent.legs,
+      //     distance: meetEvent.event_distance.distance,
+      //     metres: meetEvent.event_distance.metres,
+      //     course: meetEvent.event_distance.course,
+      //     eventname: meetEvent.eventname,
+      //     prognumber: meetEvent.prognumber,
+      //     progsuffix: meetEvent.progsuffix,
+      //     eventfee: meetEvent.eventfee,
+      //     deadline: meetEvent.deadline
+      //   };
+      //   events.push(eventObj);
+      // });
 
-      result['events'].forEach((meetEvent) => {
-        const eventObj = <MeetEvent>{
-          id: meetEvent.id,
-          meet_id: meetEvent.meet_id,
-          type: meetEvent.event_type.typename,
-          discipline: meetEvent.event_discipline.discipline,
-          legs: meetEvent.legs,
-          distance: meetEvent.event_distance.distance,
-          metres: meetEvent.event_distance.metres,
-          course: meetEvent.event_distance.course,
-          eventname: meetEvent.eventname,
-          prognumber: meetEvent.prognumber,
-          progsuffix: meetEvent.progsuffix,
-          eventfee: meetEvent.eventfee,
-          deadline: meetEvent.deadline
-        };
-        events.push(eventObj);
-      });
+      // this.getMeet(meet_id).events = events;
+      const index = this.meets.indexOf(this.getMeet(meet_id));
 
-      this.getMeet(meet_id).events = events;
+      if (index !== -1) {
+        this.meets[index] = result;
+      }
+
       localStorage.setItem('meets', JSON.stringify(this.meets));
       this.meetsChanged.next(this.meets);
     });
@@ -179,5 +186,16 @@ export class MeetService {
 
     return meetsArray.reverse();
 
+  }
+
+  getEventIds(meetId) {
+    const meet = this.getMeet(meetId);
+    const eventIds = [];
+
+    for (const meetEvent of meet.events) {
+      eventIds.push(meetEvent.id);
+    }
+
+    return eventIds;
   }
 }

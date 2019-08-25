@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {Meet} from '../models/meet';
-import {FormBuilder} from '@angular/forms';
+import {FormBuilder, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PlatformLocation} from '@angular/common';
 import {UserService} from '../user.service';
@@ -8,6 +8,8 @@ import {MeetService} from '../meet.service';
 import {EntryService} from '../entry.service';
 import {Subject} from 'rxjs';
 import {IPayPalConfig, ICreateOrderRequest, IPayPalButtonStyle} from 'ngx-paypal';
+
+import {PaymentOption} from '../models/paymentoption';
 
 @Component({
   selector: 'app-entry-confirmation',
@@ -23,8 +25,15 @@ export class EntryConfirmationComponent implements OnInit {
   meetName;
 
   entry;
+  paymentOptionForm;
 
-  public payPalConfig ?: IPayPalConfig;
+
+  public defaultPrice: string = '9.99';
+  public payPalConfig?: IPayPalConfig;
+
+  public showSuccess: boolean = false;
+  public showCancel: boolean = false;
+  public showError: boolean = false;
 
   constructor(private fb: FormBuilder,
               private route: ActivatedRoute,
@@ -44,9 +53,29 @@ export class EntryConfirmationComponent implements OnInit {
 
     this.entry = this.entryService.getEntry(this.meet_id);
 
-    this.initPaypalConfig();
+
+    this.paymentOptionForm = this.fb.group({
+      paymentOption: ['paypal', Validators.required]
+    });
+
+    this.paymentOptionForm.valueChanges.subscribe(val => {
+      if (this.paymentOptionForm.valid) {
+        this.formValidSubject.next(true);
+      } else {
+        this.formValidSubject.next(false);
+      }
+    });
+
+    this.initConfig();
 
   }
+
+  private resetStatus(): void {
+    this.showError = false;
+    this.showSuccess = false;
+    this.showCancel = false;
+  }
+
 
   onSubmit($event) {
     switch ($event) {
@@ -58,38 +87,48 @@ export class EntryConfirmationComponent implements OnInit {
         break;
       case 'submit':
         this.saveEntry();
+        this.submit();
         break;
     }
   }
 
   saveEntry() {
+    const paymentOption: PaymentOption = Object.assign({}, this.paymentOptionForm.value);
+    this.entryService.setPaymentOptions(this.meet_id, paymentOption);
     console.log('saveentry');
   }
 
-  private initPaypalConfig(): void {
+  submit() {
+    console.log('submit');
+    this.entryService.storeIncompleteEntry(this.entryService.getEntry(this.meet_id));
+    this.entryService.finalise(this.entryService.getEntry(this.meet_id));
+  }
+
+
+  private initConfig(): void {
     this.payPalConfig = {
-      currency: 'AUD',
-      clientId: 'AZWwmMRH-EF8MkmCfwNITJfMrsQ4Nbkd24LtT66jx5mnXHOEzvVxl2ZfqhdMTCWJI1Q_qdHANwDkrcXu',
+      currency: 'EUR',
+      clientId: 'sb',
       createOrderOnClient: (data) => < ICreateOrderRequest > {
         intent: 'CAPTURE',
         purchase_units: [{
           amount: {
-            currency_code: 'AUD',
-            value: '25.00',
+            currency_code: 'EUR',
+            value: '9.99',
             breakdown: {
               item_total: {
-                currency_code: 'AUD',
-                value: '25.00'
+                currency_code: 'EUR',
+                value: '9.99'
               }
             }
           },
           items: [{
-            name: 'Entry Fees',
+            name: 'Enterprise Subscription',
             quantity: '1',
             category: 'DIGITAL_GOODS',
             unit_amount: {
-              currency_code: 'AUD',
-              value: '25.00',
+              currency_code: 'EUR',
+              value: '9.99',
             },
           }]
         }]
@@ -97,11 +136,9 @@ export class EntryConfirmationComponent implements OnInit {
       advanced: {
         commit: 'true'
       },
-      style: <IPayPalButtonStyle> {
-        label: 'pay',
-        size: 'large',
-        shape: 'rect',
-        layout: 'horizontal'
+      style: {
+        label: 'paypal',
+        layout: 'vertical'
       },
       onApprove: (data, actions) => {
         console.log('onApprove - transaction was approved, but not authorized', data, actions);
@@ -112,21 +149,21 @@ export class EntryConfirmationComponent implements OnInit {
       },
       onClientAuthorization: (data) => {
         console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
-        // this.showSuccess = true;
+        this.showSuccess = true;
       },
       onCancel: (data, actions) => {
         console.log('OnCancel', data, actions);
-        // this.showCancel = true;
+        this.showCancel = true;
 
       },
       onError: err => {
         console.log('OnError', err);
-        // this.showError = true;
+        this.showError = true;
       },
       onClick: (data, actions) => {
         console.log('onClick', data, actions);
-        // this.resetStatus();
-      },
+        this.resetStatus();
+      }
     };
   }
 

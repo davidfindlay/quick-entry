@@ -3,19 +3,42 @@ import {Entry} from './models/entry';
 import {MembershipDetails} from './models/membership-details';
 import {MedicalDetails} from './models/medical-details';
 import {MemberHistoryService} from './member-history.service';
-import {Subject} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {EntryEvent} from './models/entryevent';
 import {MeetService} from './meet.service';
+import {HttpClient} from '@angular/common/http';
+import {EnvironmentSpecificService} from './environment-specific.service';
+import {PaymentOption} from './models/paymentoption';
+import {IncompleteEntry} from './models/incomplete_entry';
 
 @Injectable()
 export class EntryService {
+
+  api: string;
 
   entries: Entry[] = [];
   entriesChanged = new Subject();
   membershipDetails: MembershipDetails;
 
   constructor(private memberHistoryService: MemberHistoryService,
-              private meetService: MeetService) {
+              private meetService: MeetService,
+              private http: HttpClient,
+              private envSpecificSvc: EnvironmentSpecificService) {
+
+    if (this.envSpecificSvc.envSpecific == null) {
+      console.log('Requesting environment load');
+      this.envSpecificSvc.loadEnvironment();
+
+      this.envSpecificSvc.subscribe(this, () => {
+        console.log('Got environment');
+        this.api = this.envSpecificSvc.envSpecific.api;
+      });
+
+    } else {
+      console.log('Already should have environment');
+      this.api = this.envSpecificSvc.envSpecific.api;
+    }
+
     this.loadSavedEntries();
   }
 
@@ -73,6 +96,19 @@ export class EntryService {
       const entry = this.entries.find(x => x.meetId === meetId, 10);
       if (entry) {
         entry.medicalDetails = medicalDetails;
+        this.storeEntries();
+      } else {
+        console.error('Unable to find entry');
+      }
+    }
+    console.log(this.entries);
+  }
+
+  setPaymentOptions(meetId: number, paymentOptions: PaymentOption) {
+    if (this.entries) {
+      const entry = this.entries.find(x => x.meetId === meetId, 10);
+      if (entry) {
+        entry.paymentOptions = paymentOptions;
         this.storeEntries();
       } else {
         console.error('Unable to find entry');
@@ -218,6 +254,67 @@ export class EntryService {
     console.log('Clear unsaved entries');
     this.entries = [];
     this.storeEntries();
+  }
+
+  getDisabledEventsSubscription(meetId) {
+    return new Observable<number[]>((observer) => {
+      this.entriesChanged.subscribe((changed: Entry[]) => {
+        const currentEntry = changed.filter(x => x.meetId === meetId)[0];
+        console.log(currentEntry);
+
+        const numIndividualEvents = this.getIndividualEventCount(currentEntry);
+
+        if (numIndividualEvents >= this.meetService.getMeet(currentEntry.meetId).maxevents) {
+          console.log('Maximum individual events reached');
+
+          // const disabledEvents = this.meetService.getEventIds(meetId).filter(n => !this.getEnteredEventIds(currentEntry).includes(n));
+          const disabledEvents = this.meetService.getEventIds(meetId);
+          observer.next(disabledEvents);
+        } else {
+          observer.next([]);
+        }
+
+      })
+    });
+  }
+
+  getEnteredEventIds(meetEntry: Entry) {
+    const eventIds = [];
+    const events: EntryEvent[] = meetEntry.entryEvents;
+
+    if (events !== undefined && events !== null) {
+      for (const event of events) {
+        eventIds.push(event.event_id);
+      }
+    }
+
+    return eventIds;
+  }
+
+  storeIncompleteEntry(meetEntry) {
+    const incompleteEntry = <IncompleteEntry>{
+      meet_id: meetEntry.meetId,
+      user_id: null,
+      status_id: null,
+      member_id: null,
+      entrydata: meetEntry
+    };
+
+    console.log(incompleteEntry);
+
+    return this.http.post(this.api + 'entry_incomplete', incompleteEntry).subscribe((entry: IncompleteEntry) => {
+      const localEntry = this.getEntry(meetEntry.meetId);
+      localEntry.incompleteId = entry.id;
+      console.log(localEntry);
+      this.storeEntries();
+    });
+  }
+
+  finalise(meetEntry) {
+    console.log('finalise');
+    return this.http.post(this.api + 'entry_finalise/' + meetEntry.incompleteId, {}).subscribe((entry: any) => {
+      console.log(entry);
+    });
   }
 
 }

@@ -2,6 +2,7 @@ import {Session} from './session';
 import {MeetEvent} from './meet-event';
 import {Phone} from './phone';
 import {Email} from './email';
+import {MeetEventGroup} from './meet-event-group';
 
 /**
  * Created by david on 7/9/17.
@@ -30,4 +31,6 @@ export class Meet {
   public programfee;
   public sessions: Session[];
   public events: MeetEvent[];
+
+  public groups: MeetEventGroup[];
 }
