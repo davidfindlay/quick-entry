@@ -4,7 +4,7 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: false,
-  api: 'http://localhost:8088/api/',
+  production: true,
+  api: 'https://msqtest.davsoft.com.au/api/',
   resultsPortal: 'https://b4wt31qb36.execute-api.ap-southeast-2.amazonaws.com/production/'
 };

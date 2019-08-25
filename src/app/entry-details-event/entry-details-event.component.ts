@@ -80,8 +80,10 @@ export class EntryDetailsEventComponent implements OnInit {
         // Once results are available, check if there's a previous result for this event
         if (resultsAvailable) {
           this.isMemberHistoryAvailable();
+
           // Freetime not available
           if (this.historyAvailable && this.meetEvent.freetime) {
+            console.log('Disable free time entry on event ' + this.meetEvent.prognumber);
             this.eventEntryForm.controls.seedTime.disable();
           }
         }

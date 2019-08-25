@@ -5,29 +5,21 @@ import {BehaviorSubject, Observable, Subject} from 'rxjs';
 
 import * as moment from 'moment';
 import {of} from 'rxjs/internal/observable/of';
-import {EnvironmentSpecificService} from './environment-specific.service';
-import {EnvSpecific} from './models/env-specific';
+
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MemberHistoryService {
 
-  private resultsPortal;
-
   private results: Result[];
   private historyDownloading = false;
 
   resultsAvailable = new BehaviorSubject<boolean>(false);
 
-  constructor(private http: HttpClient,
-              private envSpecificSvc: EnvironmentSpecificService) {
-    envSpecificSvc.subscribe(this, this.setResultsPortal);
-  }
+  constructor(private http: HttpClient) {
 
-  setResultsPortal(caller: any, es: EnvSpecific) {
-    const thisCaller = caller as MemberHistoryService;
-    thisCaller.resultsPortal = es.resultsPortal;
   }
 
   downloadHistory(member_no: number) {
@@ -37,8 +29,10 @@ export class MemberHistoryService {
       if (historyDownload !== undefined && historyDownload !== null) {
         historyDownload.subscribe((results: any[]) => {
           console.log('Got history and stored it');
-          this.storeResults(results);
+          this.storeResults(results, member_no);
         });
+      } else {
+        console.log('history undefined or null');
       }
     }
   }
@@ -49,10 +43,10 @@ export class MemberHistoryService {
     } else {
       this.historyDownloading = true;
     }
-    return this.http.get( this.resultsPortal + 'history/' + member_no + '/');
+    return this.http.get( environment.resultsPortal + 'history/' + member_no + '/');
   }
 
-  storeResults(results) {
+  storeResults(results, member_no) {
     const storeResults: Result[] = [];
 
     results.forEach((result) => {
@@ -77,7 +71,15 @@ export class MemberHistoryService {
     this.historyDownloading = false;
     this.results = storeResults;
     this.resultsAvailable.next(true);
-    console.log(this.results);
+    // console.log(this.results);
+    console.log('Stored history');
+
+    localStorage.setItem('history', JSON.stringify({
+      member_no: member_no,
+      timestamp: new Date(),
+      history: this.results
+    }));
+
   }
 
   isHistoryAvailable(member_no: number, distance: number, discipline: string, course?: string): boolean {

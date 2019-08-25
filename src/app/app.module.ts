@@ -1,8 +1,7 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {EnvironmentSpecificResolver} from './environment-specific-resolver';
+import {HttpClientModule} from '@angular/common/http';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import {Routes,
@@ -25,7 +24,6 @@ import { WorkflowNavComponent } from './workflow-nav/workflow-nav.component';
 import {AuthenticationModule} from './authentication';
 import {UserService} from './user.service';
 import {EntryService} from './entry.service';
-import {EnvironmentSpecificService} from './environment-specific.service';
 import { MembershipClubDetailsComponent } from './membership-club-details/membership-club-details.component';
 import { ClassificationMedicalDetailsComponent } from './classification-medical-details/classification-medical-details.component';
 import { EntryPaymentComponent } from './entry-payment/entry-payment.component';
@@ -39,7 +37,7 @@ import { EntryDetailsTotalsComponent } from './entry-details-totals/entry-detail
 import {NgxPayPalModule} from 'ngx-paypal';
 
 const appRoutes: Routes = [
-    { path: '', component: MeetListComponent, resolve: { envSpecific: EnvironmentSpecificResolver } },
+    { path: '', component: MeetListComponent },
     { path: 'login', component: LoginComponent },
     { path: 'enter/:meet/step1', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step2', component: MembershipClubDetailsComponent},
@@ -86,8 +84,6 @@ const appRoutes: Routes = [
     NgxPayPalModule,
   ],
     providers: [
-      EnvironmentSpecificService,
-      EnvironmentSpecificResolver,
         MeetService,
         UserService,
         EntryService,

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Club} from './models/club';
-import {EnvironmentSpecificService} from './environment-specific.service';
-import {EnvSpecific} from './models/env-specific';
+
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,20 +12,12 @@ export class ClubsService {
 
   clubs: Club[];
 
-  constructor(private http: HttpClient,
-              private envSpecificSvc: EnvironmentSpecificService) {
-    envSpecificSvc.subscribe(this, this.setApi);
-
-  }
-
-  setApi(caller: any, es: EnvSpecific) {
-    const thisCaller = caller as ClubsService;
-    thisCaller.api = es.api;
+  constructor(private http: HttpClient) {
   }
 
   loadClubs() {
     console.log('loadClubs');
-    this.http.get(this.api + 'clubs').subscribe((result: Club[]) => {
+    this.http.get(environment.api + 'clubs').subscribe((result: Club[]) => {
       this.clubs = result;
     });
   }

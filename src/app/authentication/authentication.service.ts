@@ -5,11 +5,9 @@ import { AuthService } from 'ngx-auth';
 import {TokenStorage} from './token.service';
 import {Router} from '@angular/router';
 import {NgxSpinnerService} from 'ngx-spinner';
-import * as jwt_decode from 'jwt-decode';
-import {EnvironmentSpecificService} from '../environment-specific.service';
-import {EnvSpecific} from '../models/env-specific';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {User} from '../models/user';
+import {environment} from '../../environments/environment';
 
 interface AccessData {
   access_token: string;
@@ -21,8 +19,6 @@ interface AccessData {
 @Injectable()
 export class AuthenticationService implements AuthService {
 
-  private api: string;
-
   private interruptedUrl: string;
   private user: User;
 
@@ -33,17 +29,13 @@ export class AuthenticationService implements AuthService {
     private tokenStorage: TokenStorage,
     private router: Router,
     private spinner: NgxSpinnerService,
-    private envSpecificSvc: EnvironmentSpecificService
   ) {
-    envSpecificSvc.subscribe(this, this.setApi);
-
     // Check if we have token
+    if (this.isAuthorized()) {
+      this.user = JSON.parse(localStorage.getItem('user'));
+      this.authenticationChanged.next(this.user);
+    }
 
-  }
-
-  setApi(caller: any, es: EnvSpecific) {
-    const thisCaller = caller as AuthenticationService;
-    thisCaller.api = es.api;
   }
 
   /**
@@ -92,7 +84,7 @@ export class AuthenticationService implements AuthService {
       .getRefreshToken()
       .pipe(
         switchMap((refreshToken: string) =>
-          this.http.post(this.api + `token/refresh/`, { 'refresh': refreshToken })
+          this.http.post(environment.api + `token/refresh/`, { 'refresh': refreshToken })
         ),
         timeout(5000),
         tap((tokens: AccessData) => {
@@ -140,7 +132,7 @@ export class AuthenticationService implements AuthService {
 
   public login(username, password): Observable<any> {
     console.log('login request for ' + username);
-    return this.http.post(this.api + `login/`, {'username': username, 'password': password})
+    return this.http.post(environment.api + `login/`, {'username': username, 'password': password})
       .pipe(tap((tokens: AccessData) => {
         this.saveAccessData(tokens);
       }));
@@ -152,6 +144,7 @@ export class AuthenticationService implements AuthService {
   public logout(): void {
     this.tokenStorage.clear();
     this.user = null;
+    localStorage.removeItem('user');
     this.authenticationChanged.next(null);
   }
 
@@ -166,6 +159,7 @@ export class AuthenticationService implements AuthService {
     if (access_data.access_token == null) {
       console.log('Clear tokens cause new ones are null');
       this.tokenStorage.clear();
+      localStorage.removeItem('user');
       return;
     }
 
@@ -173,6 +167,7 @@ export class AuthenticationService implements AuthService {
       console.log('Store access token');
       this.tokenStorage.setAccessToken(access_data.access_token);
       this.user = access_data.user;
+      localStorage.setItem('user', JSON.stringify(this.user));
       this.authenticationChanged.next(this.user);
     }
   }

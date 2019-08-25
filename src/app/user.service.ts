@@ -9,14 +9,12 @@ import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {HttpClient} from '@angular/common/http';
 import * as moment from 'moment';
-import {EnvironmentSpecificService} from './environment-specific.service';
-import {EnvSpecific} from './models/env-specific';
 import {BehaviorSubject} from 'rxjs';
+
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class UserService {
-
-  api: string;
 
     authSub: Subscription;
     userChanged = new BehaviorSubject<User>(null);
@@ -29,16 +27,9 @@ export class UserService {
     previousMemberships;
 
     constructor(private http: HttpClient,
-                private authenticationService: AuthenticationService,
-                private envSpecificSvc: EnvironmentSpecificService) {
-      envSpecificSvc.subscribe(this, this.setApi);
+                private authenticationService: AuthenticationService) {
         this.init();
     }
-
-  setApi(caller: any, es: EnvSpecific) {
-    const thisCaller = caller as UserService;
-    thisCaller.api = es.api;
-  }
 
     init() {
         this.user = this.authenticationService.getUser();
@@ -65,7 +56,7 @@ export class UserService {
 
         console.log('Attempt to load member');
 
-        this.http.get(this.api + 'member/' + this.user.member)
+        this.http.get(environment.api + 'member/' + this.user.member)
             .subscribe(member => {
                 this.member = member;
                 console.log(this.member);
