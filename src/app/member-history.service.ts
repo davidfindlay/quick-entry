@@ -24,7 +24,7 @@ export class MemberHistoryService {
 
   downloadHistory(member_no: number) {
     if (this.results === undefined || this.results === null || this.results.length === 0) {
-      console.log('downloadHistory of ' + member_no);
+      // console.log('downloadHistory of ' + member_no);
       const historyDownload = this.getHistory(member_no);
       if (historyDownload !== undefined && historyDownload !== null) {
         historyDownload.subscribe((results: any[]) => {
@@ -32,7 +32,7 @@ export class MemberHistoryService {
           this.storeResults(results, member_no);
         });
       } else {
-        console.log('history undefined or null');
+        // console.log('history undefined or null');
       }
     }
   }

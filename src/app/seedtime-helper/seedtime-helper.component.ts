@@ -19,6 +19,7 @@ export class SeedtimeHelperComponent implements OnInit {
   @Input() inDistance: Observable<number>;
   @Input() inDiscipline: Observable<string>;
   @Input() inCourse: Observable<string>;
+  @Input() inFreetime: Observable<boolean>;
 
   @Input() timeIn: number;
 
@@ -30,6 +31,7 @@ export class SeedtimeHelperComponent implements OnInit {
   public distance: number;
   public discipline: string;
   public course: string;
+  public freetime: boolean;
 
   closeResult: string;
   seedTimeForm: FormGroup;
@@ -84,11 +86,13 @@ export class SeedtimeHelperComponent implements OnInit {
     forkJoin({
       distance: this.inDistance,
       discipline: this.inDiscipline,
-      course: this.inCourse
+      course: this.inCourse,
+      freetime: this.inFreetime
     }).subscribe((eventDetails) => {
       this.distance = eventDetails.distance;
       this.discipline = eventDetails.discipline;
       this.course = eventDetails.course;
+      this.freetime = eventDetails.freetime;
       this.shouldShowHours();
 
       this.memberHistoryService.getPersonalBest(this.memberNo, this.distance, this.discipline, this.course).subscribe((pbs) => {

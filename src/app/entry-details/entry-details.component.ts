@@ -45,9 +45,13 @@ export class EntryDetailsComponent implements OnInit {
             this.meetName = this.meet.meetname;
         }
 
-        console.log('Meet: ' + this.meetName);
-
-        console.log(this.meet);
+        if (this.meet.events === undefined || this.meet.events === null) {
+          this.meetService.getMeetDetails(this.meet).subscribe((updated) => {
+            console.log('Got Meet Details');
+            console.log(updated);
+            this.meet = updated;
+          });
+        }
 
         this.createForm();
 

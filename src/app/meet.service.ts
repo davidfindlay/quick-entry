@@ -84,6 +84,15 @@ export class MeetService {
     });
   }
 
+  getMeetDetails(meet_id) {
+    return new Observable<Meet>((observer) => {
+      this.loadMeetDetails(meet_id);
+      this.meetsChanged.subscribe(changed => {
+        observer.next(this.getMeet(meet_id));
+      });
+    });
+  }
+
   getOpenMeets() {
 
     const meetsArray = [];
@@ -139,12 +148,25 @@ export class MeetService {
 
   }
 
-  getEventIds(meetId) {
+  getEventIds(meetId): number[] {
     const meet = this.getMeet(meetId);
     const eventIds = [];
 
     for (const meetEvent of meet.events) {
       eventIds.push(meetEvent.id);
+    }
+
+    return eventIds;
+  }
+
+  getIndividualEventIds(meetId): number[] {
+    const meet = this.getMeet(meetId);
+    const eventIds = [];
+
+    for (const meetEvent of meet.events) {
+      if (meetEvent.legs === 1) {
+        eventIds.push(meetEvent.id);
+      }
     }
 
     return eventIds;

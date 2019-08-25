@@ -189,7 +189,6 @@ export class EntryService {
         return false;
       }
 
-
       return true;
     }
 
@@ -243,20 +242,50 @@ export class EntryService {
     return new Observable<number[]>((observer) => {
       this.entriesChanged.subscribe((changed: Entry[]) => {
         const currentEntry = changed.filter(x => x.meetId === meetId)[0];
-
         const numIndividualEvents = this.getIndividualEventCount(currentEntry);
+        let disabledEvents = this.getBlockedEvents(currentEntry);
 
         if (numIndividualEvents >= this.meetService.getMeet(currentEntry.meetId).maxevents) {
-          const disabledEvents = this.meetService.getEventIds(meetId).filter(n => !this.getEnteredEventIds(currentEntry).includes(n));
-          console.log(disabledEvents);
-          // const disabledEvents = this.meetService.getEventIds(meetId);
-          observer.next(disabledEvents);
-        } else {
-          observer.next([]);
+          disabledEvents = disabledEvents.concat(this.meetService.getIndividualEventIds(meetId).filter(n => !this.getEnteredEventIds(currentEntry).includes(n)));
         }
+
+        // console.log('Disable events: ' + disabledEvents);
+        observer.next(disabledEvents);
 
       })
     });
+  }
+
+  getBlockedEvents(meetEntry: Entry): number[] {
+    const blockedGroups = [];
+    const blockedEvents = [];
+
+    const meetDetails = this.meetService.getMeet(meetEntry.meetId);
+
+    for (const group of meetDetails.groups) {
+      const groupMax = group.max_choices;
+      let groupCount = 0;
+
+      for (const groupEvent of group.events) {
+        for (const entryEvent of meetEntry.entryEvents) {
+          if (entryEvent.event_id === groupEvent.event_id) {
+            groupCount++;
+          }
+        }
+      }
+
+      if (groupCount >= groupMax) {
+        blockedGroups.push(group);
+      }
+    }
+
+    for (const group of blockedGroups) {
+      for (const groupEvent of group.events) {
+        blockedEvents.push(groupEvent.event_id);
+      }
+    }
+
+    return blockedEvents;
   }
 
   getEnteredEventIds(meetEntry: Entry) {

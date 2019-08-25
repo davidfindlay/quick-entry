@@ -42,6 +42,8 @@ export class EntryDetailsEventComponent implements OnInit {
   entered = false;
   fixCount = 0;
   enterButtonDisabled = false;
+  disabledClass = 'btn btn-secondary';
+  undisableClass = '';
 
   entry;
   memberNo = 0;
@@ -61,17 +63,18 @@ export class EntryDetailsEventComponent implements OnInit {
   ngOnInit() {
     this.entry = this.entryService.getEntry(this.meetEvent.meet_id);
 
+    this.eventEntryForm = this.fb.group({
+      enter: false,
+      seedTime: ''
+    });
+
     if (this.entry !== undefined && this.entry !== null) {
       const membershipDetails = this.entry.membershipDetails;
       if (membershipDetails !== undefined && membershipDetails !== null) {
         this.memberNo = parseInt(membershipDetails.member_number, 10);
       }
-    }
 
-    this.eventEntryForm = this.fb.group({
-      enter: false,
-      seedTime: ''
-    });
+    }
 
     // Download member history if it's not already available
     if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
@@ -83,7 +86,7 @@ export class EntryDetailsEventComponent implements OnInit {
 
           // Freetime not available
           if (this.historyAvailable && this.meetEvent.freetime) {
-            console.log('Disable free time entry on event ' + this.meetEvent.prognumber);
+            // console.log('Disable free time entry on event ' + this.meetEvent.prognumber);
             this.eventEntryForm.controls.seedTime.disable();
           }
         }
@@ -99,10 +102,16 @@ export class EntryDetailsEventComponent implements OnInit {
     });
 
     this.eventsDisabledSubscription = this.entryService.getDisabledEventsSubscription(this.meetEvent.meet_id).subscribe((disabledEvents) => {
-      // TODO: include rule reference
       if (disabledEvents.includes(this.meetEvent.id)) {
         if (!this.entered) {
           this.enterButtonDisabled = true;
+          this.undisableClass = this.enterClass;
+          this.enterClass = this.disabledClass;
+        }
+      } else {
+        this.enterButtonDisabled = false;
+        if (this.enterClass === this.disabledClass) {
+          this.enterClass = this.undisableClass;
         }
       }
     });
@@ -115,14 +124,40 @@ export class EntryDetailsEventComponent implements OnInit {
       this.seedTimeRequired = false;
     }
 
+    if (this.entry !== undefined && this.entry !== null) {
+      if (this.entry.entryEvents !== undefined && this.entry.entryEvents !== null) {
+        const currentEvents = this.entry.entryEvents.filter(x => x.event_id === this.meetEvent.id)
+        if (currentEvents !== undefined && currentEvents !== null) {
+          if (currentEvents.length > 0) {
+            const currentEventEntry = currentEvents[0];
+            this.showEntered();
+
+            console.log(currentEventEntry.seedtime);
+            const seedtime = TimeService.formatTime(currentEventEntry.seedtime);
+
+            this.eventEntryForm.patchValue({
+              enter: true,
+              seedTime: seedtime
+            });
+
+          }
+        }
+      }
+    }
+
   }
 
   isMemberHistoryAvailable() {
     if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
-      this.historyAvailable = this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.metres,
-        this.meetEvent.discipline, this.meetEvent.course)
+      this.historyAvailable = this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.event_distance.metres,
+        this.meetEvent.event_discipline.discipline, this.meetEvent.event_distance.course);
+      if (this.historyAvailable) {
+        // console.log('History available for event ' + this.meetEvent.prognumber);
+      } else {
+        // console.log('No member history for event ' + this.meetEvent.prognumber);
+      }
     } else {
-      console.log('No member history for this event');
+      // console.log('No member history for event ' + this.meetEvent.prognumber);
       this.historyAvailable = false;
     }
   }
@@ -137,9 +172,10 @@ export class EntryDetailsEventComponent implements OnInit {
     console.log(this.meetEvent);
 
     modalRef.componentInstance.memberNo = this.memberNo;
-    modalRef.componentInstance.inDistance = of(this.meetEvent.metres);
-    modalRef.componentInstance.inDiscipline = of(this.meetEvent.discipline);
-    modalRef.componentInstance.inCourse = of(this.meetEvent.course);
+    modalRef.componentInstance.inDistance = of(this.meetEvent.event_distance.metres);
+    modalRef.componentInstance.inDiscipline = of(this.meetEvent.event_discipline.discipline);
+    modalRef.componentInstance.inCourse = of(this.meetEvent.event_distance.course);
+    modalRef.componentInstance.inFreetime = of(this.meetEvent.freetime);
 
     if (this.eventEntryForm.controls['seedTime'].value !== '') {
       modalRef.componentInstance.timeIn = TimeService.timeStringToSeconds(this.eventEntryForm.controls['seedTime'].value);
@@ -154,31 +190,33 @@ export class EntryDetailsEventComponent implements OnInit {
 
   clickEnter() {
     if (this.entered === false) {
-      this.entered = true;
-      this.enterClass = 'btn btn-success';
-      this.enterText = this.enteredButtonCaption;
-      this.btnIconClass = this.enteredButtonIcon;
-      this.eventAriaLabel = 'Cancel entry for event ' + this.meetEvent.prognumber + this.meetEvent.progsuffix + ' '
-        + this.meetEvent.distance + ' ' + this.meetEvent.discipline;
-
+      this.showEntered();
       this.entryService.addEventEntry(this.meetEvent);
-
     } else if (this.entered === true) {
       this.entered = false;
       this.enterClass = 'btn btn-outline-primary';
       this.enterText = this.enterButtonCaption;
       this.btnIconClass = null;
       this.eventAriaLabel = 'Enter event ' + this.meetEvent.prognumber + this.meetEvent.progsuffix + ' '
-        + this.meetEvent.distance + ' ' + this.meetEvent.discipline;
+        + this.meetEvent.distance + ' ' + this.meetEvent.event_discipline.discipline;
 
       this.entryService.removeEventEntry(this.meetEvent);
     }
   }
 
+  showEntered() {
+    this.entered = true;
+    this.enterClass = 'btn btn-success';
+    this.enterText = this.enteredButtonCaption;
+    this.btnIconClass = this.enteredButtonIcon;
+    this.eventAriaLabel = 'Cancel entry for event ' + this.meetEvent.prognumber + this.meetEvent.progsuffix + ' '
+      + this.meetEvent.distance + ' ' + this.meetEvent.event_discipline.discipline;
+  }
+
   clickLastTime() {
-    this.memberHistoryService.getLastTime(this.memberNo, this.meetEvent.metres,
-      this.meetEvent.discipline,
-      this.meetEvent.course).subscribe((lastTime) => {
+    this.memberHistoryService.getLastTime(this.memberNo, this.meetEvent.event_distance.metres,
+      this.meetEvent.event_discipline.discipline,
+      this.meetEvent.event_distance.course).subscribe((lastTime) => {
 
       if (lastTime != null) {
         this.eventEntryForm.controls['seedTime'].patchValue(
@@ -197,9 +235,9 @@ export class EntryDetailsEventComponent implements OnInit {
   }
 
   clickPersonalBest() {
-    this.memberHistoryService.getPersonalBest(this.memberNo, this.meetEvent.metres,
-      this.meetEvent.discipline,
-      this.meetEvent.course).subscribe((personalBests) => {
+    this.memberHistoryService.getPersonalBest(this.memberNo, this.meetEvent.event_distance.metres,
+      this.meetEvent.event_discipline.discipline,
+      this.meetEvent.event_distance.course).subscribe((personalBests) => {
 
       if (personalBests !== null && personalBests.length > 0) {
 

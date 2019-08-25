@@ -3,6 +3,7 @@
  */
 import {EventType} from './event-type';
 import {EventDistance} from './event-distance';
+import {EventDiscipline} from './event-discipline';
 
 export class MeetEvent {
 
@@ -25,5 +26,6 @@ export class MeetEvent {
 
     event_type: EventType;
     event_distance: EventDistance;
+    event_discipline: EventDiscipline;
 
 }
