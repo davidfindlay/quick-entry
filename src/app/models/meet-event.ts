@@ -22,7 +22,7 @@ export class MeetEvent {
     deadline: string;
     exhibition: boolean;
     freetime: boolean;
-    timesrequired: boolean;
+    timerequired: boolean;
 
     event_type: EventType;
     event_distance: EventDistance;

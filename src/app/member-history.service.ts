@@ -205,9 +205,9 @@ export class MemberHistoryService {
 
   filterResults(distance: number, discipline: string, course: string): Result[] {
 
-    if (discipline === 'Individual Medley') {
-      discipline = 'IM';
-    }
+    // if (discipline === 'Individual Medley') {
+    //   discipline = 'IM';
+    // }
 
     // console.log('Searching for last result in ' + distance + ' ' + course + ' ' + discipline + '.');
 

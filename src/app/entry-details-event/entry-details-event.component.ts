@@ -50,8 +50,10 @@ export class EntryDetailsEventComponent implements OnInit {
   historyAvailable = false;
 
   seedTimeRequired = true;
+  seedTimeMandatory = false;
   seedTimeTooShort = false;
   seedTimeTooLong = false;
+  seedTimeNT = false;
 
   constructor(private fb: FormBuilder,
               private memberHistoryService: MemberHistoryService,
@@ -94,11 +96,10 @@ export class EntryDetailsEventComponent implements OnInit {
     }
 
     this.eventEntryForm.valueChanges.subscribe((entryDetails) => {
-      const newSeedTime = TimeService.timeStringToSeconds(entryDetails.seedTime);
-
-      if (this.isTimeReasonable(newSeedTime)) {
-        this.entryService.updateEventEntry(this.meetEvent, newSeedTime);
-      }
+      const rawValues = this.eventEntryForm.getRawValue();
+      const newSeedTime = TimeService.timeStringToSeconds(rawValues.seedTime);
+      this.isTimeReasonable(newSeedTime);
+      this.entryService.updateEventEntry(this.meetEvent, newSeedTime);
     });
 
     this.eventsDisabledSubscription = this.entryService.getDisabledEventsSubscription(this.meetEvent.meet_id).subscribe((disabledEvents) => {
@@ -124,6 +125,11 @@ export class EntryDetailsEventComponent implements OnInit {
       this.seedTimeRequired = false;
     }
 
+    if (this.meetEvent.timerequired) {
+      this.seedTimeMandatory = true;
+      console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
+    }
+
     if (this.entry !== undefined && this.entry !== null) {
       if (this.entry.entryEvents !== undefined && this.entry.entryEvents !== null) {
         const currentEvents = this.entry.entryEvents.filter(x => x.event_id === this.meetEvent.id)
@@ -140,6 +146,10 @@ export class EntryDetailsEventComponent implements OnInit {
               seedTime: seedtime
             });
 
+            if (currentEventEntry.seedtime === 0) {
+              this.seedTimeNT = true;
+            }
+
           }
         }
       }
@@ -149,6 +159,7 @@ export class EntryDetailsEventComponent implements OnInit {
 
   isMemberHistoryAvailable() {
     if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
+      // console.log('Look for member history for ' + this.meetEvent.event_discipline.discipline);
       this.historyAvailable = this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.event_distance.metres,
         this.meetEvent.event_discipline.discipline, this.meetEvent.event_distance.course);
       if (this.historyAvailable) {
@@ -192,6 +203,9 @@ export class EntryDetailsEventComponent implements OnInit {
     if (this.entered === false) {
       this.showEntered();
       this.entryService.addEventEntry(this.meetEvent);
+      if (this.meetEvent.freetime && this.historyAvailable) {
+        this.clickPersonalBest();
+      }
     } else if (this.entered === true) {
       this.entered = false;
       this.enterClass = 'btn btn-outline-primary';
@@ -222,12 +236,16 @@ export class EntryDetailsEventComponent implements OnInit {
         this.eventEntryForm.controls['seedTime'].patchValue(
           this.timePipe.transform(lastTime.seconds), {});
 
-        this.seedTimeTip.close();
+        if (this.seedTimeTip !== undefined) {
+          this.seedTimeTip.close();
+        }
         this.seedTimeTip.ngbTooltip = 'Your time from ' + moment(lastTime.event_date).format('DD/MM/YYYY') + ' at '
           + lastTime.location;
         this.seedTimeTip.open();
       } else {
-        this.seedTimeTip.close();
+        if (this.seedTimeTip !== undefined) {
+          this.seedTimeTip.close();
+        }
         this.seedTimeTip.ngbTooltip = 'No previous times in the event available!';
         this.seedTimeTip.open();
       }
@@ -244,12 +262,17 @@ export class EntryDetailsEventComponent implements OnInit {
         this.eventEntryForm.controls['seedTime'].patchValue(
           this.timePipe.transform(personalBests[0].seconds), {});
 
-        this.seedTimeTip.close();
+        // TODO: fix
+        if (this.seedTimeTip !== undefined) {
+          this.seedTimeTip.close();
+        }
         this.seedTimeTip.ngbTooltip = 'Your time from ' + moment(personalBests[0].event_date).format('DD/MM/YYYY') + ' at '
           + personalBests[0].location;
         this.seedTimeTip.open();
       } else {
-        this.seedTimeTip.close();
+        if (this.seedTimeTip !== undefined) {
+          this.seedTimeTip.close();
+        }
         this.seedTimeTip.ngbTooltip = 'No previous times in the event available!';
         this.seedTimeTip.open();
       }
@@ -327,6 +350,7 @@ export class EntryDetailsEventComponent implements OnInit {
   }
 
   isTimeReasonable(newSeedTime) {
+    console.log('isTimeResaonable: ' + newSeedTime);
     const minTime = (this.meetEvent.event_distance.metres / 25) * 7;
     const maxTime = (this.meetEvent.event_distance.metres / 25) * 80;
 
@@ -334,16 +358,21 @@ export class EntryDetailsEventComponent implements OnInit {
       if (newSeedTime < minTime) {
         this.seedTimeTooShort = true;
         this.seedTimeTooLong = false;
+        this.seedTimeNT = false;
         return false;
       } else if (newSeedTime > maxTime) {
         this.seedTimeTooLong = true;
         this.seedTimeTooShort = false;
+        this.seedTimeNT = false;
         return false;
       } else {
         this.seedTimeTooLong = false;
         this.seedTimeTooShort = false;
+        this.seedTimeNT = false;
       }
+      console.log('Seed time not 0');
     } else {
+      this.seedTimeNT = true;
       this.seedTimeTooLong = false;
       this.seedTimeTooShort = false;
     }

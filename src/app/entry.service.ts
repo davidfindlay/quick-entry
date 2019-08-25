@@ -3,7 +3,7 @@ import {Entry} from './models/entry';
 import {MembershipDetails} from './models/membership-details';
 import {MedicalDetails} from './models/medical-details';
 import {MemberHistoryService} from './member-history.service';
-import {Observable, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {EntryEvent} from './models/entryevent';
 import {MeetService} from './meet.service';
 import {HttpClient} from '@angular/common/http';
@@ -15,7 +15,7 @@ import { environment } from '../environments/environment';
 @Injectable()
 export class EntryService {
   entries: Entry[] = [];
-  entriesChanged = new Subject();
+  entriesChanged = new BehaviorSubject<Entry[]>(this.entries);
   membershipDetails: MembershipDetails;
 
   constructor(private memberHistoryService: MemberHistoryService,
@@ -156,6 +156,8 @@ export class EntryService {
       if (entryEvent.length === 1) {
         entryEvent[0].seedtime = seedtime;
       }
+
+      this.storeEntries();
     }
   }
 
@@ -189,11 +191,41 @@ export class EntryService {
         return false;
       }
 
+      if (this.checkForNT(meetEntry)) {
+        console.log('Disable form because of NT');
+        return false;
+      }
+
       return true;
     }
 
     console.log('Couldn\'t find entry');
 
+    return false;
+  }
+
+  checkEvents(meet_id) {
+    console.log('Check Events');
+    const meetEntry = this.getEntry(meet_id);
+    meetEntry.validEvents = this.validateEntryEvents(meetEntry);
+    this.entriesChanged.next(this.entries);
+  }
+
+  checkForNT(meetEntry) {
+    const meetDetails = this.meetService.getMeet(meetEntry.meetId);
+
+    for (const event of meetDetails.events) {
+      if (event.timerequired) {
+        for (const eventEntry of meetEntry.entryEvents) {
+          if (event.id === eventEntry.event_id) {
+            if (eventEntry.seedtime === 0) {
+              console.log('Event ' + event.prognumber + ' has disallowed 0 seedtime!');
+              return true;
+            }
+          }
+        }
+      }
+    }
     return false;
   }
 

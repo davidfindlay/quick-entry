@@ -63,6 +63,8 @@ export class EntryDetailsComponent implements OnInit {
         }
       });
 
+      this.entryService.checkEvents(this.meet_id);
+
       if (this.meet.groups !== undefined && this.meet.groups !== null) {
         for (const group of this.meet.groups) {
           for (const rule of group.rules) {
