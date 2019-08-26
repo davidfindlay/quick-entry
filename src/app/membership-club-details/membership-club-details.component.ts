@@ -78,15 +78,6 @@ export class MembershipClubDetailsComponent implements OnInit {
       this.meetName = this.meet.meetname;
     }
 
-    const existingEntry = this.getExistingEntry();
-    console.log(existingEntry);
-
-    if (existingEntry != null) {
-      console.log('Got existing entry');
-      console.log(existingEntry);
-      this.memberDetailsForm.patchValue(existingEntry);
-    }
-
     this.currentEntry = this.entryService.getEntry(this.meet_id);
 
     if (this.currentEntry.entrantDetails.who === 'else') {
@@ -99,9 +90,26 @@ export class MembershipClubDetailsComponent implements OnInit {
       this.member = this.userService.getMember();
       this.currentMemberships = this.userService.getCurrentMemberships();
       this.previousMemberships = this.userService.getPreviousMemberships();
+
+      if (this.currentMemberships.length > 0) {
+        const firstValue = this.currentMemberships[0].club.id;
+        console.log('first club id: ' + firstValue);
+        this.memberDetailsForm.patchValue({
+          club_selector: firstValue
+        });
+      }
     }
 
     this.clubsService.loadClubs();
+
+    const existingEntry = this.getExistingEntry();
+    console.log(existingEntry);
+
+    if (existingEntry != null) {
+      console.log('Got existing entry');
+      console.log(existingEntry);
+      this.memberDetailsForm.patchValue(existingEntry);
+    }
 
   }
 
