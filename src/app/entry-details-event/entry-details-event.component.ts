@@ -380,4 +380,9 @@ export class EntryDetailsEventComponent implements OnInit {
     return true;
   }
 
+  enterPressed($event) {
+    const target = $event.target;
+    target.blur();
+  }
+
 }

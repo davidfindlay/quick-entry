@@ -87,15 +87,15 @@
           <div class="input-group col-sm-9">
             <input type="text" class="form-control" id="seedTime" formControlName="seedTime"
                    ngbTooltip triggers="manual" #seedTimeTip="ngbTooltip" placement="bottom"
-                   (blur)="fixSeedTime()">
+                   (blur)="fixSeedTime()" (keyup.enter)="enterPressed($event)">
             <div class="input-group-append">
-              <button class="btn btn-outline-info" placement="bottom" ngbTooltip="Personal Best"
+              <button type="button" class="btn btn-outline-info" placement="bottom" ngbTooltip="Personal Best"
                       (click)="clickPersonalBest()" *ngIf="historyAvailable">PB
               </button>
-              <button class="btn btn-outline-info" placement="bottom" ngbTooltip="Last Result Time"
+              <button type="button" class="btn btn-outline-info" placement="bottom" ngbTooltip="Last Result Time"
                       (click)="clickLastTime()" *ngIf="historyAvailable">LT
               </button>
-              <button class="btn btn-outline-info" placement="bottom" ngbTooltip="More Options"
+              <button type="button" class="btn btn-outline-info" placement="bottom" ngbTooltip="More Options"
                       (click)="clickMore()">More
               </button>
             </div>
