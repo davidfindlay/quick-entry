@@ -231,6 +231,12 @@ export class EntryService {
 
   getIndividualEventCount(meetEntry) {
     let eventCount = 0;
+
+    // If no entry events yet return 0
+    if (meetEntry.entryEvents === undefined || meetEntry.entryEvents === null || meetEntry.entryEvents.length === 0) {
+      return 0;
+    }
+
     const meetDetails = this.meetService.getMeet(meetEntry.meetId);
 
     for (const event of meetDetails.events) {
@@ -299,9 +305,11 @@ export class EntryService {
       let groupCount = 0;
 
       for (const groupEvent of group.events) {
-        for (const entryEvent of meetEntry.entryEvents) {
-          if (entryEvent.event_id === groupEvent.event_id) {
-            groupCount++;
+        if (meetEntry.entryEvents !== undefined && meetEntry.entryEvents !== null) {
+          for (const entryEvent of meetEntry.entryEvents) {
+            if (entryEvent.event_id === groupEvent.event_id) {
+              groupCount++;
+            }
           }
         }
       }

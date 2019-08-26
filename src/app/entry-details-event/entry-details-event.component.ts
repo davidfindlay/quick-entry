@@ -104,6 +104,7 @@ export class EntryDetailsEventComponent implements OnInit {
 
     this.eventsDisabledSubscription = this.entryService.getDisabledEventsSubscription(this.meetEvent.meet_id).subscribe((disabledEvents) => {
       if (disabledEvents.includes(this.meetEvent.id)) {
+
         if (!this.entered) {
           this.enterButtonDisabled = true;
           this.undisableClass = this.enterClass;
@@ -138,7 +139,6 @@ export class EntryDetailsEventComponent implements OnInit {
             const currentEventEntry = currentEvents[0];
             this.showEntered();
 
-            console.log(currentEventEntry.seedtime);
             const seedtime = TimeService.formatTime(currentEventEntry.seedtime);
 
             this.eventEntryForm.patchValue({
@@ -220,6 +220,7 @@ export class EntryDetailsEventComponent implements OnInit {
 
   showEntered() {
     this.entered = true;
+    this.enterButtonDisabled = false;
     this.enterClass = 'btn btn-success';
     this.enterText = this.enteredButtonCaption;
     this.btnIconClass = this.enteredButtonIcon;
@@ -350,7 +351,7 @@ export class EntryDetailsEventComponent implements OnInit {
   }
 
   isTimeReasonable(newSeedTime) {
-    console.log('isTimeResaonable: ' + newSeedTime);
+    // console.log('isTimeResaonable: ' + newSeedTime);
     const minTime = (this.meetEvent.event_distance.metres / 25) * 7;
     const maxTime = (this.meetEvent.event_distance.metres / 25) * 80;
 
@@ -370,7 +371,7 @@ export class EntryDetailsEventComponent implements OnInit {
         this.seedTimeTooShort = false;
         this.seedTimeNT = false;
       }
-      console.log('Seed time not 0');
+      // console.log('Seed time not 0');
     } else {
       this.seedTimeNT = true;
       this.seedTimeTooLong = false;

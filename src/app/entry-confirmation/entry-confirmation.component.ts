@@ -10,6 +10,7 @@ import {Subject} from 'rxjs';
 import {IPayPalConfig, ICreateOrderRequest, IPayPalButtonStyle} from 'ngx-paypal';
 
 import {PaymentOption} from '../models/paymentoption';
+import {EntryEvent} from '../models/entryevent';
 
 @Component({
   selector: 'app-entry-confirmation',
@@ -27,6 +28,9 @@ export class EntryConfirmationComponent implements OnInit {
   entry;
   paymentOptionForm;
 
+  eventEntries: EntryEvent[];
+
+  statusText = 'Not Submitted: This entry has not yet been submitted. Click Next to submit this entry.'
 
   public defaultPrice: string = '9.99';
   public payPalConfig?: IPayPalConfig;
@@ -53,6 +57,9 @@ export class EntryConfirmationComponent implements OnInit {
 
     this.entry = this.entryService.getEntry(this.meet_id);
     console.log(this.entry);
+
+    this.eventEntries = this.entry.entryEvents;
+    this.eventEntries.sort((a, b) => (a.program_no > b.program_no) ? 1 : -1);
 
     this.paymentOptionForm = this.fb.group({
       paymentOption: ['paypal', Validators.required]

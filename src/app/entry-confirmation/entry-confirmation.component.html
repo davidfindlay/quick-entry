@@ -221,7 +221,7 @@
       <th>Seed Time</th>
     </tr>
     </thead>
-    <tr *ngFor="let event of entry.entryEvents">
+    <tr *ngFor="let event of eventEntries">
       <td class="pr-4">
         {{event.program_no}}
       </td>
@@ -301,43 +301,65 @@
       <h4 class="card-title">
         Payment Options
       </h4>
-        <ul>
-      <li>
-        Credit/Debit Card: We accept payment via Credit or Debit card using PayPal's card payment processing.
-        You do not need to have a PayPal account to use this option.
-      </li>
-          <li>
-            Pay Later: You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
-            for your entry by the Meet Entry Deadline your entry may not be accepted.
-          </li>
-          <li>
-            Pay via Club: Your club may make a bulk payment on behalf of members. Please check with your Club Recorder
-            or Club Captain. Note that if you do not pay for your entry by the Meet Entry Deadline your entry may not
-            be accepted.
-          </li>
-    </ul>
+      <ul>
+        <li>
+          Credit/Debit Card: We accept payment via Credit or Debit card using PayPal's card payment processing.
+          You do not need to have a PayPal account to use this option.
+        </li>
+        <li>
+          Pay Later: You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
+          for your entry by the Meet Entry Deadline your entry may not be accepted.
+        </li>
+        <li>
+          Pay via Club: Your club may make a bulk payment on behalf of members. Please check with your Club Recorder
+          or Club Captain. Note that if you do not pay for your entry by the Meet Entry Deadline your entry may not
+          be accepted.
+        </li>
+      </ul>
     </div>
   </div>
+
   <form [formGroup]="paymentOptionForm">
-    <div class="fieldName col-sm-3">
-      Select Payment Option:
-    </div>
-    <div class="fieldValue">
-      <div class="form-check">
-        <input type="radio" name="paymentOption" class="form-check-input" value="paypal" id="paypal" formControlName="paymentOption" />
-        <label for="paypal" class="form-check-label">Credit/Debit Card or PayPal Account</label>
-        <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+    <fieldset class="qe-fieldset">
+      <div class="form-group row">
+        <label class="col-form-legend col-sm-2">Select Payment Option:</label>
+
+        <div class="col-sm-8">
+          <div class="form-check">
+            <label for="paypal" class="form-check-label">
+              <input type="radio" name="paymentOption" class="form-check-input" value="paypal" id="paypal"
+                     formControlName="paymentOption"/>
+              Credit/Debit Card or PayPal Account
+            </label>
+          </div>
+          <div class="form-check">
+            <label for="club" class="form-check-label">
+              <input type="radio" name="paymentOption" class="form-check-input" value="club" id="club"
+                     formControlName="paymentOption"/>
+              Pay via Club
+            </label>
+          </div>
+          <div class="form-check">
+            <label for="later" class="form-check-label">
+              <input type="radio" name="paymentOption" class="form-check-input" value="later" id="later"
+                     formControlName="paymentOption"/>
+              Pay Later
+            </label>
+          </div>
+        </div>
       </div>
-      <div class="form-check">
-        <input type="radio" name="paymentOption" class="form-check-input" value="later" id="later" formControlName="paymentOption" />
-        <label for="later" class="form-check-label">Pay Later</label>
-      </div>
-      <div class="form-check">
-        <input type="radio" name="paymentOption" class="form-check-input" value="club" id="club" formControlName="paymentOption" />
-        <label for="club" class="form-check-label">Pay via Club</label>
-      </div>
-    </div>
+    </fieldset>
   </form>
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <h4 class="card-title">
+        Entry Status
+      </h4>
+      <p class="card-text">
+        {{statusText}}
+      </p>
+    </div>
+  </div>
 </div>
 
 <app-workflow-nav next="/enter/{{meet_id}}/confirmation" previous="/enter/{{meet_id}}/step4"
