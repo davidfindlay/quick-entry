@@ -10,7 +10,7 @@ import {HttpClient} from '@angular/common/http';
 import {PaymentOption} from './models/paymentoption';
 import {IncompleteEntry} from './models/incomplete_entry';
 
-import { environment } from '../environments/environment';
+import {environment} from '../environments/environment';
 
 @Injectable()
 export class EntryService {
@@ -157,6 +157,8 @@ export class EntryService {
         entryEvent[0].seedtime = seedtime;
       }
 
+      // Check that entry is now valid with this seed time change
+      entry.validEvents = this.validateEntryEvents(entry);
       this.storeEntries();
     }
   }
@@ -205,9 +207,9 @@ export class EntryService {
   }
 
   checkEvents(meet_id) {
-    console.log('Check Events');
     const meetEntry = this.getEntry(meet_id);
     meetEntry.validEvents = this.validateEntryEvents(meetEntry);
+    console.log('Check events: ' + meetEntry.validEvents);
     this.entriesChanged.next(this.entries);
   }
 
@@ -215,7 +217,7 @@ export class EntryService {
     const meetDetails = this.meetService.getMeet(meetEntry.meetId);
 
     for (const event of meetDetails.events) {
-      if (event.timerequired) {
+      if (event.times_required) {
         for (const eventEntry of meetEntry.entryEvents) {
           if (event.id === eventEntry.event_id) {
             if (eventEntry.seedtime === 0) {
@@ -352,11 +354,14 @@ export class EntryService {
 
     console.log(incompleteEntry);
 
-    return this.http.post(environment.api + 'entry_incomplete', incompleteEntry).subscribe((entry: IncompleteEntry) => {
-      const localEntry = this.getEntry(meetEntry.meetId);
-      localEntry.incompleteId = entry.id;
-      console.log(localEntry);
-      this.storeEntries();
+    return new Observable((observer) => {
+      this.http.post(environment.api + 'entry_incomplete', incompleteEntry).subscribe((entry: IncompleteEntry) => {
+        const localEntry = this.getEntry(meetEntry.meetId);
+        localEntry.incompleteId = entry.id;
+        console.log(localEntry);
+        this.storeEntries();
+        observer.next(localEntry);
+      });
     });
   }
 

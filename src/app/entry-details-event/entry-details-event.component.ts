@@ -126,7 +126,7 @@ export class EntryDetailsEventComponent implements OnInit {
       this.seedTimeRequired = false;
     }
 
-    if (this.meetEvent.timerequired) {
+    if (this.meetEvent.times_required) {
       this.seedTimeMandatory = true;
       console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
     }
@@ -373,6 +373,7 @@ export class EntryDetailsEventComponent implements OnInit {
       }
       // console.log('Seed time not 0');
     } else {
+      console.log('seed time NT')
       this.seedTimeNT = true;
       this.seedTimeTooLong = false;
       this.seedTimeTooShort = false;

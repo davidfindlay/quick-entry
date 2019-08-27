@@ -11,6 +11,7 @@ import {IPayPalConfig, ICreateOrderRequest, IPayPalButtonStyle} from 'ngx-paypal
 
 import {PaymentOption} from '../models/paymentoption';
 import {EntryEvent} from '../models/entryevent';
+import {Entry} from '../models/entry';
 
 @Component({
   selector: 'app-entry-confirmation',
@@ -107,10 +108,14 @@ export class EntryConfirmationComponent implements OnInit {
 
   submit() {
     console.log('submit');
-    this.entryService.storeIncompleteEntry(this.entryService.getEntry(this.meet_id));
-    this.entryService.finalise(this.entryService.getEntry(this.meet_id)).subscribe((finalised) => {
-
+    this.entryService.storeIncompleteEntry(this.entryService.getEntry(this.meet_id)).subscribe((entrySaved: Entry) => {
+      console.log('Saved entry to incomplete store');
+      this.entryService.finalise(this.entryService.getEntry(this.meet_id)).subscribe((finalised) => {
+        console.log('Finalise entry');
+        console.log(finalised);
+      });
     });
+
   }
 
 

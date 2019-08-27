@@ -4,7 +4,7 @@ import {UserService} from '../user.service';
 import {PlatformLocation} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
-import {Subject} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 import {Meet} from '../models/meet';
 import {EntryService} from '../entry.service';
 import {Entry} from '../models/entry';
@@ -16,7 +16,7 @@ import {Entry} from '../models/entry';
 })
 export class EntryDetailsComponent implements OnInit {
 
-  public formValidSubject: Subject<boolean> = new Subject<boolean>();
+  public formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     entryDetailsForm: FormGroup;
 
@@ -65,6 +65,7 @@ export class EntryDetailsComponent implements OnInit {
 
       this.entryService.checkEvents(this.meet_id);
 
+      console.log(this.meet.groups);
       if (this.meet.groups !== undefined && this.meet.groups !== null) {
         for (const group of this.meet.groups) {
           for (const rule of group.rules) {

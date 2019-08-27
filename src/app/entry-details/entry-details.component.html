@@ -1,5 +1,5 @@
-<h1>Step 4</h1>
-<h2>Entry Details</h2>
+<h1>Enter {{meetName}}</h1>
+<h2>Event Details</h2>
 <form [formGroup]="entryDetailsForm">
 
   <div class="card mb-3 bg-info text-white">
@@ -45,7 +45,7 @@
 
   <div class="card">
     <div class="card-header">
-      <h2>Event List</h2>
+      <h2>{{meetName}} - Event List</h2>
     </div>
     <div class="card-body">
       <div *ngFor="let e of this.meet.events; let i = index">
