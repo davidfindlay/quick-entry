@@ -35,6 +35,7 @@ import { SeedtimeHelperComponent } from './seedtime-helper/seedtime-helper.compo
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import { EntryDetailsTotalsComponent } from './entry-details-totals/entry-details-totals.component';
 import {NgxPayPalModule} from 'ngx-paypal';
+import {NgxSpinnerModule} from 'ngx-spinner';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -82,6 +83,7 @@ const appRoutes: Routes = [
     AuthenticationModule,
     NgxDatatableModule,
     NgxPayPalModule,
+    NgxSpinnerModule
   ],
     providers: [
         MeetService,

@@ -6,12 +6,17 @@ import {PlatformLocation} from '@angular/common';
 import {UserService} from '../user.service';
 import {MeetService} from '../meet.service';
 import {EntryService} from '../entry.service';
-import {Subject} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 import {IPayPalConfig, ICreateOrderRequest, IPayPalButtonStyle} from 'ngx-paypal';
+
+import { environment } from '../../environments/environment';
 
 import {PaymentOption} from '../models/paymentoption';
 import {EntryEvent} from '../models/entryevent';
 import {Entry} from '../models/entry';
+import {HttpClient} from '@angular/common/http';
+import {NgxSpinner} from 'ngx-spinner/lib/ngx-spinner.enum';
+import {NgxSpinnerService} from 'ngx-spinner';
 
 @Component({
   selector: 'app-entry-confirmation',
@@ -20,7 +25,7 @@ import {Entry} from '../models/entry';
 })
 export class EntryConfirmationComponent implements OnInit {
 
-  formValidSubject = new Subject<boolean>();
+  formValidSubject = new BehaviorSubject<boolean>(true);
 
   meet_id;
   meet: Meet;
@@ -31,7 +36,13 @@ export class EntryConfirmationComponent implements OnInit {
 
   eventEntries: EntryEvent[];
 
-  statusText = 'Not Submitted: This entry has not yet been submitted. Click Next to submit this entry.'
+  window = window;
+
+  paypalSuccess;
+  paypalToken;
+
+  statusCode = 0;
+  statusText = 'Not Submitted: This entry has not yet been submitted. Click Next to submit this entry.';
 
   public defaultPrice: string = '9.99';
   public payPalConfig?: IPayPalConfig;
@@ -46,7 +57,9 @@ export class EntryConfirmationComponent implements OnInit {
               private location: PlatformLocation,
               private userService: UserService,
               private meetService: MeetService,
-              private entryService: EntryService) { }
+              private entryService: EntryService,
+              private http: HttpClient,
+              private ngxSpinner: NgxSpinnerService) { }
 
   ngOnInit() {
     this.meet_id = +this.route.snapshot.paramMap.get('meet');
@@ -74,7 +87,16 @@ export class EntryConfirmationComponent implements OnInit {
       }
     });
 
-    this.initConfig();
+    // Paypal status
+    this.paypalSuccess = this.route.snapshot.paramMap.get('paypalsuccess');
+    this.paypalToken = this.route.snapshot.paramMap.get('token');
+
+    this.entryService.entriesChanged.subscribe((entries) => {
+      this.entry = this.entryService.getEntry(this.meet_id);
+      console.log(this.entry);
+
+      this.statusCode = this.entry.status;
+    });
 
   }
 
@@ -107,78 +129,45 @@ export class EntryConfirmationComponent implements OnInit {
   }
 
   submit() {
+    this.ngxSpinner.show();
     console.log('submit');
     this.entryService.storeIncompleteEntry(this.entryService.getEntry(this.meet_id)).subscribe((entrySaved: Entry) => {
       console.log('Saved entry to incomplete store');
-      this.entryService.finalise(this.entryService.getEntry(this.meet_id)).subscribe((finalised) => {
+      this.entryService.finalise(this.entryService.getEntry(this.meet_id)).subscribe((finalised: any) => {
         console.log('Finalise entry');
         console.log(finalised);
+
+        this.ngxSpinner.hide();
+
+        this.entryService.setStatus(this.entryService.getEntry(this.meet_id), finalised.status);
+
+        if (this.paymentOptionForm.controls.paymentOption.value === 'paypal') {
+          // this.paypalPay(finalised.meet_entry);
+          console.log('not moving to paypal');
+        }
+
       });
     });
 
   }
 
+  paypalPay(entry) {
 
-  private initConfig(): void {
-    this.payPalConfig = {
-      currency: 'EUR',
-      clientId: 'sb',
-      createOrderOnClient: (data) => < ICreateOrderRequest > {
-        intent: 'CAPTURE',
-        purchase_units: [{
-          amount: {
-            currency_code: 'EUR',
-            value: '9.99',
-            breakdown: {
-              item_total: {
-                currency_code: 'EUR',
-                value: '9.99'
-              }
-            }
-          },
-          items: [{
-            name: 'Enterprise Subscription',
-            quantity: '1',
-            category: 'DIGITAL_GOODS',
-            unit_amount: {
-              currency_code: 'EUR',
-              value: '9.99',
-            },
-          }]
-        }]
-      },
-      advanced: {
-        commit: 'true'
-      },
-      style: {
-        label: 'paypal',
-        layout: 'vertical'
-      },
-      onApprove: (data, actions) => {
-        console.log('onApprove - transaction was approved, but not authorized', data, actions);
-        actions.order.get().then(details => {
-          console.log('onApprove - you can get full order details inside onApprove: ', details);
-        });
 
-      },
-      onClientAuthorization: (data) => {
-        console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
-        this.showSuccess = true;
-      },
-      onCancel: (data, actions) => {
-        console.log('OnCancel', data, actions);
-        this.showCancel = true;
 
-      },
-      onError: err => {
-        console.log('OnError', err);
-        this.showError = true;
-      },
-      onClick: (data, actions) => {
-        console.log('onClick', data, actions);
-        this.resetStatus();
-      }
+    const paymentDetails = {
+      entryId: entry.id,
+      meetId: entry.meet_id
     };
+
+    this.http.post(environment.payPalLegacyUrl, paymentDetails).subscribe((url: any) => {
+      this.ngxSpinner.hide();
+      console.log(url);
+      console.log('Paypal payment redirect to ' + url.approvalUrl);
+      // @ts-ignore
+      window.location.assign(url.approvalUrl);
+    });
   }
+
 
 }

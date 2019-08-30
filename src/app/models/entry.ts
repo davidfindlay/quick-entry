@@ -32,4 +32,6 @@ export class Entry {
 
   incompleteId: number;
 
+  status: number;
+
 }

@@ -37,7 +37,7 @@
           </div>
         </div>
 
-        <div class="card mb-3 bg-warning text-white" *ngIf="meetEvent.timerequired && entry.seconds === 0 && eventSelected()">
+        <div class="card mb-3 bg-warning text-white" *ngIf="meetEvent.times_required && entry.seconds === 0 && eventSelected()">
           <div class="card-body">
             <p class="card-text">
               The rules for this event require you to supply a valid seed time. No time(NT) is not allowed.

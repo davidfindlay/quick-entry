@@ -370,4 +370,12 @@ export class EntryService {
     return this.http.post(environment.api + 'entry_finalise/' + meetEntry.incompleteId, {});
   }
 
+  setStatus(meetEntry, status_id) {
+    console.log('Set status to ' + status_id);
+    meetEntry.status = status_id;
+    this.storeEntries();
+    this.entriesChanged.next(this.entries);
+    console.log(this.entries);
+  }
+
 }

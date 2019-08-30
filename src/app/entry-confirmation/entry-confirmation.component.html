@@ -329,8 +329,10 @@
             <label for="paypal" class="form-check-label">
               <input type="radio" name="paymentOption" class="form-check-input" value="paypal" id="paypal"
                      formControlName="paymentOption"/>
-              Credit/Debit Card or PayPal Account
+              Credit/Debit Card or PayPal Account<br />
+              <img src="https://www.paypalobjects.com/webstatic/mktg/logo/PP_AcceptanceMarkTray-NoDiscover_243x40.png">
             </label>
+<!--            <button class="btn btn-primary" (click)="paypalPay()">Pay Now</button>-->
           </div>
           <div class="form-check">
             <label for="club" class="form-check-label">
@@ -366,3 +368,4 @@
                   [nextActivated]="formValidSubject.asObservable()"
                   (submitEvent)="onSubmit($event)"></app-workflow-nav>
 
+<ngx-spinner></ngx-spinner>
