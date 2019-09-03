@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Meet} from '../models/meet';
 import {FormBuilder, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -17,6 +17,9 @@ import {Entry} from '../models/entry';
 import {HttpClient} from '@angular/common/http';
 import {NgxSpinner} from 'ngx-spinner/lib/ngx-spinner.enum';
 import {NgxSpinnerService} from 'ngx-spinner';
+import {MeetEntryStatusService} from '../meet-entry-status.service';
+import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
+import {PaypalService} from '../paypal.service';
 
 @Component({
   selector: 'app-entry-confirmation',
@@ -24,6 +27,9 @@ import {NgxSpinnerService} from 'ngx-spinner';
   styleUrls: ['./entry-confirmation.component.css']
 })
 export class EntryConfirmationComponent implements OnInit {
+
+  @ViewChild(WorkflowNavComponent, {static: false})
+  workflowNav: WorkflowNavComponent;
 
   formValidSubject = new BehaviorSubject<boolean>(true);
 
@@ -37,12 +43,21 @@ export class EntryConfirmationComponent implements OnInit {
   eventEntries: EntryEvent[];
 
   window = window;
+  error = '';
 
   paypalSuccess;
   paypalToken;
+  paymentId;
+  payerID;
+
+  paidAmount = 0;
+  paypalData = null;
 
   statusCode = 0;
-  statusText = 'Not Submitted: This entry has not yet been submitted. Click Next to submit this entry.';
+  statusLabel = 'Not Submitted';
+  statusText = 'This entry has not yet been submitted. Click Next to submit this entry.';
+
+  showPaymentChoice = true;
 
   public defaultPrice: string = '9.99';
   public payPalConfig?: IPayPalConfig;
@@ -59,7 +74,9 @@ export class EntryConfirmationComponent implements OnInit {
               private meetService: MeetService,
               private entryService: EntryService,
               private http: HttpClient,
-              private ngxSpinner: NgxSpinnerService) { }
+              private ngxSpinner: NgxSpinnerService,
+              private statuses: MeetEntryStatusService,
+              private paypalService: PaypalService) { }
 
   ngOnInit() {
     this.meet_id = +this.route.snapshot.paramMap.get('meet');
@@ -88,14 +105,44 @@ export class EntryConfirmationComponent implements OnInit {
     });
 
     // Paypal status
-    this.paypalSuccess = this.route.snapshot.paramMap.get('paypalsuccess');
-    this.paypalToken = this.route.snapshot.paramMap.get('token');
+    console.log(this.route.snapshot);
+    this.paypalSuccess = this.route.snapshot.queryParams['paypalsuccess'];
+    this.paypalToken = this.route.snapshot.queryParams['token'];
+    this.paymentId = this.route.snapshot.queryParams['paymentId'];
+    this.payerID = this.route.snapshot.queryParams['PayerID'];
+
+    if (this.paypalSuccess) {
+      console.log('Got paypal success');
+      const paymentDetails = {
+        paypalSuccess: this.paypalSuccess,
+        paypalToken: this.paypalToken,
+        paymentId: this.paymentId,
+        payerID: this.payerID
+      };
+
+      this.paypalService.finalisePayment(paymentDetails).subscribe((paid: any) => {
+        console.log('Paid: ' + paid.paid);
+        this.paidAmount = paid.paid;
+        this.paypalData = paid.paypalPayment;
+        this.showPaymentChoice = false;
+        this.workflowNav.enableFinishButton();
+        this.entryService.setStatus(this.entryService.getEntry(this.meet_id), paid.status);
+        this.entryService.deleteEntry(this.meet_id);
+      });
+    }
 
     this.entryService.entriesChanged.subscribe((entries) => {
       this.entry = this.entryService.getEntry(this.meet_id);
       console.log(this.entry);
 
       this.statusCode = this.entry.status;
+        this.statuses.getStatus(this.entry.status).subscribe((status) => {
+          if (status !== null) {
+            this.statusLabel = status.label;
+            this.statusText = status.description;
+          }
+        });
+
     });
 
   }
@@ -137,23 +184,46 @@ export class EntryConfirmationComponent implements OnInit {
         console.log('Finalise entry');
         console.log(finalised);
 
-        this.ngxSpinner.hide();
-
         this.entryService.setStatus(this.entryService.getEntry(this.meet_id), finalised.status);
 
+        // Disable the form
+        this.showPaymentChoice = false;
+        this.workflowNav.enableFinishButton();
+
         if (this.paymentOptionForm.controls.paymentOption.value === 'paypal') {
-          // this.paypalPay(finalised.meet_entry);
-          console.log('not moving to paypal');
+
+          this.paypalService.createPaymentFinalisedEntry(finalised.meet_entry).subscribe((paymentDetails: any) => {
+            this.ngxSpinner.hide();
+            window.location.assign(paymentDetails.approvalUrl);
+          }, (error: any) => {
+
+            // Handle paypal error
+            console.log('Got error can\'t go to paypal');
+
+            this.ngxSpinner.hide();
+            this.showPaymentChoice = false;
+            this.workflowNav.enableFinishButton();
+
+          });
+
+        } else {
+          this.ngxSpinner.hide();
+          // Remove finished entry from entry service
+          this.entryService.deleteEntry(this.meet_id);
+
         }
 
+      }, (error: any) => {
+        console.log(error);
+        this.ngxSpinner.hide();
+        this.error = error.explanation;
       });
     });
 
   }
 
   paypalPay(entry) {
-
-
+    console.log(entry);
 
     const paymentDetails = {
       entryId: entry.id,
@@ -161,7 +231,7 @@ export class EntryConfirmationComponent implements OnInit {
     };
 
     this.http.post(environment.payPalLegacyUrl, paymentDetails).subscribe((url: any) => {
-      this.ngxSpinner.hide();
+
       console.log(url);
       console.log('Paypal payment redirect to ' + url.approvalUrl);
       // @ts-ignore

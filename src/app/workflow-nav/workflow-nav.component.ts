@@ -18,7 +18,14 @@ export class WorkflowNavComponent implements OnInit {
   @Input('next') next: string;
   // tslint:disable-next-line:no-input-rename
   @Input('nextActivated') nextActivated: Observable<boolean>;
+
   btnNextDisable = true;
+  btnSaveDisable = false;
+  btnCancelDisable = false;
+  btnBackDisable = false;
+
+  showNextButton = true;
+  showFinishButton = false;
 
   @Output() submitEvent = new EventEmitter<string>();
 
@@ -65,6 +72,18 @@ export class WorkflowNavComponent implements OnInit {
   clickSaveAndExit() {
     this.router.navigate(['/']);
     this.submitEvent.emit('submit');
+  }
+
+  clickFinish() {
+    this.router.navigate(['/']);
+  }
+
+  enableFinishButton() {
+    this.btnBackDisable = true;
+    this.btnCancelDisable = true;
+    this.btnSaveDisable = true;
+    this.showNextButton = false;
+    this.showFinishButton = true;
   }
 
 }

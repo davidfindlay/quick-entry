@@ -7,4 +7,6 @@ export class IncompleteEntry {
   status_id: number;
   member_id: number;
   entrydata: Entry;
+  created_at: Date;
+  updated_at: Date;
 }

@@ -11,11 +11,16 @@ import {PaymentOption} from './models/paymentoption';
 import {IncompleteEntry} from './models/incomplete_entry';
 
 import {environment} from '../environments/environment';
+import {MeetEntry} from './models/meet-entry';
 
 @Injectable()
 export class EntryService {
   entries: Entry[] = [];
+  incompleteEntries: IncompleteEntry[] = [];
+  submittedEntries: MeetEntry[] = [];
   entriesChanged = new BehaviorSubject<Entry[]>(this.entries);
+  incompleteChanged = new BehaviorSubject<IncompleteEntry[]>(this.incompleteEntries);
+  submittedChanged = new BehaviorSubject<MeetEntry[]>(this.submittedEntries);
   membershipDetails: MembershipDetails;
 
   constructor(private memberHistoryService: MemberHistoryService,
@@ -41,6 +46,34 @@ export class EntryService {
       return this.entries.find(x => x.meetId === meetId, 10);
     }
     return null;
+  }
+
+  getIncompleteEntries(meetId: number) {
+    if (this.incompleteEntries) {
+      return this.incompleteEntries.find(x => x.meet_id === meetId);
+    }
+    return null;
+  }
+
+  retrieveIncompleteEntries() {
+    this.http.get(environment.api + 'entry_incomplete').subscribe((incomplete: IncompleteEntry[]) => {
+      this.incompleteEntries = incomplete;
+      this.incompleteChanged.next(this.incompleteEntries);
+    });
+  }
+
+  getSubmittedEntries(meetId: number) {
+    if (this.submittedEntries) {
+      return this.submittedEntries.find(x => x.meet_id === meetId);
+    }
+    return null;
+  }
+
+  retrieveSubmittedEntries() {
+    this.http.get(environment.api + 'meet_entries').subscribe((entries: MeetEntry[]) => {
+      this.submittedEntries = entries;
+      this.submittedChanged.next(this.submittedEntries);
+    });
   }
 
   loadSavedEntries() {
