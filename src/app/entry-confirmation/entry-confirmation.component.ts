@@ -20,6 +20,7 @@ import {NgxSpinnerService} from 'ngx-spinner';
 import {MeetEntryStatusService} from '../meet-entry-status.service';
 import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
 import {PaypalService} from '../paypal.service';
+import {ClubsService} from '../clubs.service';
 
 @Component({
   selector: 'app-entry-confirmation',
@@ -57,6 +58,12 @@ export class EntryConfirmationComponent implements OnInit {
   statusLabel = 'Not Submitted';
   statusText = 'This entry has not yet been submitted. Click Next to submit this entry.';
 
+  membershipType = '';
+  disabilityClassificationRequired = 'No';
+  strokeDispensationRequired = 'No';
+  medicalCertificate = 'No';
+  medicalCondition = 'No';
+
   showPaymentChoice = true;
 
   public defaultPrice: string = '9.99';
@@ -76,7 +83,8 @@ export class EntryConfirmationComponent implements OnInit {
               private http: HttpClient,
               private ngxSpinner: NgxSpinnerService,
               private statuses: MeetEntryStatusService,
-              private paypalService: PaypalService) { }
+              private paypalService: PaypalService,
+              private clubService: ClubsService) { }
 
   ngOnInit() {
     this.meet_id = +this.route.snapshot.paramMap.get('meet');
@@ -90,7 +98,7 @@ export class EntryConfirmationComponent implements OnInit {
     console.log(this.entry);
 
     this.eventEntries = this.entry.entryEvents;
-    this.eventEntries.sort((a, b) => (a.program_no > b.program_no) ? 1 : -1);
+    this.eventEntries.sort((a, b) => (parseInt(a.program_no, 10) > parseInt(b.program_no, 10)) ? 1 : -1);
 
     this.paymentOptionForm = this.fb.group({
       paymentOption: ['paypal', Validators.required]
@@ -111,8 +119,9 @@ export class EntryConfirmationComponent implements OnInit {
     this.paymentId = this.route.snapshot.queryParams['paymentId'];
     this.payerID = this.route.snapshot.queryParams['PayerID'];
 
-    if (this.paypalSuccess) {
+    if (this.paypalSuccess && this.paypalSuccess !== 'false') {
       console.log('Got paypal success');
+      this.ngxSpinner.show();
       const paymentDetails = {
         paypalSuccess: this.paypalSuccess,
         paypalToken: this.paypalToken,
@@ -121,13 +130,14 @@ export class EntryConfirmationComponent implements OnInit {
       };
 
       this.paypalService.finalisePayment(paymentDetails).subscribe((paid: any) => {
-        console.log('Paid: ' + paid.paid);
+        console.log(paid);
         this.paidAmount = paid.paid;
         this.paypalData = paid.paypalPayment;
         this.showPaymentChoice = false;
         this.workflowNav.enableFinishButton();
         this.entryService.setStatus(this.entryService.getEntry(this.meet_id), paid.status);
         this.entryService.deleteEntry(this.meet_id);
+        this.ngxSpinner.hide();
       });
     }
 
@@ -145,6 +155,46 @@ export class EntryConfirmationComponent implements OnInit {
 
     });
 
+    switch (this.entry.membershipDetails.member_type) {
+      case 'msa':
+        this.membershipType = 'Masters Swimming Australia member';
+        break;
+      case 'international':
+        this.membershipType = 'International Masters Swimming member';
+        break;
+      case 'guest':
+        this.membershipType = 'Guest swimmer';
+        break;
+      case 'non_member':
+        this.membershipType = 'Non-member';
+        break;
+    }
+
+    if (this.entry.medicalDetails.classification !== 'no') {
+      this.disabilityClassificationRequired = this.toTitleCase(this.entry.medicalDetails.classification);
+    }
+
+    if (this.entry.medicalDetails.dispensation === 'true') {
+      this.strokeDispensationRequired = 'Yes';
+    }
+
+    if (this.entry.medicalDetails.medicalCertificate === 'true') {
+      this.medicalCertificate = 'Yes';
+    }
+
+    if (this.entry.medicalDetails.medicalCondition === 'true') {
+      this.medicalCondition = 'Yes';
+    }
+
+  }
+
+  toTitleCase(str: string) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
   }
 
   private resetStatus(): void {
@@ -192,7 +242,14 @@ export class EntryConfirmationComponent implements OnInit {
 
         if (this.paymentOptionForm.controls.paymentOption.value === 'paypal') {
 
-          this.paypalService.createPaymentFinalisedEntry(finalised.meet_entry).subscribe((paymentDetails: any) => {
+          let paypalPayment;
+          if (finalised.incomplete_entry !== undefined) {
+            paypalPayment = this.paypalService.createPaymentIncompleteEntry(finalised.incomplete_entry);
+          } else if (finalised.meet_entry !== undefined) {
+            paypalPayment = this.paypalService.createPaymentFinalisedEntry(finalised.meet_entry);
+          }
+
+          paypalPayment.subscribe((paymentDetails: any) => {
             this.ngxSpinner.hide();
             window.location.assign(paymentDetails.approvalUrl);
           }, (error: any) => {
@@ -239,5 +296,51 @@ export class EntryConfirmationComponent implements OnInit {
     });
   }
 
+  enablePaymentOption(paymentType) {
+    let paymentTypeId = 0;
+    if (paymentType === 'paypal') {
+      paymentTypeId = 1;
+    }
+    if (paymentType === 'club') {
+      paymentTypeId = 2;
+    }
+
+    const meetPaymentTypes = this.meet.payment_types;
+    if (meetPaymentTypes === undefined && meetPaymentTypes === null) {
+      return false;
+    }
+
+    const filtered = meetPaymentTypes.filter(x => x.payment_type_id === paymentTypeId);
+
+    if (filtered.length > 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  getLegs(event_id) {
+    const events = this.meet.events.filter(x => x.id === event_id);
+
+    if (events.length > 0) {
+      return events[0].legs;
+    }
+
+    return 1;
+  }
+
+  getEventName(event_id) {
+    const events = this.meet.events.filter(x => x.id === event_id);
+
+    if (events.length > 0) {
+      if (events[0].eventname === null) {
+        return '';
+      } else {
+        return events[0].eventname;
+      }
+    }
+
+    return '';
+  }
 
 }

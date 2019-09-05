@@ -13,6 +13,7 @@ export class ClubsService {
   clubs: Club[];
 
   constructor(private http: HttpClient) {
+    this.loadClubs();
   }
 
   loadClubs() {

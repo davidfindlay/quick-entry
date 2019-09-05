@@ -3,6 +3,7 @@ import {MeetEvent} from './meet-event';
 import {Phone} from './phone';
 import {Email} from './email';
 import {MeetEventGroup} from './meet-event-group';
+import {MeetPaymentMethod} from './meet-payment-method';
 
 /**
  * Created by david on 7/9/17.
@@ -33,4 +34,5 @@ export class Meet {
   public events: MeetEvent[];
 
   public groups: MeetEventGroup[];
+  public payment_types: MeetPaymentMethod[];
 }

@@ -145,8 +145,9 @@ export class SeedtimeHelperComponent implements OnInit {
     this.activeModal.close();
   }
 
-  selectResultRow(seconds) {
+  selectResultRow(seconds, row) {
     this.setTime(seconds);
+    console.log(row);
   }
 
   setTime(value) {

@@ -11,6 +11,7 @@ import {EntryService} from '../entry.service';
 import {EntrantDetails} from '../models/entrant-details';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {Behavior} from 'popper.js';
+import {RegisterUser} from '../models/register-user';
 
 @Component({
   selector: 'app-entrant-details',
@@ -341,6 +342,41 @@ export class EntrantDetailsComponent implements OnInit {
     this.entry.entrantDetails = entrantDetails;
     this.entry.meetId = this.meet_id;
     this.entryService.addEntry(this.entry);
+  }
+
+  register() {
+
+    if (this.inlineRegisterForm.controls.confirmpassword.touched) {
+      if (this.inlineRegisterForm.controls.password.value !== this.inlineRegisterForm.controls.confirmpassword.value) {
+        console.log('Passwords don\'t match');
+        return;
+      }
+    }
+
+    if (this.entrantDetailsForm.controls.who.value === 'me') {
+
+      let genderLetter;
+      if (this.entrantDetailsForm.controls.entrantGender.value === 'male') {
+        genderLetter = 'M';
+      } else {
+        genderLetter = 'F';
+      }
+
+      const newUser = <RegisterUser>{
+        email: this.entrantDetailsForm.controls.entrantEmail.value,
+        password: this.inlineRegisterForm.controls.password.value,
+        confirmPassword: this.inlineRegisterForm.controls.confirmpassword.value,
+        firstname: this.entrantDetailsForm.controls.entrantFirstName.value,
+        surname: this.entrantDetailsForm.controls.entrantSurname.value,
+        dob: this.entrantDetailsForm.controls.entrantDob.value,
+        gender: genderLetter,
+        phone: this.entrantDetailsForm.controls.entrantPhone.value,
+        emergency_firstname: this.entrantDetailsForm.controls.emergencyFirstName.value,
+        emergency_surname: this.entrantDetailsForm.controls.emergencySurname.value,
+        emergency_phone: this.entrantDetailsForm.controls.emergencyPhone.value,
+        emergency_email: this.entrantDetailsForm.controls.emergencyEmail.value
+      }
+    }
   }
 
 }

@@ -73,7 +73,7 @@
                 <th>Time</th>
               </tr>
               </thead>
-              <tr *ngFor="let pb of pbRows" (click)="selectResultRow(pb.seconds)" class="resultRow">
+              <tr *ngFor="let pb of pbRows; let i = index" (click)="selectResultRow(pb.seconds, i)" class="resultRow">
                 <td>{{pb.event_date | date: 'dd/MM/yyyy'}}</td>
                 <td>{{pb.age_min}}-{{pb.age_max}}</td>
                 <td>{{pb.location}}</td>
@@ -94,7 +94,7 @@
                 <th>Time</th>
               </tr>
               </thead>
-              <tr *ngFor="let pb of recentRows" (click)="selectResultRow(pb.seconds)" class="resultRow">
+              <tr *ngFor="let pb of recentRows; let i = index" (click)="selectResultRow(pb.seconds, i)" class="resultRow">
                 <td>{{pb.event_date | date: 'dd/MM/yyyy'}}</td>
                 <td>{{pb.age_min}}-{{pb.age_max}}</td>
                 <td>{{pb.location}}</td>
