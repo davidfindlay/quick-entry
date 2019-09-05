@@ -80,7 +80,7 @@ const appRoutes: Routes = [
     FontAwesomeModule,
     ReactiveFormsModule,
     NgbModule.forRoot(),
-    RouterModule.forRoot(appRoutes),
+    RouterModule.forRoot(appRoutes, {scrollPositionRestoration: 'enabled'}),
     HttpClientModule,
     AuthenticationModule,
     NgxDatatableModule,
