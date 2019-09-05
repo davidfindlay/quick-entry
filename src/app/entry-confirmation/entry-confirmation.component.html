@@ -1,6 +1,6 @@
 <h1>Enter {{meetName}}</h1>
 <h2>Confirm Entry Details and Payment</h2>
-<div class="card mb-3 bg-info text-white">
+<div class="card mb-3 bg-info text-white" *ngIf="paypalSuccess === null">
   <div class="card-body">
     <h4 class="card-title">
       Please Check Your Entry
@@ -10,6 +10,17 @@
     </p>
     <p class="card-text">
       <strong>Your entry is not submitted until you choose a Payment Option below.</strong>
+    </p>
+  </div>
+</div>
+
+<div class="card mb-3 bg-info text-white">
+  <div class="card-body">
+    <h4 class="card-title">
+      Entry Status
+    </h4>
+    <p class="card-text">
+      {{statusLabel}}: {{statusText}}
     </p>
   </div>
 </div>
@@ -121,7 +132,7 @@
       Member Type:
     </div>
     <div class="fieldValue">
-      {{entry.membershipDetails.member_type}}
+      {{membershipType}}
     </div>
   </div>
   <div class="row">
@@ -150,7 +161,7 @@
       Disability Classification:
     </div>
     <div class="fieldValue">
-      {{entry.medicalDetails.classification}}
+      {{disabilityClassificationRequired}}
     </div>
   </div>
   <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
@@ -182,7 +193,7 @@
       Stroke Dispensation Required:
     </div>
     <div class="fieldValue">
-      {{entry.medicalDetails.dispensation}}
+      {{strokeDispensationRequired}}
     </div>
   </div>
   <div class="row" *ngIf="entry.medicalDetails.dispensation === 'true'">
@@ -190,7 +201,7 @@
       Medical Certificate:
     </div>
     <div class="fieldValue">
-      {{entry.medicalDetails.medicalCertificate}}
+      {{medicalCertificate}}
     </div>
   </div>
   <div class="row">
@@ -198,7 +209,7 @@
       Medical Condition:
     </div>
     <div class="fieldValue">
-      {{entry.medicalDetails.medicalCondition}}
+      {{medicalCondition}}
     </div>
   </div>
   <div class="row" *ngIf="entry.medicalDetails.medicalCondition === 'true'">
@@ -226,10 +237,19 @@
         {{event.program_no}}
       </td>
       <td class="pr-4">
-        {{event.distance}} {{event.discipline}}
+        <span *ngIf="getEventName(event.event_id) !== ''">
+          {{getEventName(event.event_id)}}:
+        </span>
+        <span *ngIf="getLegs(event.event_id) > 1">
+          {{getLegs(event.event_id)}}x</span>{{event.distance}} {{event.discipline}}
+        <span *ngIf="getLegs(event.event_id) > 1">
+          Relay
+        </span>
       </td>
       <td class="seedtimeCol">
-        {{event.seedtime | time}}
+        <span *ngIf="getLegs(event.event_id) === 1">
+          {{event.seedtime | time}}
+        </span>
       </td>
     </tr>
   </table>
@@ -268,10 +288,10 @@
         Meet Entry Fee
       </td>
       <td class="moneycol">
-        $25.00
+        {{meet.meetfee | currency}}
       </td>
       <td class="moneycol">
-        $25.00
+        {{meet.meetfee | currency}}
       </td>
     </tr>
     <tr>
@@ -279,7 +299,7 @@
         Total
       </td>
       <td class="moneycol">
-        $25.00
+        {{meet.meetfee | currency}}
       </td>
     </tr>
     <tr>
@@ -287,78 +307,91 @@
         Paid
       </td>
       <td class="moneycol">
-        $0.00
+        {{paidAmount | currency}}
       </td>
     </tr>
     </tbody>
   </table>
 
-  <h2>
-    Payment Method
-  </h2>
-  <div class="card mb-3 bg-info text-white">
-    <div class="card-body">
-      <h4 class="card-title">
-        Payment Options
-      </h4>
-      <ul>
-        <li>
-          Credit/Debit Card: We accept payment via Credit or Debit card using PayPal's card payment processing.
-          You do not need to have a PayPal account to use this option.
-        </li>
-        <li>
-          Pay Later: You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
-          for your entry by the Meet Entry Deadline your entry may not be accepted.
-        </li>
-        <li>
-          Pay via Club: Your club may make a bulk payment on behalf of members. Please check with your Club Recorder
-          or Club Captain. Note that if you do not pay for your entry by the Meet Entry Deadline your entry may not
-          be accepted.
-        </li>
-      </ul>
+  <div *ngIf="showPaymentChoice">
+    <h2>
+      Payment Method
+    </h2>
+    <div class="card mb-3 bg-info text-white">
+      <div class="card-body">
+        <h4 class="card-title">
+          Payment Options
+        </h4>
+        <ul>
+          <li *ngIf="enablePaymentOption('paypal')">
+            Credit/Debit Card: We accept payment via Credit or Debit card using PayPal's card payment processing.
+            You do not need to have a PayPal account to use this option.
+          </li>
+          <li *ngIf="enablePaymentOption('club')">
+            Pay via Club: Your club may make a bulk payment on behalf of members. Please check with your Club Recorder
+            or Club Captain. Note that if you do not pay for your entry by the Meet Entry Deadline your entry may not
+            be accepted.
+          </li>
+          <li>
+            Pay Later: You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
+            for your entry by the Meet Entry Deadline your entry <strong><u>may be rejected</u></strong>.
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
 
-  <form [formGroup]="paymentOptionForm">
-    <fieldset class="qe-fieldset">
-      <div class="form-group row">
-        <label class="col-form-legend col-sm-2">Select Payment Option:</label>
+    <form [formGroup]="paymentOptionForm">
+      <fieldset class="qe-fieldset">
+        <div class="form-group row">
+          <label class="col-form-legend col-sm-2">Select Payment Option:</label>
 
-        <div class="col-sm-8">
-          <div class="form-check">
-            <label for="paypal" class="form-check-label">
-              <input type="radio" name="paymentOption" class="form-check-input" value="paypal" id="paypal"
-                     formControlName="paymentOption"/>
-              Credit/Debit Card or PayPal Account<br />
-              <img src="https://www.paypalobjects.com/webstatic/mktg/logo/PP_AcceptanceMarkTray-NoDiscover_243x40.png">
-            </label>
-<!--            <button class="btn btn-primary" (click)="paypalPay()">Pay Now</button>-->
-          </div>
-          <div class="form-check">
-            <label for="club" class="form-check-label">
-              <input type="radio" name="paymentOption" class="form-check-input" value="club" id="club"
-                     formControlName="paymentOption"/>
-              Pay via Club
-            </label>
-          </div>
-          <div class="form-check">
-            <label for="later" class="form-check-label">
-              <input type="radio" name="paymentOption" class="form-check-input" value="later" id="later"
-                     formControlName="paymentOption"/>
-              Pay Later
-            </label>
+          <div class="col-sm-8">
+            <div class="form-check" *ngIf="enablePaymentOption('paypal')">
+              <label for="paypal" class="form-check-label">
+                <input type="radio" name="paymentOption" class="form-check-input" value="paypal" id="paypal"
+                       formControlName="paymentOption"/>
+                Credit/Debit Card or PayPal Account<br />
+                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/PP_AcceptanceMarkTray-NoDiscover_243x40.png">
+              </label>
+  <!--            <button class="btn btn-primary" (click)="paypalPay()">Pay Now</button>-->
+            </div>
+            <div class="form-check" *ngIf="enablePaymentOption('club')">
+              <label for="club" class="form-check-label">
+                <input type="radio" name="paymentOption" class="form-check-input" value="club" id="club"
+                       formControlName="paymentOption"/>
+                Pay via Club
+              </label>
+            </div>
+            <div class="form-check">
+              <label for="later" class="form-check-label">
+                <input type="radio" name="paymentOption" class="form-check-input" value="later" id="later"
+                       formControlName="paymentOption"/>
+                Pay Later
+              </label>
+            </div>
           </div>
         </div>
-      </div>
-    </fieldset>
-  </form>
+      </fieldset>
+    </form>
+  </div>
   <div class="card mb-3 bg-info text-white">
     <div class="card-body">
       <h4 class="card-title">
         Entry Status
       </h4>
       <p class="card-text">
-        {{statusText}}
+        {{statusLabel}}: {{statusText}}
+      </p>
+    </div>
+    <div class="card-body" *ngIf="paypalData !== null">
+      <h4 class="card-title">
+        Paypal Payment Received
+      </h4>
+      <p class="card-text">
+        Invoice: {{paypalData.invoice_id}}<br />
+        Paid By: {{paypalData.payer_name}} <{{paypalData.payer_email}}><br />
+        Amount: {{paypalData.paid}}<br />
+        Date/Time: {{paypalData.updated_at | date: 'medium'}}
       </p>
     </div>
   </div>

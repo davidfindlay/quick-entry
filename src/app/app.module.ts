@@ -36,10 +36,12 @@ import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import { EntryDetailsTotalsComponent } from './entry-details-totals/entry-details-totals.component';
 import {NgxPayPalModule} from 'ngx-paypal';
 import {NgxSpinnerModule} from 'ngx-spinner';
+import {MeetEntryStatusService} from './meet-entry-status.service';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
     { path: 'login', component: LoginComponent },
+  { path: 'enter/:meet', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step1', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step2', component: MembershipClubDetailsComponent},
   { path: 'enter/:meet/step3', component: ClassificationMedicalDetailsComponent},
@@ -89,7 +91,8 @@ const appRoutes: Routes = [
         MeetService,
         UserService,
         EntryService,
-      TimePipe
+      TimePipe,
+      MeetEntryStatusService
     ],
     bootstrap: [AppComponent]
 })

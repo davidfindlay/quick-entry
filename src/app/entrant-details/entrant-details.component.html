@@ -293,11 +293,7 @@
           </div>
         </div>
       </div>
-      <div *ngIf="entrantDetailsForm.value.register === 'yes'">
-      <div class="form-group row">
-            <label for="usernameRegister" class="form-control-label col-sm-2">Username:</label>
-            <input class="form-control col-sm-10" type="text" formControlName="usernameRegister" id="usernameRegister" value="{{usernameRegister}}" />
-        </div>
+      <div *ngIf="inlineRegisterForm.value.register === 'yes'">
         <div class="form-group row">
             <label for="password" class="form-control-label col-sm-2">Password:</label>
             <input class="form-control col-sm-10" type="password" formControlName="password" id="password"/>
@@ -308,7 +304,7 @@
         </div>
         <div class="form-group">
             <p>
-                <button type="submit" class="btn btn-primary" routerLink="/register">Register</button>
+                <button type="button" class="btn btn-primary" (click)="register()">Register</button>
             </p>
         </div>
       </div>
