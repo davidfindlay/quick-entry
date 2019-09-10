@@ -25,7 +25,7 @@ export class EntryDetailsEventComponent implements OnInit {
 
   eventEntryForm: FormGroup;
 
-  // Subscription to Entry Service not allowed events
+  // Subscription to EntryFormObject Service not allowed events
   eventsDisabledSubscription;
 
   enterClass = 'btn btn-outline-primary';
@@ -63,7 +63,7 @@ export class EntryDetailsEventComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.entry = this.entryService.getEntry(this.meetEvent.meet_id);
+    this.entry = this.entryService.getIncompleteEntryFO(this.meetEvent.meet_id);
 
     this.eventEntryForm = this.fb.group({
       enter: false,

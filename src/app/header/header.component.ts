@@ -62,4 +62,9 @@ export class HeaderComponent implements OnInit {
     }
   }
 
+  openSidebar() {
+
+  }
+
+
 }

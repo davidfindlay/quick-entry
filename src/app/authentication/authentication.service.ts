@@ -52,8 +52,11 @@ export class AuthenticationService implements AuthService {
     return this.tokenStorage
       .getAccessToken()
       .pipe(map((token) => {
-        if (token !== null) {
+        console.log(token);
+        if (token !== undefined && token !== null) {
           return true;
+        } else {
+          return false;
         }
       }));
   }
@@ -84,7 +87,7 @@ export class AuthenticationService implements AuthService {
       .getRefreshToken()
       .pipe(
         switchMap((refreshToken: string) =>
-          this.http.post(environment.api + `refresh`, { 'refresh': refreshToken })
+          this.http.post(environment.api + `refresh`, {})
         ),
         timeout(5000),
         tap((tokens: AccessData) => {

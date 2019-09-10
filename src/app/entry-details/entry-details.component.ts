@@ -7,7 +7,8 @@ import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {Meet} from '../models/meet';
 import {EntryService} from '../entry.service';
-import {Entry} from '../models/entry';
+import {EntryFormObject} from '../models/entry-form-object';
+import {IncompleteEntry} from '../models/incomplete_entry';
 
 @Component({
     selector: 'app-entry-details',
@@ -56,10 +57,10 @@ export class EntryDetailsComponent implements OnInit {
         this.createForm();
 
         // Monitor changes to the entry
-      this.entryService.entriesChanged.subscribe((entries: Entry[]) => {
-        const meetEntry = entries.filter(x => x.meetId === this.meet_id);
+      this.entryService.incompleteChanged.subscribe((entries: IncompleteEntry[]) => {
+        const meetEntry = entries.filter(x => x.meet_id === this.meet_id);
         if (meetEntry !== null && meetEntry.length === 1) {
-          this.formValidSubject.next(meetEntry[0].validEvents);
+          this.formValidSubject.next(meetEntry[0].entrydata.validEvents);
         }
       });
 

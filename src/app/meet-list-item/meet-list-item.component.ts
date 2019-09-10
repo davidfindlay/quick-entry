@@ -7,6 +7,8 @@ import {MeetEntryStatusService} from '../meet-entry-status.service';
 import {MeetEntry} from '../models/meet-entry';
 import {UserService} from '../user.service';
 import {AuthenticationService} from '../authentication';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmCancelComponent} from '../confirm-cancel/confirm-cancel.component';
 
 @Component({
   selector: 'app-meet-list-item',
@@ -31,24 +33,19 @@ export class MeetListItemComponent implements OnInit {
               private router: Router,
               private statuses: MeetEntryStatusService,
               private userService: UserService,
-              private authService: AuthenticationService) {
+              private authService: AuthenticationService,
+              private modalService: NgbModal) {
   }
 
   ngOnInit() {
 
     // console.log(this.meet);
     if (this.userService.isLoggedIn()) {
-      console.log('user is logged in');
+      // console.log('user is logged in');
       this.incompleteSubscription = this.entryService.incompleteChanged.subscribe((incomplete: IncompleteEntry[]) => {
         if (incomplete !== undefined && incomplete !== null) {
-          this.incompleteEntries = incomplete.filter(x => x.meet_id === this.meet.id);
-
-          for (const entry of this.incompleteEntries) {
-            const currentEntry: any = entry;
-            console.log(currentEntry.entrydata);
-            const entryData = JSON.parse(currentEntry.entrydata);
-            entry.entrydata = entryData;
-          }
+          this.incompleteEntries = incomplete.filter(x => x.meet_id === this.meet.id
+            && (x.status_id === 1 || x.status_id === 14));
         }
       });
 
@@ -56,12 +53,12 @@ export class MeetListItemComponent implements OnInit {
         // console.log(submitted);
         if (submitted !== undefined && submitted !== null) {
           this.submittedEntries = submitted.filter(x => x.meet_id === this.meet.id);
-          console.log(this.submittedEntries);
+          // console.log(this.submittedEntries);
         }
       });
 
       this.userDetails = this.userService.getUsers();
-      console.log(this.userDetails);
+      // console.log(this.userDetails);
     }
   }
 
@@ -110,7 +107,7 @@ export class MeetListItemComponent implements OnInit {
 
   hasEntry() {
     const meetId = this.meet.id;
-    const entry = this.entryService.getEntry(meetId);
+    const entry = this.entryService.getIncompleteEntry(meetId);
 
     if (entry !== undefined && entry !== null) {
       return true;
@@ -124,7 +121,7 @@ export class MeetListItemComponent implements OnInit {
    */
   openExistingEntry() {
     const meetId = this.meet.id;
-    const entry = this.entryService.getEntry(meetId);
+    const entry = this.entryService.getIncompleteEntryFO(meetId);
 
     if (entry !== undefined && entry !== null) {
       if (entry.entrantDetails === undefined) {
@@ -141,42 +138,21 @@ export class MeetListItemComponent implements OnInit {
     }
   }
 
-  getStatusText(statusCode) {
-    return this.statuses.getStatus(statusCode);
+  cancelExistingEntry() {
+    const meetId = this.meet.id;
+
+    const modalRef = this.modalService.open(ConfirmCancelComponent);
+    modalRef.componentInstance.name = 'meet';
+    modalRef.result.then((result) => {
+        console.log(result);
+        if (result === 'yes') {
+          this.entryService.deleteEntry(meetId);
+        }
+      },
+      (reason) => {
+        console.log(reason);
+      });
   }
 
-  getEventProgramNo(eventId: number) {
-    if (this.meet.events !== undefined && this.meet.events !== null) {
-      const event = this.meet.events.filter(x => x.id === eventId);
-      if (event.length === 1) {
-        let progNo = event[0].prognumber;
-        if (event[0].progsuffix !== null) {
-          progNo += event[0].progsuffix;
-        }
-        return progNo;
-      } else {
-        console.log('Event ' + eventId + ' not found.');
-      }
-    } else {
-      console.log('Unable to get events for meet ' + this.meet.meetname);
-    }
-  }
-
-  getEventDetails(eventId: number) {
-    if (this.meet.events !== undefined && this.meet.events !== null) {
-      const event = this.meet.events.filter(x => x.id === eventId);
-      if (event.length === 1) {
-        let eventDetails = event[0].event_distance.distance + ' ' + event[0].event_discipline.discipline;
-        if (event[0].eventname !== null && event[0].eventname !== '') {
-          eventDetails = event[0].eventname + ': ' + eventDetails;
-        }
-        return eventDetails;
-      } else {
-        console.log('Event ' + eventId + ' not found.');
-      }
-    } else {
-      console.log('Unable to get events for meet ' + this.meet.meetname);
-    }
-  }
 
 }

@@ -78,13 +78,20 @@ export class MembershipClubDetailsComponent implements OnInit {
       this.meetName = this.meet.meetname;
     }
 
-    this.currentEntry = this.entryService.getEntry(this.meet_id);
+    this.currentEntry = this.entryService.getIncompleteEntryFO(this.meet_id);
+
+    if (this.currentEntry === undefined || this.currentEntry == null) {
+      console.log('No entry in progress');
+      // TODO redirect
+    }
 
     if (this.currentEntry.entrantDetails.who === 'else') {
       this.isThirdPartyEntry = true;
     }
 
     if (this.userService.isMember()) {
+      // Got member entry
+      console.log('Got member entry');
       this.isMemberEntry = true;
 
       this.member = this.userService.getMember();
@@ -103,9 +110,9 @@ export class MembershipClubDetailsComponent implements OnInit {
     // this.clubsService.loadClubs();
 
     const existingEntry = this.getExistingEntry();
-    console.log(existingEntry);
+    // console.log(existingEntry);
 
-    if (existingEntry != null) {
+    if (existingEntry !== null) {
       console.log('Got existing entry');
       console.log(existingEntry);
       this.memberDetailsForm.patchValue(existingEntry);
@@ -114,7 +121,7 @@ export class MembershipClubDetailsComponent implements OnInit {
   }
 
   getExistingEntry() {
-    const entry = this.entryService.getEntry(this.meet_id);
+    const entry = this.entryService.getIncompleteEntryFO(this.meet_id);
     console.log(entry);
     if (entry !== undefined && entry !== null) {
       const membershipDetails = entry.membershipDetails;
@@ -201,7 +208,7 @@ export class MembershipClubDetailsComponent implements OnInit {
   }
 
   saveEntry() {
-    console.log('Save Entry');
+    console.log('Save EntryFormObject');
     const memberDetails: MembershipDetails = Object.assign({}, this.memberDetailsForm.value);
 
     if (this.userService.isLoggedIn() && !this.isThirdPartyEntry) {

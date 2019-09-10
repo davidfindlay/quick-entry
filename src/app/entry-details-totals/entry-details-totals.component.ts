@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {EntryService} from '../entry.service';
-import {Entry} from '../models/entry';
+import {EntryFormObject} from '../models/entry-form-object';
+import {IncompleteEntry} from '../models/incomplete_entry';
 
 @Component({
   selector: 'app-entry-details-totals',
@@ -16,8 +17,8 @@ export class EntryDetailsTotalsComponent implements OnInit {
   constructor(private entryService: EntryService) { }
 
   ngOnInit() {
-    const entry = this.entryService.getEntry(this.meetId);
-    this.entryService.entriesChanged.subscribe((entries: Entry[]) => {
+    const entry = this.entryService.getIncompleteEntryFO(this.meetId);
+    this.entryService.incompleteChanged.subscribe((entries: IncompleteEntry[]) => {
       this.eventsEntered = this.entryService.getIndividualEventCount(entry);
 
       this.entryCost = this.entryService.getEntryCost(entry);

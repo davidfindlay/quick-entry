@@ -4,7 +4,7 @@ import {MembershipDetails} from './membership-details';
 import {MedicalDetails} from './medical-details';
 import {PaymentOption} from './paymentoption';
 
-export class Entry {
+export class EntryFormObject {
 
   id: number;
   meetId: number;

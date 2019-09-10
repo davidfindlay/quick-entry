@@ -13,14 +13,16 @@ import { environment } from '../../environments/environment';
 
 import {PaymentOption} from '../models/paymentoption';
 import {EntryEvent} from '../models/entryevent';
-import {Entry} from '../models/entry';
+import {EntryFormObject} from '../models/entry-form-object';
 import {HttpClient} from '@angular/common/http';
 import {NgxSpinner} from 'ngx-spinner/lib/ngx-spinner.enum';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {MeetEntryStatusService} from '../meet-entry-status.service';
 import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
-import {PaypalService} from '../paypal.service';
+import {PaypalService} from '../paypal/paypal.service';
 import {ClubsService} from '../clubs.service';
+import {AuthenticationService} from '../authentication';
+import {IncompleteEntry} from '../models/incomplete_entry';
 
 @Component({
   selector: 'app-entry-confirmation',
@@ -32,7 +34,7 @@ export class EntryConfirmationComponent implements OnInit {
   @ViewChild(WorkflowNavComponent, {static: false})
   workflowNav: WorkflowNavComponent;
 
-  formValidSubject = new BehaviorSubject<boolean>(true);
+  formValidSubject = new BehaviorSubject<boolean>(false);
 
   meet_id;
   meet: Meet;
@@ -66,18 +68,12 @@ export class EntryConfirmationComponent implements OnInit {
 
   showPaymentChoice = true;
 
-  public defaultPrice: string = '9.99';
-  public payPalConfig?: IPayPalConfig;
-
-  public showSuccess: boolean = false;
-  public showCancel: boolean = false;
-  public showError: boolean = false;
-
   constructor(private fb: FormBuilder,
               private route: ActivatedRoute,
               private router: Router,
               private location: PlatformLocation,
               private userService: UserService,
+              private authService: AuthenticationService,
               private meetService: MeetService,
               private entryService: EntryService,
               private http: HttpClient,
@@ -94,7 +90,7 @@ export class EntryConfirmationComponent implements OnInit {
       this.meetName = this.meet.meetname;
     }
 
-    this.entry = this.entryService.getEntry(this.meet_id);
+    this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
     console.log(this.entry);
 
     this.eventEntries = this.entry.entryEvents;
@@ -135,14 +131,14 @@ export class EntryConfirmationComponent implements OnInit {
         this.paypalData = paid.paypalPayment;
         this.showPaymentChoice = false;
         this.workflowNav.enableFinishButton();
-        this.entryService.setStatus(this.entryService.getEntry(this.meet_id), paid.status);
+        this.entryService.setStatus(this.entryService.getIncompleteEntry(this.meet_id), paid.status);
         this.entryService.deleteEntry(this.meet_id);
         this.ngxSpinner.hide();
       });
     }
 
-    this.entryService.entriesChanged.subscribe((entries) => {
-      this.entry = this.entryService.getEntry(this.meet_id);
+    this.entryService.incompleteChanged.subscribe((entries) => {
+      this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
       console.log(this.entry);
 
       this.statusCode = this.entry.status;
@@ -197,13 +193,6 @@ export class EntryConfirmationComponent implements OnInit {
     );
   }
 
-  private resetStatus(): void {
-    this.showError = false;
-    this.showSuccess = false;
-    this.showCancel = false;
-  }
-
-
   onSubmit($event) {
     switch ($event) {
       case 'cancel':
@@ -228,13 +217,13 @@ export class EntryConfirmationComponent implements OnInit {
   submit() {
     this.ngxSpinner.show();
     console.log('submit');
-    this.entryService.storeIncompleteEntry(this.entryService.getEntry(this.meet_id)).subscribe((entrySaved: Entry) => {
+    this.entryService.storeIncompleteEntry(this.entryService.getIncompleteEntryFO(this.meet_id)).subscribe((entrySaved: IncompleteEntry) => {
       console.log('Saved entry to incomplete store');
-      this.entryService.finalise(this.entryService.getEntry(this.meet_id)).subscribe((finalised: any) => {
+      this.entryService.finalise(this.entryService.getIncompleteEntry(this.meet_id)).subscribe((finalised: any) => {
         console.log('Finalise entry');
         console.log(finalised);
 
-        this.entryService.setStatus(this.entryService.getEntry(this.meet_id), finalised.status);
+        this.entryService.setStatus(this.entryService.getIncompleteEntry(this.meet_id), finalised.status);
 
         // Disable the form
         this.showPaymentChoice = false;
@@ -266,7 +255,11 @@ export class EntryConfirmationComponent implements OnInit {
         } else {
           this.ngxSpinner.hide();
           // Remove finished entry from entry service
-          this.entryService.deleteEntry(this.meet_id);
+          if (this.userService.getUsers() !== null) {
+            this.entryService.retrieveIncompleteEntries();
+          } else {
+            this.entryService.deleteEntry(this.meet_id);
+          }
 
         }
 

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
-import { environment } from '../environments/environment';
-import {MeetEntry} from './models/meet-entry';
-import {IncompleteEntry} from './models/incomplete_entry';
+import { environment } from '../../environments/environment';
+import {MeetEntry} from '../models/meet-entry';
+import {IncompleteEntry} from '../models/incomplete_entry';
 
 @Injectable({
   providedIn: 'root'

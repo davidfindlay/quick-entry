@@ -37,6 +37,10 @@ import { EntryDetailsTotalsComponent } from './entry-details-totals/entry-detail
 import {NgxPayPalModule} from 'ngx-paypal';
 import {NgxSpinnerModule} from 'ngx-spinner';
 import {MeetEntryStatusService} from './meet-entry-status.service';
+import { SubmittedEntryComponent } from './submitted-entry/submitted-entry.component';
+import { PendingEntryComponent } from './pending-entry/pending-entry.component';
+import { SidebarMenuComponent } from './sidebar-menu/sidebar-menu.component';
+import { MyProfileComponent } from './my-profile/my-profile.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -48,6 +52,7 @@ const appRoutes: Routes = [
   { path: 'enter/:meet/step4', component: EntryDetailsComponent},
   { path: 'enter/:meet/step5', component: EntryPaymentComponent},
   { path: 'enter/:meet/confirmation', component: EntryConfirmationComponent},
+  { path: 'my-profile', component: MyProfileComponent },
     { path: '**', component: MeetListComponent }
 ];
 
@@ -71,7 +76,11 @@ const appRoutes: Routes = [
         EventSelectCheckboxComponent,
         TimePipe,
         SeedtimeHelperComponent,
-        EntryDetailsTotalsComponent
+        EntryDetailsTotalsComponent,
+        SubmittedEntryComponent,
+        PendingEntryComponent,
+        SidebarMenuComponent,
+        MyProfileComponent
     ],
     entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
   imports: [

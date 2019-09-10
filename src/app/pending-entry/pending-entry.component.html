@@ -1,0 +1,17 @@
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">
+      {{incompleteEntry.entrydata.entrantDetails.entrantFirstName}} {{incompleteEntry.entrydata.entrantDetails.entrantSurname}}
+    </h2>
+  </div>
+  <div class="card-body">
+    <strong>Lodged: </strong>{{incompleteEntry.created_at | date: 'medium'}}<br />
+    <strong>Status: </strong> {{incompleteEntry.status_id}}
+    <div>
+      <button class="btn btn-primary" (click)="editIncompleteEntry(incompleteEntry)" *ngIf="entriesOpen()">
+        Edit
+      </button>
+    </div>
+  </div>
+
+</div>

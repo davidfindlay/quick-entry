@@ -1,7 +1,17 @@
 <app-header></app-header>
 
+
+<div class="container-fluid flex-fill d-flex">
+  <div class="row flex-fill">
+    <div class="col-xs-12 col-sm-4 col-md-3 sidebar bg-dark min-vh-100 pt-3 d-none d-sm-block" id="Navbar">
+
+    <app-sidebar-menu></app-sidebar-menu>
+    </div>
+    <div class="col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 py-3">
 <div class="container">
+      <router-outlet></router-outlet>
+</div>
+    </div>
 
-    <router-outlet></router-outlet>
-
+  </div>
 </div>

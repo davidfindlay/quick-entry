@@ -6,7 +6,7 @@ import {Subscription} from 'rxjs/Subscription';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MeetService} from '../meet.service';
 import {AuthenticationService} from '../authentication/authentication.service';
-import {Entry} from '../models/entry';
+import {EntryFormObject} from '../models/entry-form-object';
 import {EntryService} from '../entry.service';
 import {EntrantDetails} from '../models/entrant-details';
 import {BehaviorSubject, Subject} from 'rxjs';
@@ -27,7 +27,7 @@ export class EntrantDetailsComponent implements OnInit {
   meetSub: Subscription;
   meetName: String = '';
 
-  entry: Entry;
+  entry: EntryFormObject;
 
   entrantDetailsForm: FormGroup;
   inlineLoginForm: FormGroup;
@@ -140,7 +140,7 @@ export class EntrantDetailsComponent implements OnInit {
   }
 
   getExistingEntry() {
-    const entry = this.entryService.getEntry(this.meet_id);
+    const entry = this.entryService.getIncompleteEntryFO(this.meet_id);
     if (entry !== undefined && entry !== null) {
       const entrantDetails = entry.entrantDetails;
       if (entrantDetails !== undefined && entrantDetails != null) {
@@ -279,12 +279,14 @@ export class EntrantDetailsComponent implements OnInit {
 
     switch ($event) {
       case 'cancel':
+        console.log('cancel');
         this.entryService.deleteEntry(this.meet_id);
         break;
       case 'saveAndExit':
         this.saveEntry();
         break;
       case 'submit':
+        console.log('submit');
         this.saveEntry();
         break;
     }
@@ -332,9 +334,9 @@ export class EntrantDetailsComponent implements OnInit {
     const entrantDetails: EntrantDetails = Object.assign({}, this.entrantDetailsForm.value);
 
     // Check for existing entry
-    const existingEntry = this.entryService.getEntry(this.meet_id);
+    const existingEntry = this.entryService.getIncompleteEntryFO(this.meet_id);
     if (existingEntry == null) {
-      this.entry = new Entry();
+      this.entry = new EntryFormObject();
     } else {
       this.entry = existingEntry;
     }

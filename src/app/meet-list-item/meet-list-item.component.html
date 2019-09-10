@@ -34,73 +34,32 @@
       </table>
     </div>
 
+    <div class="mt-3">
     <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && !hasEntry()">Enter Meet</button>
-    <button type="button" class="btn btn-warning" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry()">Resume Incomplete Entry</button>
+    <button type="button" class="btn btn-warning mr-1" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry()">Resume Incomplete Entry</button>
+    <button type="button" class="btn btn-danger" (click)="cancelExistingEntry()" *ngIf="isOpen() && hasEntry()">Cancel Incomplete Entry</button>
+    </div>
+
     <div class="card" *ngIf="!isOpen()">
       This meet is not yet open. Please try again later.
     </div>
 
     <div class="mt-3" *ngIf="incompleteEntries.length > 0">
-      <h3>Entries Awaiting Followup:</h3>
+      <h3>Pending Entries:</h3>
 
-      <div class="card" *ngFor="let incompleteEntry of incompleteEntries">
-        <div class="card-header">
-          <h2 class="card-title">
-            {{incompleteEntry.entrydata.entrantDetails.entrantFirstName}} {{incompleteEntry.entrydata.entrantDetails.entrantSurname}}
-          </h2>
-        </div>
-        <div class="card-body">
-          <strong>Lodged: </strong>{{incompleteEntry.created_at | date: 'medium'}}<br />
-          <strong>Status: </strong> {{incompleteEntry.status_id}}
-        </div>
-
-      </div>
-
+      <app-pending-entry *ngFor="let incompleteEntry of incompleteEntries"
+                         [meet]="meet"
+                         [incompleteEntry]="incompleteEntry">
+      </app-pending-entry>
     </div>
 
     <div class="mt-3" *ngIf="submittedEntries.length > 0">
       <h3>Submitted Entries:</h3>
-      <div class="card" *ngFor="let submittedEntry of submittedEntries">
-        <div class="card-header">
-          <h2 class="card-title">
-            {{submittedEntry.member.firstname}} {{submittedEntry.member.surname}}
-          </h2>
-          {{submittedEntry.club.clubname}} ({{submittedEntry.club.code}})
-        </div>
-        <div class="card-body">
-          <strong>Entry Number: </strong> {{submittedEntry.id}}<br />
-          <strong>Status: </strong> {{submittedEntry.status.status.label}}
-          <table>
-            <tr>
-              <th>
-                No:
-              </th>
-              <th>
-                Event Details:
-              </th>
-              <th>
-                Seed Time:
-              </th>
-            </tr>
-            <tr *ngFor="let event of submittedEntry.events">
-              <td>
-                {{ getEventProgramNo(event.event_id) }}
-              </td>
-              <td>
-                {{ getEventDetails(event.event_id) }}
-              </td>
-              <td>
-                {{event.seedtime | time }}
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="card-footer">
-          <strong>Lodged: </strong> {{submittedEntry.created_at | date: 'medium'}}<br />
 
-        </div>
-
-      </div>
+      <app-submitted-entry *ngFor="let submittedEntry of submittedEntries"
+                           [meet]="meet"
+                           [submittedEntry]="submittedEntry">
+      </app-submitted-entry>
     </div>
 
   </div>

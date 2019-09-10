@@ -87,7 +87,7 @@ export class ClassificationMedicalDetailsComponent implements OnInit {
   }
 
   getExistingEntry() {
-    const entry = this.entryService.getEntry(this.meet_id);
+    const entry = this.entryService.getIncompleteEntryFO(this.meet_id);
     console.log(entry);
     if (entry !== undefined && entry !== null) {
       const medicalDetails = entry.medicalDetails;

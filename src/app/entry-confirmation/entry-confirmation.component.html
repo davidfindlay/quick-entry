@@ -70,7 +70,7 @@
 </div>
 
 <div *ngIf="entry.entrantDetails.who !== 'me'" class="confirmationSection">
-  <h3>Entry Lodged By</h3>
+  <h3>EntryFormObject Lodged By</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
       Name:
@@ -166,7 +166,7 @@
   </div>
   <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
     <div class="fieldName col-sm-3">
-      Freestyle Classfication:
+      Freestyle Classification:
     </div>
     <div class="fieldValue">
       {{entry.medicalDetails.classFreestyle}}
@@ -174,7 +174,7 @@
   </div>
   <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
     <div class="fieldName col-sm-3">
-      Breaststroke Classfication:
+      Breaststroke Classification:
     </div>
     <div class="fieldValue">
       {{entry.medicalDetails.classBreaststroke}}
@@ -182,7 +182,7 @@
   </div>
   <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
     <div class="fieldName col-sm-3">
-      Medley Classfication:
+      Medley Classification:
     </div>
     <div class="fieldValue">
       {{entry.medicalDetails.classMedley}}
@@ -329,12 +329,12 @@
           </li>
           <li *ngIf="enablePaymentOption('club')">
             Pay via Club: Your club may make a bulk payment on behalf of members. Please check with your Club Recorder
-            or Club Captain. Note that if you do not pay for your entry by the Meet Entry Deadline your entry may not
+            or Club Captain. Note that if you do not pay for your entry by the Meet EntryFormObject Deadline your entry may not
             be accepted.
           </li>
           <li>
-            Pay Later: You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
-            for your entry by the Meet Entry Deadline your entry <strong><u>may be rejected</u></strong>.
+            Pay Later: You can choose to pay at a later date by returning to Quick EntryFormObject. Note that if you do not pay
+            for your entry by the Meet EntryFormObject Deadline your entry <strong><u>may be rejected</u></strong>.
           </li>
         </ul>
       </div>

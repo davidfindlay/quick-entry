@@ -1,4 +1,4 @@
-import {Entry} from './entry';
+import {EntryFormObject} from './entry-form-object';
 
 export class IncompleteEntry {
   id: number;
@@ -7,7 +7,7 @@ export class IncompleteEntry {
   user_id: number;
   status_id: number;
   member_id: number;
-  entrydata: Entry;
+  entrydata: EntryFormObject;
   created_at: Date;
   updated_at: Date;
 }
