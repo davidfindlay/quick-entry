@@ -215,7 +215,9 @@ export class MembershipClubDetailsComponent implements OnInit {
 
     if (this.userService.isLoggedIn() && !this.isThirdPartyEntry) {
       const member = this.userService.getMember();
-      memberDetails.member_number = member.number;
+      if (member !== undefined && member !== null) {
+        memberDetails.member_number = member.number;
+      }
     }
 
     if (memberDetails.club_selector !== null) {
