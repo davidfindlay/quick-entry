@@ -280,9 +280,23 @@ export class EntrantDetailsComponent implements OnInit {
       }
 
       if (this.entrantDetailsForm.valid) {
-        this.formValidSubject.next(true);
+        if (this.inlineRegisterForm.controls['register'].value === 'yes') {
+          this.formValidSubject.next(false);
+        } else {
+          this.formValidSubject.next(true);
+        }
       } else {
         this.formValidSubject.next(false);
+      }
+    });
+
+    this.inlineRegisterForm.valueChanges.subscribe(val => {
+      if (val.register === 'yes') {
+        this.formValidSubject.next(false);
+      } else {
+        if (this.entrantDetailsForm.valid) {
+          this.formValidSubject.next(true);
+        }
       }
     });
 
@@ -415,6 +429,8 @@ export class EntrantDetailsComponent implements OnInit {
 
   register() {
 
+    let newUser;
+
     if (this.inlineRegisterForm.controls.confirmpassword.touched) {
       if (this.inlineRegisterForm.controls.password.value !== this.inlineRegisterForm.controls.confirmpassword.value) {
         console.log('Passwords don\'t match');
@@ -431,7 +447,7 @@ export class EntrantDetailsComponent implements OnInit {
         genderLetter = 'F';
       }
 
-      const newUser = <RegisterUser>{
+      newUser = <RegisterUser>{
         email: this.entrantDetailsForm.controls.entrantEmail.value,
         password: this.inlineRegisterForm.controls.password.value,
         confirmPassword: this.inlineRegisterForm.controls.confirmpassword.value,
@@ -444,7 +460,32 @@ export class EntrantDetailsComponent implements OnInit {
         emergency_surname: this.entrantDetailsForm.controls.emergencySurname.value,
         emergency_phone: this.entrantDetailsForm.controls.emergencyPhone.value,
         emergency_email: this.entrantDetailsForm.controls.emergencyEmail.value
+      };
+
+
+    } else if (this.entrantDetailsForm.controls.who.value === 'else') {
+
+      let genderLetter;
+      if (this.entrantDetailsForm.controls.entrantGender.value === 'male') {
+        genderLetter = 'M';
+      } else {
+        genderLetter = 'F';
       }
+
+      newUser = <RegisterUser>{
+        email: this.entrantDetailsForm.controls.userEmail.value,
+        password: this.inlineRegisterForm.controls.password.value,
+        confirmPassword: this.inlineRegisterForm.controls.confirmpassword.value,
+        firstname: this.entrantDetailsForm.controls.userFirstName.value,
+        surname: this.entrantDetailsForm.controls.userSurname.value,
+        dob: null,
+        gender: null,
+        phone: this.entrantDetailsForm.controls.userPhone.value,
+        emergency_firstname: null,
+        emergency_surname: null,
+        emergency_phone: null,
+        emergency_email: null
+      };
 
       this.userService.register(newUser).subscribe((userRegistration: any) => {
         if (!userRegistration.success) {
@@ -455,9 +496,23 @@ export class EntrantDetailsComponent implements OnInit {
           this.unableToRegister = false;
           this.isAnonymousEntry = false;
           this.registeredUsername = userRegistration.user.email;
+          this.inlineRegisterForm.patchValue({'register': 'no'});
         }
-      })
+      });
     }
+
+    this.userService.register(newUser).subscribe((userRegistration: any) => {
+      if (!userRegistration.success) {
+        console.log('unable to register');
+        this.unableToRegister = true;
+      } else {
+        console.log('registered');
+        this.unableToRegister = false;
+        this.isAnonymousEntry = false;
+        this.registeredUsername = userRegistration.user.email;
+        this.inlineRegisterForm.patchValue({'register': 'no'});
+      }
+    });
   }
 
 }
