@@ -99,7 +99,7 @@ export class SubmittedEntryComponent implements OnInit {
   editSubmittedEntry(submittedEntry) {
     this.entryService.editSubmittedEntry(submittedEntry.id).subscribe((edit: any) => {
       this.router.navigate(['/', 'enter', edit.meet_id , 'step1'])
-    })
+    });
   }
 
 }

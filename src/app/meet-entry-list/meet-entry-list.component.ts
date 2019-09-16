@@ -63,10 +63,13 @@ export class MeetEntryListComponent implements OnInit {
           }
 
           const row = {
+            'id': entry.id,
             'Entrant': entry.member.surname + ', ' + entry.member.firstname,
-            'Club': entry.club.clubname + ' (' + entry.club.code + ')',
+            'Club': entry.club.code,
+            'clubname': entry.club.clubname,
             'Cost': entry.cost,
             'Paid': paid,
+            'Updated': entry.updated_at,
             'Status': entry.status.status.label
           };
           this.tableRows.push(row);

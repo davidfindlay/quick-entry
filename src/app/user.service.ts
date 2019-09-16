@@ -56,14 +56,17 @@ export class UserService {
 
         console.log('Attempt to load member');
 
-        this.http.get(environment.api + 'member/' + this.user.member)
+        if (this.user.member !== undefined && this.user.member !== null) {
+
+          this.http.get(environment.api + 'member/' + this.user.member)
             .subscribe(member => {
-                this.member = member;
-                // console.log(this.member);
-                this.currentMemberships = this.loadCurrentMemberships();
-                this.previousMemberships = this.loadPreviousMemberships();
-                this.memberChanged.next(this.member);
-        });
+              this.member = member;
+              // console.log(this.member);
+              this.currentMemberships = this.loadCurrentMemberships();
+              this.previousMemberships = this.loadPreviousMemberships();
+              this.memberChanged.next(this.member);
+            });
+        }
     }
 
     getUsers(): User {
@@ -158,5 +161,24 @@ export class UserService {
       } else {
         return false;
       }
+    }
+
+    register(userDetails) {
+      console.log('Register user');
+      return new Observable((observer) => {
+      this.http.post(environment.api + 'users/register', userDetails).subscribe((registeredUser: any) => {
+        if (registeredUser.success) {
+          console.log('Successfully registered new user ' + registeredUser.user.username);
+
+          this.authenticationService.login(registeredUser.user.username, userDetails.password).subscribe((loggedIn) => {
+            observer.next(registeredUser);
+          });
+
+        }
+      }, (error: any) => {
+        observer.next(error);
+      });
+
+      });
     }
 }

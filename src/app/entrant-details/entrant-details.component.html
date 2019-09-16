@@ -8,7 +8,7 @@
             <div class="card-body">
                 <div class="card-text">
                     <p>
-                        If you have an MSQ Quick EntryFormObject or MSQ EntryFormObject Manager account, please
+                        If you have an MSQ Quick Entry or MSQ Entry Manager account, please
                         Log In, so your personal details can be automatically added
                         to your entry.
                     </p>
@@ -65,11 +65,21 @@
             </div>
         </div>
 
+      <div class="card mb-3 bg-success text-white" *ngIf="registeredUsername !== null">
+        <div class="card-body">
+          <div class="card-text">
+            <p>
+              You have successfully registered an account. Your username is: {{registeredUsername}}
+            </p>
+          </div>
+        </div>
+      </div>
+
         <div class="form-group row">
             <p class="col-form-legend col-md-6">Is this entry for you or for someone else?
                 (required) </p>
             <div class="col-md-6">
-                <div class="form-check">
+                <div class="form-check" *ngIf="!existingSubmittedEntry">
                     <label for="who-me">
                         <input class="form-check-label" type="radio"
                                id="who-me" value="me"
@@ -77,6 +87,14 @@
                         Me
                     </label>
                 </div>
+              <div class="form-check" *ngIf="existingSubmittedEntry">
+                <label for="who-me">
+                  <input class="form-check-label" type="radio"
+                         id="who-me-edit" value="me-edit"
+                         formControlName="who" />
+                  Edit my existing entry
+                </label>
+              </div>
                 <div class="form-check">
                     <label for="who-else">
                         <input class="form-check-label" type="radio"
@@ -263,10 +281,11 @@
                 <div class="card-tex">
                     <p>
                         If you create an account you won't have to enter your personal details every time
-                        you enter a meet.
+                        you enter a meet. The details you've entered will be saved while you register.
                     </p>
                     <p>
-                        The details you've entered will be saved while you register.
+                        Your username will be your
+                      email address.
                     </p>
                 </div>
             </div>
@@ -295,6 +314,10 @@
       </div>
       <div *ngIf="inlineRegisterForm.value.register === 'yes'">
         <div class="form-group row">
+          <label for="usernameRegister" class="form-control-label col-sm-2">Username:</label>
+          <input class="form-control col-sm-10" type="text" formControlName="usernameRegister" id="usernameRegister"/>
+        </div>
+        <div class="form-group row">
             <label for="password" class="form-control-label col-sm-2">Password:</label>
             <input class="form-control col-sm-10" type="password" formControlName="password" id="password"/>
         </div>
@@ -307,6 +330,17 @@
                 <button type="button" class="btn btn-primary" (click)="register()">Register</button>
             </p>
         </div>
+
+        <div class="card mb-3 bg-warning text-white" *ngIf="unableToRegister">
+          <div class="card-body">
+            <div class="card-tex">
+              <p>
+                Unable to register an account.
+              </p>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </fieldset>

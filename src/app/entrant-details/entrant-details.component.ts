@@ -46,6 +46,12 @@ export class EntrantDetailsComponent implements OnInit {
   isAnonymousEntry = false;
   isMemberEntry = false;
 
+  existingSubmittedEntry = false;
+  existingSubmittedEntryId;
+
+  unableToRegister = false;
+  registeredUsername = null;
+
   constructor(private fb: FormBuilder,
               private route: ActivatedRoute,
               private router: Router,
@@ -86,6 +92,16 @@ export class EntrantDetailsComponent implements OnInit {
 
     if (existingEntry != null) {
       this.entrantDetailsForm.patchValue(existingEntry);
+
+    }
+
+    if (this.entryService.getSubmittedEntries(this.meet_id) !== undefined
+      && this.entryService.getSubmittedEntries(this.meet_id) !== null) {
+      this.existingSubmittedEntry = true;
+      this.existingSubmittedEntryId = this.entryService.getSubmittedEntries(this.meet_id).id;
+      this.entrantDetailsForm.patchValue({
+        who: 'me-edit'
+      });
     }
 
     if (this.authenticationService.getUser() == null) {
@@ -133,6 +149,16 @@ export class EntrantDetailsComponent implements OnInit {
       });
     } else {
       this.entrantDetailsForm.patchValue({
+        entrantFirstName: '',
+        entrantSurname: '',
+        entrantDob: '',
+        entrantGender: '',
+        entrantEmail: '',
+        entrantPhone: '',
+        emergencyFirstName: '',
+        emergencySurname: '',
+        emergencyPhone: '',
+        emergencyEmail: '',
         userFirstName: userDetails.firstname,
         userSurname: userDetails.surname,
         userEmail: userDetails.email,
@@ -170,7 +196,7 @@ export class EntrantDetailsComponent implements OnInit {
 
     this.inlineRegisterForm = this.fb.group({
       register: ['no'],
-      usernameRegister: '',
+      usernameRegister: {value: '', disabled: true},
       password: '',
       confirmpassword: ''
     });
@@ -214,12 +240,22 @@ export class EntrantDetailsComponent implements OnInit {
 
     // Handle change from who from me to else
     this.entrantDetailsForm.controls['who'].valueChanges.subscribe(val => {
+      // Get details from user account
+      if (this.userService.isLoggedIn()) {
+        this.prefillFromUser();
+      }
+
       if (val === 'me') {
         this.inlineRegisterForm.patchValue({
           usernameRegister: this.entrantDetailsForm.value.entrantEmail
         });
         this.isThirdPartyEntry = false;
       }
+
+      if (val === 'me-edit') {
+        this.isThirdPartyEntry = false;
+      }
+
       // Maintain value for new registration usernames
       if (val === 'else') {
         this.inlineRegisterForm.patchValue({
@@ -227,9 +263,22 @@ export class EntrantDetailsComponent implements OnInit {
         });
         this.isThirdPartyEntry = true;
       }
+
     });
 
     this.entrantDetailsForm.valueChanges.subscribe(val => {
+      if (val === 'me') {
+        this.inlineRegisterForm.patchValue({
+          registerUsername: this.entrantDetailsForm.contains['entrantEmail'].value
+        });
+      }
+
+      if (val === 'else') {
+        this.inlineRegisterForm.patchValue({
+          registerUsername: this.entrantDetailsForm.contains['userEmail'].value
+        });
+      }
+
       if (this.entrantDetailsForm.valid) {
         this.formValidSubject.next(true);
       } else {
@@ -333,6 +382,16 @@ export class EntrantDetailsComponent implements OnInit {
   }
 
   saveEntry() {
+    if (this.existingSubmittedEntry) {
+      this.entryService.editSubmittedEntry(this.existingSubmittedEntryId).subscribe((edit: any) => {
+        this.processSave();
+      });
+    } else {
+      this.processSave();
+    }
+  }
+
+  processSave() {
     const entrantDetails: EntrantDetails = Object.assign({}, this.entrantDetailsForm.value);
 
     // Check for existing entry
@@ -386,6 +445,18 @@ export class EntrantDetailsComponent implements OnInit {
         emergency_phone: this.entrantDetailsForm.controls.emergencyPhone.value,
         emergency_email: this.entrantDetailsForm.controls.emergencyEmail.value
       }
+
+      this.userService.register(newUser).subscribe((userRegistration: any) => {
+        if (!userRegistration.success) {
+          console.log('unable to register');
+          this.unableToRegister = true;
+        } else {
+          console.log('registered');
+          this.unableToRegister = false;
+          this.isAnonymousEntry = false;
+          this.registeredUsername = userRegistration.user.email;
+        }
+      })
     }
   }
 

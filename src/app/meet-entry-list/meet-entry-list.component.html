@@ -27,14 +27,19 @@
 
   rowHeight="40px"
   [rows]="tableRows">
+  <ngx-datatable-column name="Entry ID">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.id}}
+    </ng-template>
+  </ngx-datatable-column>
   <ngx-datatable-column name="Entrant" prop="Entrant">
     <ng-template let-row="row" ngx-datatable-cell-template>
       {{row.Entrant}}
     </ng-template>
   </ngx-datatable-column>
-  <ngx-datatable-column name="Club" prop="Club">
+  <ngx-datatable-column name="Club">
     <ng-template let-row="row" ngx-datatable-cell-template>
-      {{row.Club}}
+      <abbr title="{{row.clubname}}">{{row.Club}}</abbr>
     </ng-template>
   </ngx-datatable-column>
   <ngx-datatable-column name="Cost" prop="Cost">
@@ -50,6 +55,11 @@
   <ngx-datatable-column name="Status" prop="Status">
     <ng-template let-row="row" ngx-datatable-cell-template>
       {{row.Status}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Updated" prop="Updated">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.Updated}}
     </ng-template>
   </ngx-datatable-column>
   <ngx-datatable-column name="Options">
