@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {MeetService} from '../meet.service';
 import {UserService} from '../user.service';
 import {PlatformLocation} from '@angular/common';
@@ -9,6 +9,7 @@ import {Meet} from '../models/meet';
 import {EntryService} from '../entry.service';
 import {EntryFormObject} from '../models/entry-form-object';
 import {IncompleteEntry} from '../models/incomplete_entry';
+import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
 
 @Component({
     selector: 'app-entry-details',
@@ -17,6 +18,7 @@ import {IncompleteEntry} from '../models/incomplete_entry';
 })
 export class EntryDetailsComponent implements OnInit {
 
+  @ViewChild(WorkflowNavComponent, {static: true}) workflow: WorkflowNavComponent;
   public formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     entryDetailsForm: FormGroup;
@@ -60,6 +62,8 @@ export class EntryDetailsComponent implements OnInit {
       this.entryService.incompleteChanged.subscribe((entries: IncompleteEntry[]) => {
         const meetEntry = entries.filter(x => x.meet_id === this.meet_id);
         if (meetEntry !== null && meetEntry.length === 1) {
+          // console.log('valid events: ');
+          // console.log(meetEntry[0].entrydata.validEvents);
           this.formValidSubject.next(meetEntry[0].entrydata.validEvents);
         }
       });
@@ -117,6 +121,7 @@ export class EntryDetailsComponent implements OnInit {
 
     saveEntry() {
       this.entryService.storeEntries();
+      this.workflow.navigateNext();
     }
 
 }

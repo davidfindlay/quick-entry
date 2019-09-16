@@ -59,7 +59,7 @@ export class UserService {
         this.http.get(environment.api + 'member/' + this.user.member)
             .subscribe(member => {
                 this.member = member;
-                console.log(this.member);
+                // console.log(this.member);
                 this.currentMemberships = this.loadCurrentMemberships();
                 this.previousMemberships = this.loadPreviousMemberships();
                 this.memberChanged.next(this.member);

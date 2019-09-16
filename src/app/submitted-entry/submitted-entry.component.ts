@@ -3,6 +3,8 @@ import {Meet} from '../models/meet';
 import {IncompleteEntry} from '../models/incomplete_entry';
 import {MeetEntry} from '../models/meet-entry';
 import {MeetEntryStatusService} from '../meet-entry-status.service';
+import {EntryService} from '../entry.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-submitted-entry',
@@ -16,7 +18,9 @@ export class SubmittedEntryComponent implements OnInit {
 
   eventRows = [];
 
-  constructor(private statuses: MeetEntryStatusService) { }
+  constructor(private statuses: MeetEntryStatusService,
+              private entryService: EntryService,
+              private router: Router) { }
 
   ngOnInit() {
     for (const eventEntry of this.submittedEntry.events) {
@@ -52,8 +56,7 @@ export class SubmittedEntryComponent implements OnInit {
     if (this.meet.events !== undefined && this.meet.events !== null) {
       const event = this.meet.events.filter(x => x.id === eventId);
       if (event.length === 1) {
-        let progsuffix = event[0].progsuffix;
-        return progsuffix;
+        return event[0].progsuffix;
       } else {
         console.log('Event ' + eventId + ' not found.');
       }
@@ -93,8 +96,10 @@ export class SubmittedEntryComponent implements OnInit {
     }
   }
 
-  editSubmittedEntry(incompleteEntry) {
-
+  editSubmittedEntry(submittedEntry) {
+    this.entryService.editSubmittedEntry(submittedEntry.id).subscribe((edit: any) => {
+      this.router.navigate(['/', 'enter', edit.meet_id , 'step1'])
+    })
   }
 
 }

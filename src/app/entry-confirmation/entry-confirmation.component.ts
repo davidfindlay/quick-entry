@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {Meet} from '../models/meet';
 import {FormBuilder, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -23,6 +23,7 @@ import {PaypalService} from '../paypal/paypal.service';
 import {ClubsService} from '../clubs.service';
 import {AuthenticationService} from '../authentication';
 import {IncompleteEntry} from '../models/incomplete_entry';
+import {MeetEntryStatusCode} from '../models/meet-entry-status-code';
 
 @Component({
   selector: 'app-entry-confirmation',
@@ -40,7 +41,9 @@ export class EntryConfirmationComponent implements OnInit {
   meet: Meet;
   meetName;
 
-  entry;
+  @Input() entry;
+  pending_entry_id;
+  meet_entry_id;
   paymentOptionForm;
 
   eventEntries: EntryEvent[];
@@ -83,22 +86,76 @@ export class EntryConfirmationComponent implements OnInit {
               private clubService: ClubsService) { }
 
   ngOnInit() {
+    this.ngxSpinner.show();
     this.meet_id = +this.route.snapshot.paramMap.get('meet');
-    this.meet = this.meetService.getMeet(this.meet_id);
-    if (this.meet) {
+    this.pending_entry_id = +this.route.snapshot.paramMap.get('pendingId');
+    this.meet_entry_id = +this.route.snapshot.paramMap.get('entryId');
 
-      this.meetName = this.meet.meetname;
-    }
-
-    this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
-    console.log(this.entry);
-
-    this.eventEntries = this.entry.entryEvents;
-    this.eventEntries.sort((a, b) => (parseInt(a.program_no, 10) > parseInt(b.program_no, 10)) ? 1 : -1);
+    console.log(this.meet_id);
+    console.log(this.pending_entry_id);
+    console.log(this.meet_entry_id);
 
     this.paymentOptionForm = this.fb.group({
       paymentOption: ['paypal', Validators.required]
     });
+
+    if (this.meet_id !== undefined && this.meet_id !== null && this.meet_id !== 0) {
+      this.meet = this.meetService.getMeet(this.meet_id);
+      this.meetName = this.meet.meetname;
+      this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
+      this.paidAmount = parseFloat(this.entry.edit_paid);
+      console.log(this.entry);
+      this.loadEntry();
+    } else if (this.pending_entry_id !== undefined && this.pending_entry_id !== null && this.pending_entry_id !== 0) {
+      this.entryService.getPendingEntry(this.pending_entry_id).subscribe((entry: IncompleteEntry) => {
+        console.log(entry);
+        this.meet = this.meetService.getMeet(entry.meet_id);
+        this.meetName = this.meet.meetname;
+        this.entry = entry.entrydata;
+        this.statusLabel = entry.status_label;
+        this.statusText = entry.status_description;
+        if (this.entry.paymentDetails !== undefined && this.entry.paymentDetails !== null) {
+          this.paidAmount = parseFloat(this.entry.paymentDetails.amount);
+        } else {
+          this.paidAmount = parseFloat(this.entry.edit_paid);
+        }
+        console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
+        if (this.paidAmount === this.meet.meetfee) {
+          this.showPaymentChoice = false;
+          this.workflowNav.enableFinishButton();
+        } else {
+          this.workflowNav.disableBack();
+          this.workflowNav.disableCancel();
+        }
+        this.loadEntry();
+      });
+    } else if (this.meet_entry_id !== undefined && this.meet_entry_id !== null && this.meet_entry_id !== 0) {
+      this.entryService.getMeetEntryFO(this.meet_entry_id).subscribe((entry: IncompleteEntry) => {
+        console.log(entry);
+        this.meet = this.meetService.getMeet(entry.meet_id);
+        this.meetName = this.meet.meetname;
+        this.entry = entry.entrydata;
+        this.statusLabel = entry.status_label;
+        this.statusText = entry.status_description;
+        this.paidAmount = entry.paid_amount;
+        console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
+        if (this.paidAmount === this.meet.meetfee) {
+          this.showPaymentChoice = false;
+          this.workflowNav.enableFinishButton();
+        } else {
+          this.workflowNav.disableBack();
+          this.workflowNav.disableCancel();
+        }
+        this.loadEntry();
+      });
+    }
+
+  }
+
+  loadEntry() {
+
+    this.eventEntries = this.entry.entryEvents;
+    this.eventEntries.sort((a, b) => (parseInt(a.program_no, 10) > parseInt(b.program_no, 10)) ? 1 : -1);
 
     this.paymentOptionForm.valueChanges.subscribe(val => {
       if (this.paymentOptionForm.valid) {
@@ -108,48 +165,31 @@ export class EntryConfirmationComponent implements OnInit {
       }
     });
 
-    // Paypal status
-    console.log(this.route.snapshot);
-    this.paypalSuccess = this.route.snapshot.queryParams['paypalsuccess'];
-    this.paypalToken = this.route.snapshot.queryParams['token'];
-    this.paymentId = this.route.snapshot.queryParams['paymentId'];
-    this.payerID = this.route.snapshot.queryParams['PayerID'];
-
-    if (this.paypalSuccess && this.paypalSuccess !== 'false') {
-      console.log('Got paypal success');
-      this.ngxSpinner.show();
-      const paymentDetails = {
-        paypalSuccess: this.paypalSuccess,
-        paypalToken: this.paypalToken,
-        paymentId: this.paymentId,
-        payerID: this.payerID
-      };
-
-      this.paypalService.finalisePayment(paymentDetails).subscribe((paid: any) => {
-        console.log(paid);
-        this.paidAmount = paid.paid;
-        this.paypalData = paid.paypalPayment;
-        this.showPaymentChoice = false;
-        this.workflowNav.enableFinishButton();
-        this.entryService.setStatus(this.entryService.getIncompleteEntry(this.meet_id), paid.status);
-        this.entryService.deleteEntry(this.meet_id);
-        this.ngxSpinner.hide();
-      });
+    if (this.paymentOptionForm.valid) {
+      this.formValidSubject.next(true);
+    } else {
+      this.formValidSubject.next(false);
     }
 
-    this.entryService.incompleteChanged.subscribe((entries) => {
-      this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
-      console.log(this.entry);
 
-      this.statusCode = this.entry.status;
-        this.statuses.getStatus(this.entry.status).subscribe((status) => {
-          if (status !== null) {
-            this.statusLabel = status.label;
-            this.statusText = status.description;
-          }
-        });
 
-    });
+    // this.entryService.incompleteChanged.subscribe((entries) => {
+      // this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
+      // console.log(this.entry);
+      //
+      // if (this.entry !== undefined && this.entry !== null) {
+      //
+      //   this.statusCode = this.entry.status;
+      //   this.statuses.getStatus(this.entry.status).subscribe((status) => {
+      //     if (status !== null) {
+      //       this.statusLabel = status.label;
+      //       this.statusText = status.description;
+      //     }
+      //   });
+      //
+      // }
+
+    // });
 
     switch (this.entry.membershipDetails.member_type) {
       case 'msa':
@@ -181,6 +221,8 @@ export class EntryConfirmationComponent implements OnInit {
     if (this.entry.medicalDetails.medicalCondition === 'true') {
       this.medicalCondition = 'Yes';
     }
+
+    this.ngxSpinner.hide();
 
   }
 
@@ -215,28 +257,46 @@ export class EntryConfirmationComponent implements OnInit {
   }
 
   submit() {
-    this.ngxSpinner.show();
+    // this.ngxSpinner.show();
     console.log('submit');
     this.entryService.storeIncompleteEntry(this.entryService.getIncompleteEntryFO(this.meet_id)).subscribe((entrySaved: IncompleteEntry) => {
       console.log('Saved entry to incomplete store');
-      this.entryService.finalise(this.entryService.getIncompleteEntry(this.meet_id)).subscribe((finalised: any) => {
+      this.entry = entrySaved.entrydata;
+      console.log(entrySaved);
+        this.statusLabel = entrySaved.status_label;
+        this.statusText = entrySaved.status_description;
+      this.pending_entry_id = this.entry.id;
+      this.entryService.finalise(entrySaved).subscribe((finalised: any) => {
         console.log('Finalise entry');
         console.log(finalised);
 
-        this.entryService.setStatus(this.entryService.getIncompleteEntry(this.meet_id), finalised.status);
+        if (finalised.meet_entry !== undefined && finalised.meet_entry !== null) {
+          this.meet_entry_id = finalised.meet_entry.id;
+        }
+
+        // this.entryService.setStatus(this.entryService.getIncompleteEntry(this.meet_id), finalised.status);
+
+        this.statusLabel = finalised.status_label;
+        this.statusText = finalised.status_description;
 
         // Disable the form
         this.showPaymentChoice = false;
         this.workflowNav.enableFinishButton();
 
+        if (this.userService.getUsers() === null) {
+          this.entryService.deleteEntry(this.meet_id);
+        }
+
         if (this.paymentOptionForm.controls.paymentOption.value === 'paypal') {
 
           let paypalPayment;
-          if (finalised.incomplete_entry !== undefined) {
-            paypalPayment = this.paypalService.createPaymentIncompleteEntry(finalised.incomplete_entry);
+          if (finalised.pending_entry !== undefined) {
+            paypalPayment = this.paypalService.createPaymentIncompleteEntry(finalised.pending_entry);
           } else if (finalised.meet_entry !== undefined) {
             paypalPayment = this.paypalService.createPaymentFinalisedEntry(finalised.meet_entry);
           }
+
+          this.router.navigate(['/', 'paypal-depart']);
 
           paypalPayment.subscribe((paymentDetails: any) => {
             this.ngxSpinner.hide();
@@ -268,7 +328,11 @@ export class EntryConfirmationComponent implements OnInit {
         this.ngxSpinner.hide();
         this.error = error.explanation;
       });
-    });
+    },
+      (error: any) => {
+      console.log(error);
+      this.ngxSpinner.hide();
+      });
 
   }
 

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import {NgxSpinnerService} from 'ngx-spinner';
+import {EntryService} from '../../entry.service';
+import {PaypalService} from '../paypal.service';
 
 @Component({
   selector: 'app-landing',
@@ -7,9 +10,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LandingComponent implements OnInit {
 
-  constructor() { }
+  constructor(private spinner: NgxSpinnerService,
+              private entryService: EntryService,
+              private paypalService: PaypalService) { }
 
   ngOnInit() {
+    this.paypalService.handleLanding();
   }
 
 }

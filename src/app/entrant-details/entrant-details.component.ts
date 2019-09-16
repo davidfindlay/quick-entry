@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {PlatformLocation} from '@angular/common';
 import {UserService} from '../user.service';
@@ -12,6 +12,7 @@ import {EntrantDetails} from '../models/entrant-details';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {Behavior} from 'popper.js';
 import {RegisterUser} from '../models/register-user';
+import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
 
 @Component({
   selector: 'app-entrant-details',
@@ -20,6 +21,7 @@ import {RegisterUser} from '../models/register-user';
 })
 export class EntrantDetailsComponent implements OnInit {
 
+  @ViewChild(WorkflowNavComponent, {static: true}) workflow: WorkflowNavComponent;
   public formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   meet_id: number;
@@ -336,14 +338,20 @@ export class EntrantDetailsComponent implements OnInit {
     // Check for existing entry
     const existingEntry = this.entryService.getIncompleteEntryFO(this.meet_id);
     if (existingEntry == null) {
+      console.log('Create new EntryFormObject');
       this.entry = new EntryFormObject();
     } else {
+      console.log('Get existing EntryFormObject');
+      console.log(existingEntry);
       this.entry = existingEntry;
     }
 
     this.entry.entrantDetails = entrantDetails;
     this.entry.meetId = this.meet_id;
-    this.entryService.addEntry(this.entry);
+    this.entryService.addEntry(this.entry).subscribe((incompleteEntry) => {
+      console.log(incompleteEntry);
+      this.workflow.navigateNext();
+    });
   }
 
   register() {

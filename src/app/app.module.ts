@@ -41,6 +41,11 @@ import { SubmittedEntryComponent } from './submitted-entry/submitted-entry.compo
 import { PendingEntryComponent } from './pending-entry/pending-entry.component';
 import { SidebarMenuComponent } from './sidebar-menu/sidebar-menu.component';
 import { MyProfileComponent } from './my-profile/my-profile.component';
+import {PaypalModule} from './paypal/paypal.module';
+import {DepartureComponent} from './paypal/departure/departure.component';
+import {LandingComponent} from './paypal/landing/landing.component';
+import { MeetEntryListComponent } from './meet-entry-list/meet-entry-list.component';
+import { PendingEntryListComponent } from './pending-entry-list/pending-entry-list.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -52,7 +57,15 @@ const appRoutes: Routes = [
   { path: 'enter/:meet/step4', component: EntryDetailsComponent},
   { path: 'enter/:meet/step5', component: EntryPaymentComponent},
   { path: 'enter/:meet/confirmation', component: EntryConfirmationComponent},
+  { path: 'pending-entry-confirmation/:pendingId', component: EntryConfirmationComponent},
+  { path: 'entry-confirmation/:entryId', component: EntryConfirmationComponent},
   { path: 'my-profile', component: MyProfileComponent },
+  { path: 'paypal-depart', component: DepartureComponent },
+  { path: 'paypal-landing', component: LandingComponent },
+  { path: 'meet-entries/:meetId', component: MeetEntryListComponent },
+  { path: 'meet-entries', component: MeetEntryListComponent },
+  { path: 'pending-entries/:meetId', component: PendingEntryListComponent },
+  { path: 'pending-entries', component: PendingEntryListComponent },
     { path: '**', component: MeetListComponent }
 ];
 
@@ -80,7 +93,9 @@ const appRoutes: Routes = [
         SubmittedEntryComponent,
         PendingEntryComponent,
         SidebarMenuComponent,
-        MyProfileComponent
+        MyProfileComponent,
+        MeetEntryListComponent,
+        PendingEntryListComponent
     ],
     entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
   imports: [
@@ -93,8 +108,8 @@ const appRoutes: Routes = [
     HttpClientModule,
     AuthenticationModule,
     NgxDatatableModule,
-    NgxPayPalModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    PaypalModule
   ],
     providers: [
         MeetService,

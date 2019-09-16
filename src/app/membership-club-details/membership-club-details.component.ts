@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PlatformLocation} from '@angular/common';
@@ -12,6 +12,7 @@ import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {debounceTime, map, pluck} from 'rxjs/operators';
 import {distinctUntilChanged} from 'rxjs/operators';
 import {ClubsService} from '../clubs.service';
+import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
 
 @Component({
   selector: 'app-membership-club-details',
@@ -20,6 +21,7 @@ import {ClubsService} from '../clubs.service';
 })
 export class MembershipClubDetailsComponent implements OnInit {
 
+  @ViewChild(WorkflowNavComponent, {static: true}) workflow: WorkflowNavComponent;
   public formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   meet_id: number;
@@ -220,7 +222,10 @@ export class MembershipClubDetailsComponent implements OnInit {
 
     }
 
-    this.entryService.setMemberDetails(this.meet_id, memberDetails);
+    this.entryService.setMemberDetails(this.meet_id, memberDetails).subscribe((updated) => {
+      console.log(updated);
+      this.workflow.navigateNext();
+    });
   }
 
   clubSelected($event) {

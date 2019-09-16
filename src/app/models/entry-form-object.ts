@@ -32,6 +32,10 @@ export class EntryFormObject {
 
   incompleteId: number;
 
+  edit_mode: boolean;
+  edit_entry_id: number;
+  edit_paid: number;
+
   status: number;
 
 }

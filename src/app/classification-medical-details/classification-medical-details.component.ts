@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PlatformLocation} from '@angular/common';
@@ -10,6 +10,7 @@ import {ReplaySubject, Subject} from 'rxjs';
 import {MembershipDetails} from '../models/membership-details';
 import {EntryService} from '../entry.service';
 import {MedicalDetails} from '../models/medical-details';
+import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
 
 @Component({
   selector: 'app-classification-medical-details',
@@ -18,6 +19,7 @@ import {MedicalDetails} from '../models/medical-details';
 })
 export class ClassificationMedicalDetailsComponent implements OnInit {
 
+  @ViewChild(WorkflowNavComponent, {static: true}) workflow: WorkflowNavComponent;
   public formValidSubject: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
   meet_id: number;
@@ -114,7 +116,10 @@ export class ClassificationMedicalDetailsComponent implements OnInit {
 
   saveEntry() {
     const medicalDetails: MedicalDetails = Object.assign({}, this.medicalDetailsForm.value);
-    this.entryService.setMedicalDetails(this.meet_id, medicalDetails);
+    this.entryService.setMedicalDetails(this.meet_id, medicalDetails).subscribe((updated) => {
+      console.log(updated);
+      this.workflow.navigateNext();
+    });
   }
 
 }

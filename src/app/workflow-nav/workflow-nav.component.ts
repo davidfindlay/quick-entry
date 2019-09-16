@@ -65,8 +65,12 @@ export class WorkflowNavComponent implements OnInit {
   }
 
   clickNext() {
-    this.router.navigate([this.next]);
+    // this.router.navigate([this.next]);
     this.submitEvent.emit('submit');
+  }
+
+  navigateNext() {
+    this.router.navigate([this.next]);
   }
 
   clickSaveAndExit() {
@@ -76,6 +80,14 @@ export class WorkflowNavComponent implements OnInit {
 
   clickFinish() {
     this.router.navigate(['/']);
+  }
+
+  disableBack() {
+    this.btnBackDisable = true;
+  }
+
+  disableCancel() {
+    this.btnCancelDisable = true;
   }
 
   enableFinishButton() {

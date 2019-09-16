@@ -1,5 +1,6 @@
 <h1>Enter {{meetName}}</h1>
 <h2>Confirm Entry Details and Payment</h2>
+<div *ngIf="entry !== undefined && entry !== null">
 <div class="card mb-3 bg-info text-white" *ngIf="paypalSuccess === null">
   <div class="card-body">
     <h4 class="card-title">
@@ -25,7 +26,7 @@
   </div>
 </div>
 
-<div class="confirmationSection">
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
   <h3>Entrant Details</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
@@ -70,7 +71,7 @@
 </div>
 
 <div *ngIf="entry.entrantDetails.who !== 'me'" class="confirmationSection">
-  <h3>EntryFormObject Lodged By</h3>
+  <h3>Entry Lodged By</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
       Name:
@@ -97,7 +98,7 @@
   </div>
 </div>
 
-<div class="confirmationSection">
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
   <h3>Emergency Contact</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
@@ -125,7 +126,7 @@
   </div>
 </div>
 
-<div class="confirmationSection">
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
   <h3>Memebership Details</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
@@ -154,7 +155,7 @@
   </div>
 </div>
 
-<div class="confirmationSection">
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
   <h3>Classification and Medical Details</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
@@ -222,7 +223,7 @@
   </div>
 </div>
 
-<div class="confirmationSection">
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
   <h3>Events Selected</h3>
   <table>
     <thead>
@@ -333,8 +334,8 @@
             be accepted.
           </li>
           <li>
-            Pay Later: You can choose to pay at a later date by returning to Quick EntryFormObject. Note that if you do not pay
-            for your entry by the Meet EntryFormObject Deadline your entry <strong><u>may be rejected</u></strong>.
+            Pay Later: You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
+            for your entry by the Meet Entry Deadline your entry <strong><u>may be rejected</u></strong>.
           </li>
         </ul>
       </div>
@@ -395,6 +396,7 @@
       </p>
     </div>
   </div>
+</div>
 </div>
 
 <app-workflow-nav next="/enter/{{meet_id}}/confirmation" previous="/enter/{{meet_id}}/step4"

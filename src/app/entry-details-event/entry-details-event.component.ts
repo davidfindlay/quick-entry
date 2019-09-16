@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {MeetEvent} from '../models/meet-event';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
@@ -59,7 +59,8 @@ export class EntryDetailsEventComponent implements OnInit {
               private memberHistoryService: MemberHistoryService,
               private timePipe: TimePipe,
               private modalService: NgbModal,
-              private entryService: EntryService) {
+              private entryService: EntryService,
+              private cdRef: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -128,7 +129,7 @@ export class EntryDetailsEventComponent implements OnInit {
 
     if (this.meetEvent.times_required) {
       this.seedTimeMandatory = true;
-      console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
+      // console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
     }
 
     if (this.entry !== undefined && this.entry !== null) {
@@ -180,7 +181,7 @@ export class EntryDetailsEventComponent implements OnInit {
   clickMore() {
     const modalRef = this.modalService.open(SeedtimeHelperComponent, {size: 'lg'});
 
-    console.log(this.meetEvent);
+    // console.log(this.meetEvent);
 
     modalRef.componentInstance.memberNo = this.memberNo;
     modalRef.componentInstance.inDistance = of(this.meetEvent.event_distance.metres);
@@ -202,6 +203,7 @@ export class EntryDetailsEventComponent implements OnInit {
   clickEnter() {
     if (this.entered === false) {
       this.showEntered();
+      this.cdRef.detectChanges();
       this.entryService.addEventEntry(this.meetEvent);
       if (this.meetEvent.freetime && this.historyAvailable) {
         this.clickPersonalBest();

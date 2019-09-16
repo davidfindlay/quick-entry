@@ -2,15 +2,15 @@ export class MedicalDetails {
 
   // Field for determining if this is a third party entry
 
-  private classification: string;
-  private classFreestyle: string;
-  private classBreaststroke: string;
-  private classMedley: string;
+  classification: string;
+  classFreestyle: string;
+  classBreaststroke: string;
+  classMedley: string;
 
-  private dispensation: boolean;
-  private medicalCertificate: boolean;
+  dispensation: string;
+  medicalCertificate: string;
 
-  private medicalCondition: boolean;
-  private medicalDetails: string;
+  medicalCondition: string;
+  medicalDetails: string;
 
 }
