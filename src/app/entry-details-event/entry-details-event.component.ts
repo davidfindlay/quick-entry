@@ -103,7 +103,8 @@ export class EntryDetailsEventComponent implements OnInit {
       this.entryService.updateEventEntry(this.meetEvent, newSeedTime);
     });
 
-    this.eventsDisabledSubscription = this.entryService.getDisabledEventsSubscription(this.meetEvent.meet_id).subscribe((disabledEvents) => {
+    this.eventsDisabledSubscription = this.entryService.getDisabledEventsSubscription(this.meetEvent.meet_id)
+      .subscribe((disabledEvents) => {
       if (disabledEvents.includes(this.meetEvent.id)) {
 
         if (!this.entered) {

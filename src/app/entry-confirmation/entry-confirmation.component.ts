@@ -259,7 +259,8 @@ export class EntryConfirmationComponent implements OnInit {
   submit() {
     // this.ngxSpinner.show();
     console.log('submit');
-    this.entryService.storeIncompleteEntry(this.entryService.getIncompleteEntryFO(this.meet_id)).subscribe((entrySaved: IncompleteEntry) => {
+    this.entryService.storeIncompleteEntry(this.entryService.getIncompleteEntryFO(this.meet_id))
+      .subscribe((entrySaved: IncompleteEntry) => {
       console.log('Saved entry to incomplete store');
       this.entry = entrySaved.entrydata;
       console.log(entrySaved);
