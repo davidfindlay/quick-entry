@@ -120,7 +120,7 @@ export class EntryConfirmationComponent implements OnInit {
           this.paidAmount = parseFloat(this.entry.edit_paid);
         }
         console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
-        if (this.paidAmount === this.meet.meetfee) {
+        if (this.paidAmount >= this.meet.meetfee) {
           this.showPaymentChoice = false;
           this.workflowNav.enableFinishButton();
         } else {
@@ -207,7 +207,7 @@ export class EntryConfirmationComponent implements OnInit {
     }
 
     if (this.entry.medicalDetails.classification !== 'no') {
-      this.disabilityClassificationRequired = this.toTitleCase(this.entry.medicalDetails.classification);
+      this.disabilityClassificationRequired = this.entry.medicalDetails.classification;
     }
 
     if (this.entry.medicalDetails.dispensation === 'true') {
@@ -227,6 +227,9 @@ export class EntryConfirmationComponent implements OnInit {
   }
 
   toTitleCase(str: string) {
+    if (str === undefined || str === null) {
+      return '';
+    }
     return str.replace(
       /\w\S*/g,
       function(txt) {

@@ -41,7 +41,7 @@
       Gender:
     </div>
     <div class="fieldValue">
-      {{entry.entrantDetails.entrantGender}}
+      {{entry.entrantDetails.entrantGender | titlecase}}
     </div>
   </div>
   <div class="row">
@@ -127,7 +127,7 @@
 </div>
 
 <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
-  <h3>Memebership Details</h3>
+  <h3>Membership Details</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
       Member Type:
@@ -194,7 +194,7 @@
       Stroke Dispensation Required:
     </div>
     <div class="fieldValue">
-      {{strokeDispensationRequired}}
+      {{strokeDispensationRequired | titlecase}}
     </div>
   </div>
   <div class="row" *ngIf="entry.medicalDetails.dispensation === 'true'">
@@ -202,7 +202,7 @@
       Medical Certificate:
     </div>
     <div class="fieldValue">
-      {{medicalCertificate}}
+      {{medicalCertificate | titlecase}}
     </div>
   </div>
   <div class="row">
@@ -210,7 +210,7 @@
       Medical Condition:
     </div>
     <div class="fieldValue">
-      {{medicalCondition}}
+      {{medicalCondition | titlecase}}
     </div>
   </div>
   <div class="row" *ngIf="entry.medicalDetails.medicalCondition === 'true'">
@@ -330,7 +330,7 @@
           </li>
           <li *ngIf="enablePaymentOption('club')">
             Pay via Club: Your club may make a bulk payment on behalf of members. Please check with your Club Recorder
-            or Club Captain. Note that if you do not pay for your entry by the Meet EntryFormObject Deadline your entry may not
+            or Club Captain. Note that if you do not pay for your entry by the Meet Entry Deadline your entry may not
             be accepted.
           </li>
           <li>
@@ -401,6 +401,6 @@
 
 <app-workflow-nav next="/enter/{{meet_id}}/confirmation" previous="/enter/{{meet_id}}/step4"
                   [nextActivated]="formValidSubject.asObservable()"
-                  (submitEvent)="onSubmit($event)"></app-workflow-nav>
+                  (submitEvent)="onSubmit($event)" nextText="Submit Entry"></app-workflow-nav>
 
 <ngx-spinner></ngx-spinner>

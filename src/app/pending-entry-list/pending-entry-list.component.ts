@@ -4,6 +4,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MeetService} from '../meet.service';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-pending-entry-list',
@@ -34,45 +35,66 @@ export class PendingEntryListComponent implements OnInit {
 
   constructor(private fb: FormBuilder,
               private meetService: MeetService,
-              private http: HttpClient) { }
+              private http: HttpClient,
+              private router: Router,
+              private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.meets = this.meetService.getMeets();
+    this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.createForm();
+    this.loadMeet();
+
+    this.route.params.subscribe(
+      params => {
+        this.meetId = params['meetId'];
+        this.loadMeet();
+      });
   }
 
   createForm() {
     this.meetSelectorForm = this.fb.group({
       meetYear: [2019, Validators.required],
-      meet: [0, Validators.required]
+      meet: [this.meetId, Validators.required]
     });
 
     this.meetSelectorFormSub = this.meetSelectorForm.valueChanges.subscribe((change) => {
-      this.meetId = change.meet;
+      this.router.navigate(['/', 'pending-entries', change.meet]);
       console.log('Selected meet ' + this.meetId);
-
-      this.http.get(environment.api + 'pending_entries/' + this.meetId).subscribe((entries: any) => {
-        this.entries = entries.pending_entries;
-
-        this.tableRows = [];
-
-        for (const entry of this.entries) {
-          const row = {
-            'Entrant': entry.entrydata.entrantDetails.entrantSurname + ', ' + entry.entrydata.entrantDetails.entrantFirstName,
-            'Club': entry.entrydata.membershipDetails.club_name + ' (' + entry.entrydata.membershipDetails.club_code + ')',
-            'Status': entry.entrydata.status_id,
-            'Reason': entry.pending_reason
-          };
-          this.tableRows.push(row);
-        }
-
-        this.tableRows = [...this.tableRows];
-        this.table.recalculate();
-
-        console.log(this.tableRows);
-
-      });
+      // this.loadMeet();
     });
+  }
+
+  loadMeet() {
+    this.http.get(environment.api + 'pending_entries/' + this.meetId).subscribe((entries: any) => {
+      this.entries = entries.pending_entries;
+
+      this.tableRows = [];
+
+      for (const entry of this.entries) {
+        console.log(entry);
+        const row = {
+          'id': entry.id,
+          'Entrant': entry.entrydata.entrantDetails.entrantSurname + ', ' + entry.entrydata.entrantDetails.entrantFirstName,
+          'Club':  entry.entrydata.membershipDetails.club_code,
+          'clubname': entry.entrydata.membershipDetails.club_name,
+          'Status': entry.status.label,
+          'Reason': entry.pending_reason,
+          'Updated': entry.updated_at
+        };
+        this.tableRows.push(row);
+      }
+
+      this.tableRows = [...this.tableRows];
+      this.table.recalculate();
+
+      console.log(this.tableRows);
+
+    });
+  }
+
+  actionEntry(pendingId) {
+    this.router.navigate(['/', 'pending-entry', pendingId]);
   }
 
 }

@@ -540,7 +540,7 @@ export class EntryService {
         });
       });
     } else {
-      console.log('Incomplete entry ' + incompleteEntry.id + ' update');
+      // console.log('Incomplete entry ' + incompleteEntry.id + ' update');
 
       return new Observable((observer) => {
         this.http.put(environment.api + 'entry_incomplete/' + incompleteEntry.id, incompleteEntry)
@@ -640,9 +640,9 @@ export class EntryService {
         } else if (meetEntry.distability_status === 1) {
           medicalDetailsFO.classification = 'classified';
         }
-        medicalDetailsFO.classFreestyle = meetEntry.disability_s_id;
-        medicalDetailsFO.classBreaststroke = meetEntry.disability_sb_id;
-        medicalDetailsFO.classMedley = meetEntry.disability_sm_id;
+        medicalDetailsFO.classFreestyle = meetEntry.disability_s.classification;
+        medicalDetailsFO.classBreaststroke = meetEntry.disability_sb.classification;
+        medicalDetailsFO.classMedley = meetEntry.disability_sm.classification;
 
         if (meetEntry.medical_condition) {
           medicalDetailsFO.dispensation = 'true';
@@ -740,6 +740,35 @@ export class EntryService {
 
       });
     });
+  }
+
+  getSubmittedEntriesByMemberNumber(memberNumber, meetId) {
+    return new Observable((observer) => {
+      this.http.get(environment.api + 'meet_entries_by_member_number/' + memberNumber).subscribe((entriesResp: any) => {
+        const entries = entriesResp.meet_entries;
+        observer.next(entries.filter(x => x.meet_id === meetId));
+      });
+    });
+  }
+
+  approvePending(pendingId) {
+    console.log('Approve Pending: ' + pendingId);
+    if (pendingId !== undefined && pendingId !== null) {
+      return this.http.post(environment.api + 'approve_pending/' + pendingId, {});
+    } else {
+      return null;
+    }
+
+  }
+
+  deletePending(pendingId) {
+    console.log('Delete Pending: ' + pendingId);
+    if (pendingId !== undefined && pendingId !== null) {
+      return this.http.delete(environment.api + 'entry_incomplete/' + pendingId, {});
+    } else {
+      return null;
+    }
+
   }
 
 }

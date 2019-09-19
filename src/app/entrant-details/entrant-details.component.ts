@@ -46,6 +46,8 @@ export class EntrantDetailsComponent implements OnInit {
   isAnonymousEntry = false;
   isMemberEntry = false;
 
+  missingEmergency = false;
+
   existingSubmittedEntry = false;
   existingSubmittedEntryId;
 
@@ -134,7 +136,7 @@ export class EntrantDetailsComponent implements OnInit {
       gender = 'female';
     }
 
-    if (this.entrantDetailsForm.controls.who.value === 'me') {
+    if (this.entrantDetailsForm.controls.who.value === 'me' || this.entrantDetailsForm.controls.who.value === 'me-edit') {
       this.entrantDetailsForm.patchValue({
         entrantFirstName: userDetails.firstname,
         entrantSurname: userDetails.surname,
@@ -147,7 +149,10 @@ export class EntrantDetailsComponent implements OnInit {
         emergencyPhone: userDetails.emergency_phone,
         emergencyEmail: userDetails.emergency_email
       });
-    } else {
+      if (userDetails.emergency_surname === null || userDetails.emergency_surname === '') {
+        this.missingEmergency = true;
+      }
+    } else if (this.entrantDetailsForm.controls.who.value === 'else') {
       this.entrantDetailsForm.patchValue({
         entrantFirstName: '',
         entrantSurname: '',
@@ -165,6 +170,8 @@ export class EntrantDetailsComponent implements OnInit {
         userPhone: userDetails.phone
       });
     }
+
+    console.log(this.entrantDetailsForm);
   }
 
   getExistingEntry() {

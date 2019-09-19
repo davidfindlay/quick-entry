@@ -217,6 +217,19 @@ export class MembershipClubDetailsComponent implements OnInit {
       const member = this.userService.getMember();
       if (member !== undefined && member !== null) {
         memberDetails.member_number = member.number;
+      } else {
+        // Lets see if we can get the user linked to a member
+        if (this.currentEntry.entrantDetails !== undefined && this.currentEntry.entrantDetails !== null) {
+          if (this.currentEntry.entrantDetails.who === 'me' && this.memberDetailsForm.controls['member_type'].value === 'msa') {
+            const memberNumber = this.memberDetailsForm.controls['member_number'].value;
+            if (memberNumber !== null && memberNumber !== '') {
+              console.log('Link this user to member ' + memberNumber);
+              this.userService.linkMember(memberNumber).subscribe((result) => {
+                console.log(result);
+              });
+            }
+          }
+        }
       }
     }
 

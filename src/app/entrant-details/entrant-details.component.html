@@ -88,9 +88,9 @@
                     </label>
                 </div>
               <div class="form-check" *ngIf="existingSubmittedEntry">
-                <label for="who-me">
+                <label for="who-me-edit">
                   <input class="form-check-label" type="radio"
-                         id="who-me-edit" value="me-edit"
+                         id="who-me-edit" value="me"
                          formControlName="who" />
                   Edit my existing entry
                 </label>
@@ -235,7 +235,7 @@
 
     </fieldset>
 
-    <fieldset class="qe-fieldset" *ngIf="isAnonymousEntry || isThirdPartyEntry">
+    <fieldset class="qe-fieldset" *ngIf="isAnonymousEntry || isThirdPartyEntry || missingEmergency">
         <h3>
             Emergency Contact Details
         </h3>
