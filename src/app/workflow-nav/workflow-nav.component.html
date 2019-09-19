@@ -5,7 +5,7 @@
       <button type="button" class="btn btn-danger" id="btnCancel" (click)="clickCancel()" [disabled]="btnCancelDisable">Cancel</button>
       <button type="button" class="btn btn-secondary" id="btnSave" (click)="clickSaveAndExit()" [disabled]="btnSaveDisable">Save and Exit</button>
     </div>
-    <button type="submit" class="btn btn-success" id="btnNext" (click)="clickNext()" [disabled]="btnNextDisable" *ngIf="showNextButton">Next</button>
+    <button type="submit" class="btn btn-success" id="btnNext" (click)="clickNext()" [disabled]="btnNextDisable" *ngIf="showNextButton">{{nextText}}</button>
     <button type="submit" class="btn btn-success" id="btnFinish" (click)="clickFinish()" *ngIf="showFinishButton">Finish</button>
   </div>
 </fieldset>
