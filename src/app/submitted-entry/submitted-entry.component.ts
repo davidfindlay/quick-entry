@@ -5,6 +5,9 @@ import {MeetEntry} from '../models/meet-entry';
 import {MeetEntryStatusService} from '../meet-entry-status.service';
 import {EntryService} from '../entry.service';
 import {Router} from '@angular/router';
+import {MeetService} from '../meet.service';
+import {PaypalService} from '../paypal/paypal.service';
+import {NgxSpinnerService} from 'ngx-spinner';
 
 @Component({
   selector: 'app-submitted-entry',
@@ -16,11 +19,19 @@ export class SubmittedEntryComponent implements OnInit {
   @Input() meet: Meet;
   @Input() submittedEntry: MeetEntry;
 
+  paymentOwed = false;
+  paymentAmountOwed = 0;
+
+  paypalAvailable = false;
+
   eventRows = [];
 
   constructor(private statuses: MeetEntryStatusService,
+              private meetService: MeetService,
               private entryService: EntryService,
-              private router: Router) { }
+              private paypalService: PaypalService,
+              private router: Router,
+              private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
     for (const eventEntry of this.submittedEntry.events) {
@@ -35,6 +46,28 @@ export class SubmittedEntryComponent implements OnInit {
     this.eventRows.sort(function (a, b) {
       return a.progNumber - b.progNumber || a.progSuffix - b.progSuffix;
     });
+
+    // Determine if payment is needed
+    let totalPayments = 0;
+    if (this.submittedEntry.payments !== undefined && this.submittedEntry.payments !== null) {
+      for (const payment of this.submittedEntry.payments) {
+        totalPayments += payment.amount;
+      }
+    }
+
+    if (totalPayments < this.submittedEntry.cost) {
+      this.paymentOwed = true;
+      this.paymentAmountOwed = this.submittedEntry.cost - totalPayments;
+    }
+
+    // Is PayPal option available?
+    if (this.meet.payment_types !== undefined && this.meet.payment_types !== null) {
+      for (const paymentType of this.meet.payment_types) {
+        if (paymentType.payment_type_id === 1) {
+          this.paypalAvailable = true;
+        }
+      }
+    }
 
   }
 
@@ -99,6 +132,24 @@ export class SubmittedEntryComponent implements OnInit {
   editSubmittedEntry(submittedEntry) {
     this.entryService.editSubmittedEntry(submittedEntry.id).subscribe((edit: any) => {
       this.router.navigate(['/', 'enter', edit.meet_id , 'step1'])
+    });
+  }
+
+  viewSubmittedEntry() {
+    this.router.navigate(['/', 'entry-confirmation', this.submittedEntry.id]);
+  }
+
+  payNow(submittedEntry) {
+    this.spinner.show();
+    this.router.navigate(['/', 'paypal-depart']);
+
+    this.paypalService.createPaymentFinalisedEntry(submittedEntry).subscribe((payment: any) => {
+      window.location.assign(payment.approvalUrl);
+    }, (error: any) => {
+      // Handle paypal error
+      console.log('Got error can\'t go to paypal');
+
+      this.spinner.hide();
     });
   }
 

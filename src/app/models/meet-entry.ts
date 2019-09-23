@@ -2,6 +2,7 @@ import {Club} from './club';
 import {Member} from './member';
 import {MeetEntryEvent} from './meet-entry-event';
 import {MeetEntryStatus} from './meet-entry-status';
+import {MeetEntryPayment} from './meet-entry-payment';
 
 export class MeetEntry {
   id: number;
@@ -28,6 +29,7 @@ export class MeetEntry {
   medical_details: string;
   events: MeetEntryEvent[];
   status: MeetEntryStatus;
+  payments: MeetEntryPayment[];
   created_at: Date;
   updated_at: Date;
 }

@@ -640,9 +640,18 @@ export class EntryService {
         } else if (meetEntry.distability_status === 1) {
           medicalDetailsFO.classification = 'classified';
         }
-        medicalDetailsFO.classFreestyle = meetEntry.disability_s.classification;
-        medicalDetailsFO.classBreaststroke = meetEntry.disability_sb.classification;
-        medicalDetailsFO.classMedley = meetEntry.disability_sm.classification;
+
+        if (meetEntry.disability_status !== 0) {
+          if (meetEntry.disability_s.classification !== undefined && meetEntry.disability_s.classification !== null) {
+            medicalDetailsFO.classFreestyle = meetEntry.disability_s.classification;
+          }
+          if (meetEntry.disability_sb.classification !== undefined && meetEntry.disability_sb.classification !== null) {
+            medicalDetailsFO.classBreaststroke = meetEntry.disability_sb.classification;
+          }
+          if (meetEntry.disability_sm.classification !== undefined && meetEntry.disability_sm.classification !== null) {
+            medicalDetailsFO.classMedley = meetEntry.disability_sm.classification;
+          }
+        }
 
         if (meetEntry.medical_condition) {
           medicalDetailsFO.dispensation = 'true';
@@ -769,6 +778,13 @@ export class EntryService {
       return null;
     }
 
+  }
+
+  updatePending(pendingId, pendingEntry) {
+    console.log('Update Pending: ' + pendingId);
+    console.log(pendingEntry);
+
+    return this.http.put(environment.api + 'entry_incomplete/' + pendingId, pendingEntry);
   }
 
 }

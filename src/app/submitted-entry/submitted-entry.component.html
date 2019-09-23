@@ -6,9 +6,9 @@
     {{submittedEntry.club.clubname}} ({{submittedEntry.club.code}})
   </div>
   <div class="card-body">
-    <strong>Entry Number: </strong> {{submittedEntry.id}}<br />
+    <strong>Entry Number: </strong> {{submittedEntry.id}}<br/>
     <strong>Status: </strong> {{submittedEntry.status.status.label}}
-    <table>
+    <table class="mb-2">
       <tr>
         <th>
           No:
@@ -32,14 +32,34 @@
         </td>
       </tr>
     </table>
+    <div class="card bg-warning mb-2" *ngIf="paymentOwed">
+      <div class="card-body">
+        <div class="row">
+          <div class="card-text col-md-6">
+            <h3>Entry Payment</h3>
+            <strong>Payment Outstanding:</strong> {{paymentAmountOwed | currency}}<br />
+            <strong>Payment Due Date:</strong> {{this.meet.deadline | date: 'd/M/yyyy'}}
+          </div>
+          <div class="card-text col-md-6" *ngIf="paypalAvailable">
+            <img class="p-1" src="https://www.paypalobjects.com/webstatic/mktg/logo/PP_AcceptanceMarkTray-NoDiscover_243x40.png">
+            <button class="btn btn-success mx-1" (click)="payNow(submittedEntry)" *ngIf="paymentOwed">
+              Pay Now via PayPal/Credit/Debit Card
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div>
-      <button class="btn btn-primary" (click)="editSubmittedEntry(submittedEntry)" *ngIf="entriesOpen()">
-        Edit
+<!--      <button class="btn btn-primary" (click)="viewSubmittedEntry(submittedEntry)">-->
+<!--        View Entry-->
+<!--      </button>-->
+      <button class="btn btn-primary mx-1" (click)="editSubmittedEntry(submittedEntry)" *ngIf="entriesOpen()">
+        Edit Entry
       </button>
     </div>
   </div>
   <div class="card-footer">
-    <strong>Lodged: </strong> {{submittedEntry.created_at | date: 'medium'}}<br />
+    <strong>Lodged: </strong> {{submittedEntry.created_at | date: 'medium'}}<br/>
 
   </div>
 

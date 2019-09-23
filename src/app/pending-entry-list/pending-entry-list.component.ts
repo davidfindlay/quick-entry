@@ -18,6 +18,8 @@ export class PendingEntryListComponent implements OnInit {
   meets: Meet[];
   meetId: number;
 
+  meetList = [];
+
   entries;
   tableRows = [];
   columns = [
@@ -41,6 +43,11 @@ export class PendingEntryListComponent implements OnInit {
 
   ngOnInit() {
     this.meets = this.meetService.getMeets();
+
+    for (const meet in this.meets) {
+
+    }
+
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.createForm();
     this.loadMeet();
@@ -72,7 +79,7 @@ export class PendingEntryListComponent implements OnInit {
       this.tableRows = [];
 
       for (const entry of this.entries) {
-        console.log(entry);
+        // console.log(entry);
         const row = {
           'id': entry.id,
           'Entrant': entry.entrydata.entrantDetails.entrantSurname + ', ' + entry.entrydata.entrantDetails.entrantFirstName,
@@ -88,7 +95,7 @@ export class PendingEntryListComponent implements OnInit {
       this.tableRows = [...this.tableRows];
       this.table.recalculate();
 
-      console.log(this.tableRows);
+      // console.log(this.tableRows);
 
     });
   }
