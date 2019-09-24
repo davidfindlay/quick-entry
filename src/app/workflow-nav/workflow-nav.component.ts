@@ -18,7 +18,7 @@ export class WorkflowNavComponent implements OnInit {
   @Input('next') next: string;
   // tslint:disable-next-line:no-input-rename
   @Input('nextActivated') nextActivated: Observable<boolean>;
-
+  // tslint:disable-next-line:no-input-rename
   @Input('nextText') nextText = 'Next';
 
   btnNextDisable = true;
