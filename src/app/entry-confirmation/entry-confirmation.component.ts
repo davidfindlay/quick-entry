@@ -24,6 +24,7 @@ import {ClubsService} from '../clubs.service';
 import {AuthenticationService} from '../authentication';
 import {IncompleteEntry} from '../models/incomplete_entry';
 import {MeetEntryStatusCode} from '../models/meet-entry-status-code';
+import {UnauthenticatedEntryService} from '../unauthenticated-entry.service';
 
 @Component({
   selector: 'app-entry-confirmation',
@@ -42,8 +43,8 @@ export class EntryConfirmationComponent implements OnInit {
   meetName;
 
   @Input() entry;
-  pending_entry_id;
-  meet_entry_id;
+  pending_entry_code;
+  meet_entry_code;
   paymentOptionForm;
 
   eventEntries: EntryEvent[];
@@ -79,6 +80,7 @@ export class EntryConfirmationComponent implements OnInit {
               private authService: AuthenticationService,
               private meetService: MeetService,
               private entryService: EntryService,
+              private unauthenticatedEntryService: UnauthenticatedEntryService,
               private http: HttpClient,
               private ngxSpinner: NgxSpinnerService,
               private statuses: MeetEntryStatusService,
@@ -88,12 +90,12 @@ export class EntryConfirmationComponent implements OnInit {
   ngOnInit() {
     this.ngxSpinner.show();
     this.meet_id = +this.route.snapshot.paramMap.get('meet');
-    this.pending_entry_id = +this.route.snapshot.paramMap.get('pendingId');
-    this.meet_entry_id = +this.route.snapshot.paramMap.get('entryId');
+    this.pending_entry_code = this.route.snapshot.paramMap.get('pendingCode');
+    this.meet_entry_code = this.route.snapshot.paramMap.get('entryId');
 
     console.log(this.meet_id);
-    console.log(this.pending_entry_id);
-    console.log(this.meet_entry_id);
+    console.log(this.pending_entry_code);
+    console.log(this.meet_entry_code);
 
     this.paymentOptionForm = this.fb.group({
       paymentOption: ['paypal', Validators.required]
@@ -106,8 +108,8 @@ export class EntryConfirmationComponent implements OnInit {
       this.paidAmount = parseFloat(this.entry.edit_paid);
       console.log(this.entry);
       this.loadEntry();
-    } else if (this.pending_entry_id !== undefined && this.pending_entry_id !== null && this.pending_entry_id !== 0) {
-      this.entryService.getPendingEntry(this.pending_entry_id).subscribe((entry: IncompleteEntry) => {
+    } else if (this.pending_entry_code !== undefined && this.pending_entry_code !== null && this.pending_entry_code !== 0) {
+      this.entryService.getPendingEntry(this.pending_entry_code).subscribe((entry: IncompleteEntry) => {
         console.log(entry);
         this.meet = this.meetService.getMeet(entry.meet_id);
         this.meetName = this.meet.meetname;
@@ -129,8 +131,8 @@ export class EntryConfirmationComponent implements OnInit {
         }
         this.loadEntry();
       });
-    } else if (this.meet_entry_id !== undefined && this.meet_entry_id !== null && this.meet_entry_id !== 0) {
-      this.entryService.getMeetEntryFO(this.meet_entry_id).subscribe((entry: IncompleteEntry) => {
+    } else if (this.meet_entry_code !== undefined && this.meet_entry_code !== null && this.meet_entry_code !== 0) {
+      this.entryService.getMeetEntryByCodeFO(this.meet_entry_code).subscribe((entry: IncompleteEntry) => {
         console.log(entry);
         this.meet = this.meetService.getMeet(entry.meet_id);
         this.meetName = this.meet.meetname;
@@ -269,14 +271,14 @@ export class EntryConfirmationComponent implements OnInit {
       console.log(entrySaved);
         this.statusLabel = entrySaved.status_label;
         this.statusText = entrySaved.status_description;
-      this.pending_entry_id = this.entry.id;
+      this.pending_entry_code = this.entry.id;
       this.entryService.finalise(entrySaved).subscribe((finalised: any) => {
         console.log('Finalise entry');
         console.log(finalised);
 
-        if (finalised.meet_entry !== undefined && finalised.meet_entry !== null) {
-          this.meet_entry_id = finalised.meet_entry.id;
-        }
+        // if (finalised.meet_entry !== undefined && finalised.meet_entry !== null) {
+        //   this.meet_entry_id = finalised.meet_entry.id;
+        // }
 
         // this.entryService.setStatus(this.entryService.getIncompleteEntry(this.meet_id), finalised.status);
 
@@ -289,6 +291,7 @@ export class EntryConfirmationComponent implements OnInit {
 
         if (this.userService.getUsers() === null) {
           this.entryService.deleteEntry(this.meet_id);
+          this.unauthenticatedEntryService.addMeetEntry(finalised.meet_entry);
         }
 
         if (this.paymentOptionForm.controls.paymentOption.value === 'paypal') {

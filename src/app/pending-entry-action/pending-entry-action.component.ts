@@ -7,6 +7,7 @@ import {MeetService} from '../meet.service';
 import {MemberService} from '../member.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {FormBuilder} from '@angular/forms';
+import {ClubsService} from '../clubs.service';
 
 @Component({
   selector: 'app-pending-entry-action',
@@ -48,11 +49,15 @@ export class PendingEntryActionComponent implements OnInit {
   canBeActioned = false;
   existingEntryShow = false;
 
+  clubName = '';
+  clubCode = '';
+
   editing = false;
   pendingActionForm;
 
   constructor(private entryService: EntryService,
               private meetService: MeetService,
+              private clubService: ClubsService,
               private memberService: MemberService,
               private route: ActivatedRoute,
               private router: Router,
@@ -93,6 +98,17 @@ export class PendingEntryActionComponent implements OnInit {
     this.pendingReason = entry.pending_reason;
     this.created_at = entry.created_at;
     this.updated_at = entry.updated_at;
+
+    if (this.entry.membershipDetails.club_selector !== '') {
+      const club = this.clubService.getClubById(parseInt(this.entry.membershipDetails.club_selector, 10));
+      if (club !== null) {
+        this.clubName = club.clubname;
+        this.clubCode = club.code;
+      }
+    } else {
+      this.clubCode = this.entry.membershipDetails.club_code;
+      this.clubName = this.entry.membershipDetails.club_name;
+    }
 
     this.memberService.getMemberByNumber(this.entry.membershipDetails.member_number).subscribe((member: any) => {
       console.log(member);
@@ -184,6 +200,15 @@ export class PendingEntryActionComponent implements OnInit {
       }
     }, (reason) => {
       console.log(reason)
+    });
+  }
+
+  markProcessed() {
+    this.entryService.processedPending(this.pendingEntryId).subscribe((processed: any) => {
+      console.log(processed);
+      this.router.navigate(['/', 'pending-entries', this.meet_id]);
+    }, (error: any) => {
+      console.log(error);
     });
   }
 

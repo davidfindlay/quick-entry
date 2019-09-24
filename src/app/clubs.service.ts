@@ -20,6 +20,7 @@ export class ClubsService {
     console.log('loadClubs');
     this.http.get(environment.api + 'clubs').subscribe((result: Club[]) => {
       this.clubs = result;
+      // console.log(this.clubs);
     });
   }
 

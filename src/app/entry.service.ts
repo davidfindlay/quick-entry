@@ -543,7 +543,7 @@ export class EntryService {
       // console.log('Incomplete entry ' + incompleteEntry.id + ' update');
 
       return new Observable((observer) => {
-        this.http.put(environment.api + 'entry_incomplete/' + incompleteEntry.id, incompleteEntry)
+        this.http.put(environment.api + 'entry_incomplete/' + incompleteEntry.code, incompleteEntry)
           .subscribe((entry: IncompleteEntry) => {
             // console.log('updated entry');
             // console.log(entry);
@@ -554,7 +554,7 @@ export class EntryService {
   }
 
   deleteIncompleteEntry(meetEntry) {
-    this.http.delete(environment.api + 'entry_incomplete/' + meetEntry.id)
+    this.http.delete(environment.api + 'entry_incomplete/' + meetEntry.code)
       .subscribe((response: any) => {
         console.log(response);
       }, (error: any) => {
@@ -570,9 +570,9 @@ export class EntryService {
     }
 
     if (meetEntry.edit_entry_id !== undefined && meetEntry.edit_entry_id !== null) {
-      return this.http.put(environment.api + 'entry_finalise/' + meetEntry.id, {});
+      return this.http.put(environment.api + 'entry_finalise/' + meetEntry.code, {});
     } else {
-      return this.http.post(environment.api + 'entry_finalise/' + meetEntry.id, {});
+      return this.http.post(environment.api + 'entry_finalise/' + meetEntry.code, {});
     }
 
   }
@@ -581,141 +581,26 @@ export class EntryService {
     return this.http.get(environment.api + 'entry_incomplete/' + pendingEntryId);
   }
 
+  getMeetEntryByCodeFO(meetEntryCode) {
+    return new Observable((observer) => {
+      this.http.get(environment.api + 'meet_entry_by_code/' + meetEntryCode).subscribe((entry: any) => {
+
+          const incompleteEntry = this.convertMeetEntryToEntryFO(entry);
+          observer.next(incompleteEntry);
+
+        },
+        (err) => {
+          console.log(err);
+          observer.next(null);
+        });
+    })
+  }
+
   getMeetEntryFO(meetEntryId) {
     return new Observable((observer) => {
       this.http.get(environment.api + 'meet_entry/' + meetEntryId).subscribe((entry: any) => {
-        const meetEntry = entry.meet_entry;
-        console.log(meetEntry);
 
-        // Convert meet entry to entry form object
-        const entryFO = new EntryFormObject();
-        const entrantDetailsFO = new EntrantDetails();
-        const membershipDetailsFO = new MembershipDetails();
-        const medicalDetailsFO = new MedicalDetails();
-
-        entrantDetailsFO.entrantFirstName = meetEntry.member.firstname;
-        entrantDetailsFO.entrantSurname = meetEntry.member.surname;
-        entrantDetailsFO.entrantDob = meetEntry.member.dob;
-
-        if (meetEntry.member.gender === 1) {
-          entrantDetailsFO.entrantGender = 'Male';
-        } else if (meetEntry.member.gender === 2) {
-          entrantDetailsFO.entrantGender = 'Female';
-        } else {
-          entrantDetailsFO.entrantGender = '';
-        }
-
-        if (meetEntry.member.phones !== undefined && meetEntry.member.phones !== null) {
-          if (meetEntry.member.phones.length > 0) {
-            entrantDetailsFO.entrantPhone = meetEntry.member.phones[meetEntry.member.phones.length - 1].phonenumber;
-          }
-        }
-
-        if (meetEntry.member.emails !== undefined && meetEntry.member.emails !== null) {
-          if (meetEntry.member.emails.length > 0) {
-            entrantDetailsFO.entrantEmail = meetEntry.member.emails[meetEntry.member.emails.length - 1].address;
-          }
-        }
-
-        entrantDetailsFO.emergencyFirstName = meetEntry.member.emergency.firstname;
-          entrantDetailsFO.emergencySurname = meetEntry.member.emergency.surname;
-          entrantDetailsFO.emergencyPhone = meetEntry.member.emergency.phone.phonenumber;
-          entrantDetailsFO.emergencyEmail = ''; // TODO: Fix
-
-          entrantDetailsFO.who = 'me'; // TODO: Temporary
-        entryFO.entrantDetails = entrantDetailsFO;
-
-        // Handle Membership Details
-        membershipDetailsFO.member_type = 'msa'; // TODO: better handling
-        membershipDetailsFO.member_number = meetEntry.member.number;
-        membershipDetailsFO.club_code = meetEntry.club.code;
-        membershipDetailsFO.club_name = meetEntry.club.clubname;
-        entryFO.membershipDetails = membershipDetailsFO;
-
-        // Medical and Classification Details
-        if (meetEntry.disability_status === 0) {
-          medicalDetailsFO.classification = 'no';
-        } else if (meetEntry.disability_status === 2) {
-          medicalDetailsFO.classification = 'provisional';
-        } else if (meetEntry.distability_status === 1) {
-          medicalDetailsFO.classification = 'classified';
-        }
-
-        if (meetEntry.disability_status !== 0) {
-          if (meetEntry.disability_s.classification !== undefined && meetEntry.disability_s.classification !== null) {
-            medicalDetailsFO.classFreestyle = meetEntry.disability_s.classification;
-          }
-          if (meetEntry.disability_sb.classification !== undefined && meetEntry.disability_sb.classification !== null) {
-            medicalDetailsFO.classBreaststroke = meetEntry.disability_sb.classification;
-          }
-          if (meetEntry.disability_sm.classification !== undefined && meetEntry.disability_sm.classification !== null) {
-            medicalDetailsFO.classMedley = meetEntry.disability_sm.classification;
-          }
-        }
-
-        if (meetEntry.medical_condition) {
-          medicalDetailsFO.dispensation = 'true';
-        } else {
-          medicalDetailsFO.dispensation = 'false';
-        }
-
-        if (meetEntry.medical) {
-          medicalDetailsFO.medicalCertificate = 'true';
-        } else {
-          medicalDetailsFO.medicalCertificate = 'false';
-        }
-
-        if (meetEntry.medical_safety) {
-          medicalDetailsFO.medicalCondition = 'true';
-        } else {
-          medicalDetailsFO.medicalCondition = 'false';
-        }
-
-        medicalDetailsFO.medicalDetails = meetEntry.medical_details;
-        entryFO.medicalDetails = medicalDetailsFO;
-
-        // Handle events
-        entryFO.entryEvents = [];
-        for (const eventEntry of meetEntry.events) {
-          const eventEntryFO = new EntryEvent();
-          eventEntryFO.id = eventEntry.id;
-          eventEntryFO.entry_id = eventEntry.entry_id;
-          eventEntryFO.event_id = eventEntry.event_id;
-          eventEntryFO.program_no = eventEntry.event.prognumber + eventEntry.event.progsuffix;
-          eventEntryFO.discipline = eventEntry.event.event_discipline.discipline;
-          eventEntryFO.distance = eventEntry.event.event_distance.distance;
-          eventEntryFO.classification = null;
-          eventEntryFO.seedtime = eventEntry.seedtime;
-          entryFO.entryEvents.push(eventEntryFO);
-
-        }
-
-        entryFO.meetId = meetEntry.meet_id;
-        entryFO.validEvents = true;
-
-        // console.log(entryFO);
-        const incompleteEntry = new IncompleteEntry();
-        if (meetEntry.status !== undefined && meetEntry.status !== null) {
-          const currentStatus = meetEntry.status;
-          entryFO.status = currentStatus.code;
-          incompleteEntry.status_id = currentStatus.code;
-          incompleteEntry.status_label = currentStatus.status.label;
-          incompleteEntry.status_description = currentStatus.status.description;
-
-        }
-        incompleteEntry.entrydata = entryFO;
-        incompleteEntry.meet_id = meetEntry.meet_id;
-
-        let paidAmount = 0;
-
-        if (meetEntry.payments !== undefined && meetEntry.payments !== null) {
-          for (const payment of meetEntry.payments) {
-            paidAmount += payment.amount;
-          }
-        }
-        incompleteEntry.paid_amount = paidAmount;
-
-
+        const incompleteEntry = this.convertMeetEntryToEntryFO(entry);
         observer.next(incompleteEntry);
 
         },
@@ -726,6 +611,141 @@ export class EntryService {
     })
   }
 
+  convertMeetEntryToEntryFO(entry) {
+    const meetEntry = entry.meet_entry;
+    console.log(meetEntry);
+
+    // Convert meet entry to entry form object
+    const entryFO = new EntryFormObject();
+    const entrantDetailsFO = new EntrantDetails();
+    const membershipDetailsFO = new MembershipDetails();
+    const medicalDetailsFO = new MedicalDetails();
+
+    entrantDetailsFO.entrantFirstName = meetEntry.member.firstname;
+    entrantDetailsFO.entrantSurname = meetEntry.member.surname;
+    entrantDetailsFO.entrantDob = meetEntry.member.dob;
+
+    if (meetEntry.member.gender === 1) {
+      entrantDetailsFO.entrantGender = 'Male';
+    } else if (meetEntry.member.gender === 2) {
+      entrantDetailsFO.entrantGender = 'Female';
+    } else {
+      entrantDetailsFO.entrantGender = '';
+    }
+
+    if (meetEntry.member.phones !== undefined && meetEntry.member.phones !== null) {
+      if (meetEntry.member.phones.length > 0) {
+        entrantDetailsFO.entrantPhone = meetEntry.member.phones[meetEntry.member.phones.length - 1].phonenumber;
+      }
+    }
+
+    if (meetEntry.member.emails !== undefined && meetEntry.member.emails !== null) {
+      if (meetEntry.member.emails.length > 0) {
+        entrantDetailsFO.entrantEmail = meetEntry.member.emails[meetEntry.member.emails.length - 1].address;
+      }
+    }
+
+    entrantDetailsFO.emergencyFirstName = meetEntry.member.emergency.firstname;
+    entrantDetailsFO.emergencySurname = meetEntry.member.emergency.surname;
+    entrantDetailsFO.emergencyPhone = meetEntry.member.emergency.phone.phonenumber;
+    entrantDetailsFO.emergencyEmail = ''; // TODO: Fix
+
+    entrantDetailsFO.who = 'me'; // TODO: Temporary
+    entryFO.entrantDetails = entrantDetailsFO;
+
+    // Handle Membership Details
+    membershipDetailsFO.member_type = 'msa'; // TODO: better handling
+    membershipDetailsFO.member_number = meetEntry.member.number;
+    membershipDetailsFO.club_code = meetEntry.club.code;
+    membershipDetailsFO.club_name = meetEntry.club.clubname;
+    entryFO.membershipDetails = membershipDetailsFO;
+
+    // Medical and Classification Details
+    if (meetEntry.disability_status === 0) {
+      medicalDetailsFO.classification = 'no';
+    } else if (meetEntry.disability_status === 2) {
+      medicalDetailsFO.classification = 'provisional';
+    } else if (meetEntry.distability_status === 1) {
+      medicalDetailsFO.classification = 'classified';
+    }
+
+    if (meetEntry.disability_status !== 0) {
+      if (meetEntry.disability_s.classification !== undefined && meetEntry.disability_s.classification !== null) {
+        medicalDetailsFO.classFreestyle = meetEntry.disability_s.classification;
+      }
+      if (meetEntry.disability_sb.classification !== undefined && meetEntry.disability_sb.classification !== null) {
+        medicalDetailsFO.classBreaststroke = meetEntry.disability_sb.classification;
+      }
+      if (meetEntry.disability_sm.classification !== undefined && meetEntry.disability_sm.classification !== null) {
+        medicalDetailsFO.classMedley = meetEntry.disability_sm.classification;
+      }
+    }
+
+    if (meetEntry.medical_condition) {
+      medicalDetailsFO.dispensation = 'true';
+    } else {
+      medicalDetailsFO.dispensation = 'false';
+    }
+
+    if (meetEntry.medical) {
+      medicalDetailsFO.medicalCertificate = 'true';
+    } else {
+      medicalDetailsFO.medicalCertificate = 'false';
+    }
+
+    if (meetEntry.medical_safety) {
+      medicalDetailsFO.medicalCondition = 'true';
+    } else {
+      medicalDetailsFO.medicalCondition = 'false';
+    }
+
+    medicalDetailsFO.medicalDetails = meetEntry.medical_details;
+    entryFO.medicalDetails = medicalDetailsFO;
+
+    // Handle events
+    entryFO.entryEvents = [];
+    for (const eventEntry of meetEntry.events) {
+      const eventEntryFO = new EntryEvent();
+      eventEntryFO.id = eventEntry.id;
+      eventEntryFO.entry_id = eventEntry.entry_id;
+      eventEntryFO.event_id = eventEntry.event_id;
+      eventEntryFO.program_no = eventEntry.event.prognumber + eventEntry.event.progsuffix;
+      eventEntryFO.discipline = eventEntry.event.event_discipline.discipline;
+      eventEntryFO.distance = eventEntry.event.event_distance.distance;
+      eventEntryFO.classification = null;
+      eventEntryFO.seedtime = eventEntry.seedtime;
+      entryFO.entryEvents.push(eventEntryFO);
+
+    }
+
+    entryFO.meetId = meetEntry.meet_id;
+    entryFO.validEvents = true;
+
+    // console.log(entryFO);
+    const incompleteEntry = new IncompleteEntry();
+    if (meetEntry.status !== undefined && meetEntry.status !== null) {
+      const currentStatus = meetEntry.status;
+      entryFO.status = currentStatus.code;
+      incompleteEntry.status_id = currentStatus.code;
+      incompleteEntry.status_label = currentStatus.status.label;
+      incompleteEntry.status_description = currentStatus.status.description;
+
+    }
+    incompleteEntry.entrydata = entryFO;
+    incompleteEntry.meet_id = meetEntry.meet_id;
+
+    let paidAmount = 0;
+
+    if (meetEntry.payments !== undefined && meetEntry.payments !== null) {
+      for (const payment of meetEntry.payments) {
+        paidAmount += payment.amount;
+      }
+    }
+    incompleteEntry.paid_amount = paidAmount;
+
+    return incompleteEntry;
+  }
+
   setStatus(meetEntry, status_id) {
     console.log('Set status to ' + status_id);
     meetEntry.status = status_id;
@@ -734,11 +754,11 @@ export class EntryService {
     console.log(this.incompleteEntries);
   }
 
-  editSubmittedEntry(entryId) {
+  editSubmittedEntry(entryCode) {
     return new Observable((observer) => {
-      this.getMeetEntryFO(entryId).subscribe((incompleteEntry: IncompleteEntry) => {
+      this.getMeetEntryByCodeFO(entryCode).subscribe((incompleteEntry: IncompleteEntry) => {
         incompleteEntry.entrydata.edit_mode = true;
-        incompleteEntry.entrydata.edit_entry_id = entryId;
+        incompleteEntry.entrydata.edit_entry_id = incompleteEntry.id;
         incompleteEntry.entrydata.edit_paid = incompleteEntry.paid_amount;
         console.log(incompleteEntry.entrydata);
         this.addEntry(incompleteEntry.entrydata).subscribe((updatedEntry) => {
@@ -778,6 +798,15 @@ export class EntryService {
       return null;
     }
 
+  }
+
+  processedPending(pendingId) {
+    console.log('Processed Pending: ' + pendingId);
+    if (pendingId !== undefined && pendingId !== null) {
+      return this.http.post(environment.api + 'entry_incomplete_processed/' + pendingId, {});
+    } else {
+      return null;
+    }
   }
 
   updatePending(pendingId, pendingEntry) {

@@ -9,6 +9,7 @@ import {UserService} from '../user.service';
 import {AuthenticationService} from '../authentication';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmCancelComponent} from '../confirm-cancel/confirm-cancel.component';
+import {UnauthenticatedEntryService} from '../unauthenticated-entry.service';
 
 @Component({
   selector: 'app-meet-list-item',
@@ -29,7 +30,10 @@ export class MeetListItemComponent implements OnInit {
 
   userDetails;
 
+  loggedIn = false;
+
   constructor(private entryService: EntryService,
+              private unauthenticatedEntryService: UnauthenticatedEntryService,
               private router: Router,
               private statuses: MeetEntryStatusService,
               private userService: UserService,
@@ -41,6 +45,7 @@ export class MeetListItemComponent implements OnInit {
 
     // console.log(this.meet);
     if (this.userService.isLoggedIn()) {
+      this.loggedIn = true;
       // console.log('user is logged in');
       this.incompleteSubscription = this.entryService.incompleteChanged.subscribe((incomplete: IncompleteEntry[]) => {
         if (incomplete !== undefined && incomplete !== null) {
@@ -59,6 +64,17 @@ export class MeetListItemComponent implements OnInit {
 
       this.userDetails = this.userService.getUsers();
       // console.log(this.userDetails);
+    } else {
+      this.submittedSubscription = this.unauthenticatedEntryService.unauthenticatedEntriesChanged
+        .subscribe((submitted: MeetEntry[]) => {
+        // console.log(submitted);
+        if (submitted !== undefined && submitted !== null) {
+          this.submittedEntries = submitted.filter(x => x.meet_id === this.meet.id);
+          console.log(this.submittedEntries);
+        }
+      });
+
+      this.submittedEntries = this.unauthenticatedEntryService.getEntriesByMeet(this.meet.id);
     }
   }
 

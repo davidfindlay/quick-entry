@@ -8,7 +8,7 @@
   <div class="card-body">
     <strong>Entry Number: </strong> {{submittedEntry.id}}<br/>
     <strong>Status: </strong> {{submittedEntry.status.status.label}}
-    <table class="mb-2">
+    <table class="mb-2" *ngIf="eventRows.length > 0">
       <tr>
         <th>
           No:
@@ -53,7 +53,7 @@
 <!--      <button class="btn btn-primary" (click)="viewSubmittedEntry(submittedEntry)">-->
 <!--        View Entry-->
 <!--      </button>-->
-      <button class="btn btn-primary mx-1" (click)="editSubmittedEntry(submittedEntry)" *ngIf="entriesOpen()">
+      <button class="btn btn-primary mx-1" (click)="editSubmittedEntry(submittedEntry)" *ngIf="entriesOpen() && loggedIn">
         Edit Entry
       </button>
     </div>

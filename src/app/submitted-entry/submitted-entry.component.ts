@@ -8,6 +8,7 @@ import {Router} from '@angular/router';
 import {MeetService} from '../meet.service';
 import {PaypalService} from '../paypal/paypal.service';
 import {NgxSpinnerService} from 'ngx-spinner';
+import {UserService} from '../user.service';
 
 @Component({
   selector: 'app-submitted-entry',
@@ -23,7 +24,7 @@ export class SubmittedEntryComponent implements OnInit {
   paymentAmountOwed = 0;
 
   paypalAvailable = false;
-
+  loggedIn = false;
   eventRows = [];
 
   constructor(private statuses: MeetEntryStatusService,
@@ -31,16 +32,26 @@ export class SubmittedEntryComponent implements OnInit {
               private entryService: EntryService,
               private paypalService: PaypalService,
               private router: Router,
-              private spinner: NgxSpinnerService) { }
+              private userService: UserService,
+              private spinner: NgxSpinnerService) {
+  }
 
   ngOnInit() {
-    for (const eventEntry of this.submittedEntry.events) {
-      this.eventRows.push({
-        progNumber: this.getEventProgramNo(eventEntry.event_id),
-        progSuffix: this.getEventProgramNoSuffix(eventEntry.event_id),
-        eventDetails: this.getEventDetails(eventEntry.event_id),
-        seedtime: eventEntry.seedtime
-      });
+    if (this.userService.isLoggedIn()) {
+      this.loggedIn = true;
+    }
+
+    if (this.submittedEntry.events !== undefined && this.submittedEntry.events !== null) {
+      if (this.submittedEntry.events.length > 0) {
+        for (const eventEntry of this.submittedEntry.events) {
+          this.eventRows.push({
+            progNumber: this.getEventProgramNo(eventEntry.event_id),
+            progSuffix: this.getEventProgramNoSuffix(eventEntry.event_id),
+            eventDetails: this.getEventDetails(eventEntry.event_id),
+            seedtime: eventEntry.seedtime
+          });
+        }
+      }
     }
 
     this.eventRows.sort(function (a, b) {
@@ -130,8 +141,8 @@ export class SubmittedEntryComponent implements OnInit {
   }
 
   editSubmittedEntry(submittedEntry) {
-    this.entryService.editSubmittedEntry(submittedEntry.id).subscribe((edit: any) => {
-      this.router.navigate(['/', 'enter', edit.meet_id , 'step1'])
+    this.entryService.editSubmittedEntry(submittedEntry.code).subscribe((edit: any) => {
+      this.router.navigate(['/', 'enter', edit.meet_id, 'step1'])
     });
   }
 

@@ -82,6 +82,16 @@ export class AuthenticationService implements AuthService {
     this.spinner.show();
 
     console.log('refreshToken');
+    console.log(environment.api + 'refresh');
+
+    // return this.http.post(environment.api + `refresh`, {})
+    //   .pipe(tap((tokens: AccessData) => {
+    //     this.saveAccessData(tokens);
+    //     // if (this.getInterruptedUrl() !== undefined && this.getInterruptedUrl() !== null) {
+    //     //   console.log('Attempt to navigate to interrupted route' + this.getInterruptedUrl());
+    //     //   // this.router.navigate()
+    //     // }
+    //   }));
 
     return this.tokenStorage
       .getRefreshToken()
@@ -138,6 +148,10 @@ export class AuthenticationService implements AuthService {
     return this.http.post(environment.api + `login/`, {'username': username, 'password': password})
       .pipe(tap((tokens: AccessData) => {
         this.saveAccessData(tokens);
+        if (this.getInterruptedUrl() !== undefined && this.getInterruptedUrl() !== null) {
+          console.log('Attempt to navigate to interrupted route' + this.getInterruptedUrl());
+          // this.router.navigate()
+        }
       }));
   }
 
@@ -176,10 +190,12 @@ export class AuthenticationService implements AuthService {
   }
 
   public getInterruptedUrl(): string {
+    console.log('interruptedUrl was ' + this.interruptedUrl);
     return this.interruptedUrl;
   }
 
   public setInterruptedUrl(url: string): void {
+    console.log('interruptedUrl set to ' + url);
     this.interruptedUrl = url;
   }
 

@@ -1,8 +1,3 @@
-import {Club} from './club';
-import {Member} from './member';
-import {MeetEntryEvent} from './meet-entry-event';
-import {MeetEntryStatus} from './meet-entry-status';
-
 export class MeetEntryPayment {
   id: number;
   entry_id: number;

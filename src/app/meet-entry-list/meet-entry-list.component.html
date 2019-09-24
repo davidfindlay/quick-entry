@@ -24,7 +24,6 @@
 <ngx-datatable
   #entryTable
   class="bootstrap"
-
   rowHeight="40px"
   [rows]="tableRows">
   <ngx-datatable-column name="Entry ID">
@@ -64,7 +63,7 @@
   </ngx-datatable-column>
   <ngx-datatable-column name="Options">
     <ng-template let-row="row" ngx-datatable-cell-template>
-      <button class="btn btn-primary">Edit</button>
+      <button class="btn btn-primary" (click)="view(row.id)">View/Update</button>
     </ng-template>
   </ngx-datatable-column>
 </ngx-datatable>

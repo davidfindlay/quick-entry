@@ -30,6 +30,7 @@ export class MeetEntry {
   events: MeetEntryEvent[];
   status: MeetEntryStatus;
   payments: MeetEntryPayment[];
+  code: string;
   created_at: Date;
   updated_at: Date;
 }

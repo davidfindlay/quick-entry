@@ -48,6 +48,7 @@ import { MeetEntryListComponent } from './meet-entry-list/meet-entry-list.compon
 import { PendingEntryListComponent } from './pending-entry-list/pending-entry-list.component';
 import { PendingEntryActionComponent } from './pending-entry-action/pending-entry-action.component';
 import {MemberService} from './member.service';
+import { MeetEntryActionComponent } from './meet-entry-action/meet-entry-action.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -66,6 +67,7 @@ const appRoutes: Routes = [
   { path: 'paypal-landing', component: LandingComponent },
   { path: 'meet-entries/:meetId', component: MeetEntryListComponent },
   { path: 'meet-entries', component: MeetEntryListComponent },
+  { path: 'meet-entry/:entryId', component: MeetEntryActionComponent },
   { path: 'pending-entries/:meetId', component: PendingEntryListComponent },
   { path: 'pending-entries', component: PendingEntryListComponent },
   { path: 'pending-entry/:pendingId', component: PendingEntryActionComponent },
@@ -99,7 +101,8 @@ const appRoutes: Routes = [
         MyProfileComponent,
         MeetEntryListComponent,
         PendingEntryListComponent,
-        PendingEntryActionComponent
+        PendingEntryActionComponent,
+        MeetEntryActionComponent
     ],
     entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
   imports: [

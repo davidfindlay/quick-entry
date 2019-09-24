@@ -4,6 +4,7 @@ import {MeetService} from '../meet.service';
 import {Meet} from '../models/meet';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-meet-entry-list',
@@ -33,7 +34,8 @@ export class MeetEntryListComponent implements OnInit {
 
   constructor(private fb: FormBuilder,
               private meetService: MeetService,
-              private http: HttpClient) { }
+              private http: HttpClient,
+              private router: Router) { }
 
   ngOnInit() {
     this.meets = this.meetService.getMeets();
@@ -62,6 +64,13 @@ export class MeetEntryListComponent implements OnInit {
             paid += payment.amount;
           }
 
+          let status_label = '';
+          if (entry.status !== undefined && entry.status !== null) {
+            if (entry.status.status !== undefined && entry.status.status !== null) {
+              status_label = entry.status.status.label;
+            }
+          }
+
           const row = {
             'id': entry.id,
             'Entrant': entry.member.surname + ', ' + entry.member.firstname,
@@ -70,7 +79,7 @@ export class MeetEntryListComponent implements OnInit {
             'Cost': entry.cost,
             'Paid': paid,
             'Updated': entry.updated_at,
-            'Status': entry.status.status.label
+            'Status': status_label
           };
           this.tableRows.push(row);
         }
@@ -82,6 +91,10 @@ export class MeetEntryListComponent implements OnInit {
 
       });
     });
+  }
+
+  view(id) {
+    this.router.navigate(['/', 'meet-entry', id]);
   }
 
 }
