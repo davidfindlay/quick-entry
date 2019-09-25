@@ -106,19 +106,21 @@ export class ClassificationMedicalDetailsComponent implements OnInit {
         this.entryService.deleteEntry(this.meet_id);
         break;
       case 'saveAndExit':
-        this.saveEntry();
+        this.saveEntry(false);
         break;
       case 'submit':
-        this.saveEntry();
+        this.saveEntry(true);
         break;
     }
   }
 
-  saveEntry() {
+  saveEntry(advance) {
     const medicalDetails: MedicalDetails = Object.assign({}, this.medicalDetailsForm.value);
     this.entryService.setMedicalDetails(this.meet_id, medicalDetails).subscribe((updated) => {
       console.log(updated);
-      this.workflow.navigateNext();
+      if (advance) {
+        this.workflow.navigateNext();
+      }
     });
   }
 

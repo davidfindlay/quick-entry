@@ -82,6 +82,7 @@ export class PendingEntryListComponent implements OnInit {
         // console.log(entry);
         const row = {
           'id': entry.id,
+          'code': entry.code,
           'Entrant': entry.entrydata.entrantDetails.entrantSurname + ', ' + entry.entrydata.entrantDetails.entrantFirstName,
           'Club':  entry.entrydata.membershipDetails.club_code,
           'clubname': entry.entrydata.membershipDetails.club_name,

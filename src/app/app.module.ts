@@ -49,6 +49,7 @@ import { PendingEntryListComponent } from './pending-entry-list/pending-entry-li
 import { PendingEntryActionComponent } from './pending-entry-action/pending-entry-action.component';
 import {MemberService} from './member.service';
 import { MeetEntryActionComponent } from './meet-entry-action/meet-entry-action.component';
+import { ClubMemberSelectorComponent } from './club-member-selector/club-member-selector.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -102,7 +103,8 @@ const appRoutes: Routes = [
         MeetEntryListComponent,
         PendingEntryListComponent,
         PendingEntryActionComponent,
-        MeetEntryActionComponent
+        MeetEntryActionComponent,
+        ClubMemberSelectorComponent
     ],
     entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
   imports: [

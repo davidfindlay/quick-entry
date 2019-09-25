@@ -355,11 +355,11 @@ export class EntrantDetailsComponent implements OnInit {
         this.entryService.deleteEntry(this.meet_id);
         break;
       case 'saveAndExit':
-        this.saveEntry();
+        this.saveEntry(false);
         break;
       case 'submit':
         console.log('submit');
-        this.saveEntry();
+        this.saveEntry(true);
         break;
     }
 
@@ -402,17 +402,17 @@ export class EntrantDetailsComponent implements OnInit {
         });
   }
 
-  saveEntry() {
+  saveEntry(advance) {
     if (this.existingSubmittedEntry) {
       this.entryService.editSubmittedEntry(this.existingSubmittedEntryId).subscribe((edit: any) => {
-        this.processSave();
+        this.processSave(advance);
       });
     } else {
-      this.processSave();
+      this.processSave(advance);
     }
   }
 
-  processSave() {
+  processSave(advance) {
     const entrantDetails: EntrantDetails = Object.assign({}, this.entrantDetailsForm.value);
 
     // Check for existing entry
@@ -430,7 +430,9 @@ export class EntrantDetailsComponent implements OnInit {
     this.entry.meetId = this.meet_id;
     this.entryService.addEntry(this.entry).subscribe((incompleteEntry) => {
       console.log(incompleteEntry);
-      this.workflow.navigateNext();
+      if (advance) {
+        this.workflow.navigateNext();
+      }
     });
   }
 

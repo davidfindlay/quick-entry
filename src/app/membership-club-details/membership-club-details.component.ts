@@ -201,15 +201,15 @@ export class MembershipClubDetailsComponent implements OnInit {
         this.entryService.deleteEntry(this.meet_id);
         break;
       case 'saveAndExit':
-        this.saveEntry();
+        this.saveEntry(false);
         break;
       case 'submit':
-        this.saveEntry();
+        this.saveEntry(true);
         break;
     }
   }
 
-  saveEntry() {
+  saveEntry(advance) {
     console.log('Save EntryFormObject');
     const memberDetails: MembershipDetails = Object.assign({}, this.memberDetailsForm.value);
 
@@ -239,7 +239,9 @@ export class MembershipClubDetailsComponent implements OnInit {
 
     this.entryService.setMemberDetails(this.meet_id, memberDetails).subscribe((updated) => {
       console.log(updated);
-      this.workflow.navigateNext();
+      if (advance) {
+        this.workflow.navigateNext();
+      }
     });
   }
 

@@ -38,6 +38,7 @@ export class PendingEntryActionComponent implements OnInit {
 
   paidAmount = 0;
   pendingEntryId;
+  pendingEntryCode;
   pendingReason = '';
 
   memberSearchResult;
@@ -75,7 +76,7 @@ export class PendingEntryActionComponent implements OnInit {
       entrantClub: ''
     });
 
-    this.pendingEntryId = this.route.snapshot.paramMap.get('pendingId');
+    this.pendingEntryCode = this.route.snapshot.paramMap.get('pendingId');
     this.entryService.getPendingEntry(this.pendingEntryId).subscribe((entry: any) => {
       this.loadEntry(entry);
     });
@@ -83,6 +84,7 @@ export class PendingEntryActionComponent implements OnInit {
 
   loadEntry(entry) {
     this.incompleteEntry = entry;
+    this.pendingEntryId = entry.id;
     this.entry = this.incompleteEntry.entrydata;
     console.log(entry);
     this.meet_id = entry.meet_id;

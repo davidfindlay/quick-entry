@@ -73,6 +73,7 @@ export class MeetEntryListComponent implements OnInit {
 
           const row = {
             'id': entry.id,
+            'code': entry.code,
             'Entrant': entry.member.surname + ', ' + entry.member.firstname,
             'Club': entry.club.code,
             'clubname': entry.club.clubname,
