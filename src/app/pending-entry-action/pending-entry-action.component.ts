@@ -77,7 +77,7 @@ export class PendingEntryActionComponent implements OnInit {
     });
 
     this.pendingEntryCode = this.route.snapshot.paramMap.get('pendingId');
-    this.entryService.getPendingEntry(this.pendingEntryId).subscribe((entry: any) => {
+    this.entryService.getPendingEntry(this.pendingEntryCode).subscribe((entry: any) => {
       this.loadEntry(entry);
     });
   }
