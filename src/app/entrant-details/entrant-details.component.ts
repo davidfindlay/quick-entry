@@ -10,7 +10,6 @@ import {EntryFormObject} from '../models/entry-form-object';
 import {EntryService} from '../entry.service';
 import {EntrantDetails} from '../models/entrant-details';
 import {BehaviorSubject, Subject} from 'rxjs';
-import {Behavior} from 'popper.js';
 import {RegisterUser} from '../models/register-user';
 import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
 
@@ -89,13 +88,7 @@ export class EntrantDetailsComponent implements OnInit {
     console.log('Meet: ' + this.meetName);
 
     this.createForm();
-
-    const existingEntry = this.getExistingEntry();
-
-    if (existingEntry != null) {
-      this.entrantDetailsForm.patchValue(existingEntry);
-
-    }
+    this.getExistingEntry();
 
     if (this.entryService.getSubmittedEntries(this.meet_id) !== undefined
       && this.entryService.getSubmittedEntries(this.meet_id) !== null) {
@@ -119,10 +112,7 @@ export class EntrantDetailsComponent implements OnInit {
       this.member = this.userService.getMember();
     }
 
-    // Get details from user account
-    if (this.userService.isLoggedIn()) {
-      this.prefillFromUser();
-    }
+
 
   }
 
@@ -175,14 +165,19 @@ export class EntrantDetailsComponent implements OnInit {
   }
 
   getExistingEntry() {
-    const entry = this.entryService.getIncompleteEntryFO(this.meet_id);
-    if (entry !== undefined && entry !== null) {
-      const entrantDetails = entry.entrantDetails;
-      if (entrantDetails !== undefined && entrantDetails != null) {
-        return entrantDetails;
+    this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((entry: EntryFormObject) => {
+      if (entry !== undefined && entry !== null) {
+        const entrantDetails = entry.entrantDetails;
+        if (entrantDetails !== undefined && entrantDetails != null) {
+          this.entrantDetailsForm.patchValue(entrantDetails);
+        } else {
+          // Get details from user account
+          if (this.userService.isLoggedIn()) {
+            this.prefillFromUser();
+          }
+        }
       }
-    }
-    return null;
+    });
   }
 
   loadMembershipData() {
@@ -416,23 +411,24 @@ export class EntrantDetailsComponent implements OnInit {
     const entrantDetails: EntrantDetails = Object.assign({}, this.entrantDetailsForm.value);
 
     // Check for existing entry
-    const existingEntry = this.entryService.getIncompleteEntryFO(this.meet_id);
-    if (existingEntry == null) {
-      console.log('Create new EntryFormObject');
-      this.entry = new EntryFormObject();
-    } else {
-      console.log('Get existing EntryFormObject');
-      console.log(existingEntry);
-      this.entry = existingEntry;
-    }
-
-    this.entry.entrantDetails = entrantDetails;
-    this.entry.meetId = this.meet_id;
-    this.entryService.addEntry(this.entry).subscribe((incompleteEntry) => {
-      console.log(incompleteEntry);
-      if (advance) {
-        this.workflow.navigateNext();
+    this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((existingEntry: EntryFormObject) => {
+      if (existingEntry == null) {
+        console.log('Create new EntryFormObject');
+        this.entry = new EntryFormObject();
+      } else {
+        console.log('Get existing EntryFormObject');
+        console.log(existingEntry);
+        this.entry = existingEntry;
       }
+
+      this.entry.entrantDetails = entrantDetails;
+      this.entry.meetId = this.meet_id;
+      this.entryService.addEntry(this.entry).subscribe((incompleteEntry) => {
+        console.log(incompleteEntry);
+        if (advance) {
+          this.workflow.navigateNext();
+        }
+      });
     });
   }
 

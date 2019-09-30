@@ -17,14 +17,18 @@ export class EntryDetailsTotalsComponent implements OnInit {
   constructor(private entryService: EntryService) { }
 
   ngOnInit() {
-    const entry = this.entryService.getIncompleteEntryFO(this.meetId);
-    this.entryService.incompleteChanged.subscribe((entries: IncompleteEntry[]) => {
-      this.eventsEntered = this.entryService.getIndividualEventCount(entry);
-
+    this.entryService.getIncompleteEntryFO(this.meetId).subscribe((entry: EntryFormObject) => {
       this.entryCost = this.entryService.getEntryCost(entry);
     });
 
-    this.entryCost = this.entryService.getEntryCost(entry);
+    this.entryService.incompleteChanged.subscribe((entries: IncompleteEntry[]) => {
+      const entry = entries.filter(x => x.meet_id === this.meetId);
+
+      if (entry !== undefined && entry !== null && entry.length > 0) {
+        this.eventsEntered = this.entryService.getIndividualEventCount(entry[0].entrydata);
+        this.entryCost = this.entryService.getEntryCost(entry[0].entrydata);
+      }
+    });
   }
 
 }

@@ -13,6 +13,7 @@ import {debounceTime, map, pluck} from 'rxjs/operators';
 import {distinctUntilChanged} from 'rxjs/operators';
 import {ClubsService} from '../clubs.service';
 import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
+import {EntryFormObject} from '../models/entry-form-object';
 
 @Component({
   selector: 'app-membership-club-details',
@@ -50,7 +51,7 @@ export class MembershipClubDetailsComponent implements OnInit {
     text$.pipe(
       debounceTime(200),
       distinctUntilChanged(),
-      map(term => term.length < 2 ? [] : this.clubsService.findClubName(term)),
+      map(term => term.length < 2 ? [] : this.clubsService.findClubName(term))
     );
 
   constructor(private fb: FormBuilder,
@@ -80,17 +81,6 @@ export class MembershipClubDetailsComponent implements OnInit {
       this.meetName = this.meet.meetname;
     }
 
-    this.currentEntry = this.entryService.getIncompleteEntryFO(this.meet_id);
-
-    if (this.currentEntry === undefined || this.currentEntry == null) {
-      console.log('No entry in progress');
-      // TODO redirect
-    }
-
-    if (this.currentEntry.entrantDetails.who === 'else') {
-      this.isThirdPartyEntry = true;
-    }
-
     if (this.userService.isMember()) {
       // Got member entry
       console.log('Got member entry');
@@ -110,28 +100,24 @@ export class MembershipClubDetailsComponent implements OnInit {
     }
 
     // this.clubsService.loadClubs();
-
-    const existingEntry = this.getExistingEntry();
-    // console.log(existingEntry);
-
-    if (existingEntry !== null) {
-      console.log('Got existing entry');
-      console.log(existingEntry);
-      this.memberDetailsForm.patchValue(existingEntry);
-    }
+    this.getExistingEntry();
 
   }
 
   getExistingEntry() {
-    const entry = this.entryService.getIncompleteEntryFO(this.meet_id);
-    console.log(entry);
-    if (entry !== undefined && entry !== null) {
-      const membershipDetails = entry.membershipDetails;
-      if (membershipDetails !== undefined && membershipDetails != null) {
-        return membershipDetails;
+    this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((entry: EntryFormObject) => {
+      console.log(entry);
+      if (entry !== undefined && entry !== null) {
+        const membershipDetails = entry.membershipDetails;
+        if (membershipDetails !== undefined && membershipDetails != null) {
+          this.memberDetailsForm.patchValue(membershipDetails);
+        }
+
+        if (entry.entrantDetails.who === 'else') {
+          this.isThirdPartyEntry = true;
+        }
       }
-    }
-    return null;
+    });
   }
 
   createForm() {
@@ -181,7 +167,7 @@ export class MembershipClubDetailsComponent implements OnInit {
 
     // Supply initial values
     this.memberDetailsForm.patchValue({
-      member_type: 'msa',
+      member_type: 'msa'
     });
 
     this.memberDetailsForm.valueChanges.subscribe(val => {

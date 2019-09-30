@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 
 import {environment} from '../environments/environment';
+import {NgxSpinnerService} from 'ngx-spinner';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +9,9 @@ import {environment} from '../environments/environment';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'app works!';
+
+  constructor(private spinner: NgxSpinnerService) {
+  }
 
   ngOnInit(): void {
     console.log(environment);

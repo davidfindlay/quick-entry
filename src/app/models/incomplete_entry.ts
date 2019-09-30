@@ -1,4 +1,5 @@
 import {EntryFormObject} from './entry-form-object';
+import {MeetEntryStatusCode} from './meet-entry-status-code';
 
 export class IncompleteEntry {
   id: number;
@@ -8,6 +9,8 @@ export class IncompleteEntry {
   status_id: number;
   status_label: string;
   status_description: string;
+  status: MeetEntryStatusCode;
+  pending_reason: string;
   member_id: number;
   paid_amount: number;
   edit_mode: boolean;

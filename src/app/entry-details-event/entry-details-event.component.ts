@@ -10,6 +10,7 @@ import {TimeService} from '../time.service';
 import {SeedtimeHelperComponent} from '../seedtime-helper/seedtime-helper.component';
 import {of} from 'rxjs/internal/observable/of';
 import {EntryService} from '../entry.service';
+import {EntryFormObject} from '../models/entry-form-object';
 
 @Component({
   selector: 'app-entry-details-event',
@@ -61,40 +62,67 @@ export class EntryDetailsEventComponent implements OnInit {
               private modalService: NgbModal,
               private entryService: EntryService,
               private cdRef: ChangeDetectorRef) {
-  }
-
-  ngOnInit() {
-    this.entry = this.entryService.getIncompleteEntryFO(this.meetEvent.meet_id);
-
     this.eventEntryForm = this.fb.group({
       enter: false,
       seedTime: ''
     });
+  }
 
-    if (this.entry !== undefined && this.entry !== null) {
-      const membershipDetails = this.entry.membershipDetails;
-      if (membershipDetails !== undefined && membershipDetails !== null) {
-        this.memberNo = parseInt(membershipDetails.member_number, 10);
-      }
+  ngOnInit() {
+    this.entryService.getIncompleteEntryFO(this.meetEvent.meet_id).subscribe((entry: EntryFormObject) => {
+      this.entry = entry;
 
-    }
+      if (this.entry !== undefined && this.entry !== null) {
+        if (this.entry.entryEvents !== undefined && this.entry.entryEvents !== null) {
+          const currentEvents = this.entry.entryEvents.filter(x => x.event_id === this.meetEvent.id)
+          if (currentEvents !== undefined && currentEvents !== null) {
+            if (currentEvents.length > 0) {
+              const currentEventEntry = currentEvents[0];
+              this.showEntered();
 
-    // Download member history if it's not already available
-    if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
-      this.memberHistoryService.downloadHistory(this.memberNo);
-      this.memberHistoryService.resultsAvailable.subscribe((resultsAvailable) => {
-        // Once results are available, check if there's a previous result for this event
-        if (resultsAvailable) {
-          this.isMemberHistoryAvailable();
+              const seedtime = TimeService.formatTime(currentEventEntry.seedtime);
 
-          // Freetime not available
-          if (this.historyAvailable && this.meetEvent.freetime) {
-            // console.log('Disable free time entry on event ' + this.meetEvent.prognumber);
-            this.eventEntryForm.controls.seedTime.disable();
+              this.eventEntryForm.patchValue({
+                enter: true,
+                seedTime: seedtime
+              });
+
+              if (currentEventEntry.seedtime === 0) {
+                this.seedTimeNT = true;
+              }
+
+            }
           }
         }
-      });
-    }
+      }
+
+      if (this.entry !== undefined && this.entry !== null) {
+        const membershipDetails = this.entry.membershipDetails;
+        if (membershipDetails !== undefined && membershipDetails !== null) {
+          this.memberNo = parseInt(membershipDetails.member_number, 10);
+        }
+
+      }
+
+      // Download member history if it's not already available
+      if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
+        this.memberHistoryService.downloadHistory(this.memberNo);
+        this.memberHistoryService.resultsAvailable.subscribe((resultsAvailable) => {
+          // Once results are available, check if there's a previous result for this event
+          if (resultsAvailable) {
+            this.isMemberHistoryAvailable();
+
+            // Freetime not available
+            if (this.historyAvailable && this.meetEvent.freetime) {
+              // console.log('Disable free time entry on event ' + this.meetEvent.prognumber);
+              this.eventEntryForm.controls.seedTime.disable();
+            }
+          }
+        });
+      }
+
+
+    });
 
     this.eventEntryForm.valueChanges.subscribe((entryDetails) => {
       const rawValues = this.eventEntryForm.getRawValue();
@@ -131,30 +159,6 @@ export class EntryDetailsEventComponent implements OnInit {
     if (this.meetEvent.times_required) {
       this.seedTimeMandatory = true;
       // console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
-    }
-
-    if (this.entry !== undefined && this.entry !== null) {
-      if (this.entry.entryEvents !== undefined && this.entry.entryEvents !== null) {
-        const currentEvents = this.entry.entryEvents.filter(x => x.event_id === this.meetEvent.id)
-        if (currentEvents !== undefined && currentEvents !== null) {
-          if (currentEvents.length > 0) {
-            const currentEventEntry = currentEvents[0];
-            this.showEntered();
-
-            const seedtime = TimeService.formatTime(currentEventEntry.seedtime);
-
-            this.eventEntryForm.patchValue({
-              enter: true,
-              seedTime: seedtime
-            });
-
-            if (currentEventEntry.seedtime === 0) {
-              this.seedTimeNT = true;
-            }
-
-          }
-        }
-      }
     }
 
   }

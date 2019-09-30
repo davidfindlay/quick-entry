@@ -10,6 +10,8 @@ import {AuthenticationService} from '../authentication';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmCancelComponent} from '../confirm-cancel/confirm-cancel.component';
 import {UnauthenticatedEntryService} from '../unauthenticated-entry.service';
+import {Observable} from 'rxjs';
+import {EntryFormObject} from '../models/entry-form-object';
 
 @Component({
   selector: 'app-meet-list-item',
@@ -31,6 +33,7 @@ export class MeetListItemComponent implements OnInit {
   userDetails;
 
   loggedIn = false;
+  hasEntry = false;
 
   constructor(private entryService: EntryService,
               private unauthenticatedEntryService: UnauthenticatedEntryService,
@@ -51,6 +54,11 @@ export class MeetListItemComponent implements OnInit {
         if (incomplete !== undefined && incomplete !== null) {
           this.incompleteEntries = incomplete.filter(x => x.meet_id === this.meet.id
             && (x.status_id === 1 || x.status_id === 14));
+          if (this.incompleteEntries.length > 0) {
+            this.hasEntry = true;
+          } else {
+            this.hasEntry = false;
+          }
         }
       });
 
@@ -74,7 +82,17 @@ export class MeetListItemComponent implements OnInit {
         }
       });
 
+      this.incompleteSubscription = this.unauthenticatedEntryService.unauthenticatedPendingEntriesChanged
+        .subscribe((submitted: IncompleteEntry[]) => {
+          // console.log(submitted);
+          if (submitted !== undefined && submitted !== null) {
+            this.incompleteEntries = submitted.filter(x => x.meet_id === this.meet.id);
+            console.log(this.submittedEntries);
+          }
+        });
+
       this.submittedEntries = this.unauthenticatedEntryService.getEntriesByMeet(this.meet.id);
+      this.incompleteEntries = this.unauthenticatedEntryService.getPendingByMeet(this.meet.id);
     }
   }
 
@@ -121,37 +139,26 @@ export class MeetListItemComponent implements OnInit {
     }
   }
 
-  hasEntry() {
-    const meetId = this.meet.id;
-    const entry = this.entryService.getIncompleteEntry(meetId);
-
-    if (entry !== undefined && entry !== null) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   /**
    * Determine how far along existing entry is before opening it
    */
   openExistingEntry() {
     const meetId = this.meet.id;
-    const entry = this.entryService.getIncompleteEntryFO(meetId);
-
-    if (entry !== undefined && entry !== null) {
-      if (entry.entrantDetails === undefined) {
-        this.router.navigate(['enter', meetId, 'step1']);
-      } else if (entry.membershipDetails === undefined) {
-        this.router.navigate(['enter', meetId, 'step2']);
-      } else if (entry.medicalDetails === undefined) {
-        this.router.navigate(['enter', meetId, 'step3']);
+    this.entryService.getIncompleteEntryFO(meetId).subscribe((entry: EntryFormObject) => {
+      if (entry !== undefined && entry !== null) {
+        if (entry.entrantDetails === undefined) {
+          this.router.navigate(['enter', meetId, 'step1']);
+        } else if (entry.membershipDetails === undefined) {
+          this.router.navigate(['enter', meetId, 'step2']);
+        } else if (entry.medicalDetails === undefined) {
+          this.router.navigate(['enter', meetId, 'step3']);
+        } else {
+          this.router.navigate(['enter', meetId, 'step4']);
+        }
       } else {
-        this.router.navigate(['enter', meetId, 'step4']);
+        this.router.navigate(['enter', meetId, 'step1']);
       }
-    } else {
-      this.router.navigate(['enter', meetId, 'step1']);
-    }
+    });
   }
 
   cancelExistingEntry() {

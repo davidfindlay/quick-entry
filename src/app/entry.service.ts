@@ -15,6 +15,9 @@ import {MeetEntry} from './models/meet-entry';
 import {AuthenticationService} from './authentication';
 import {UserService} from './user.service';
 import {EntrantDetails} from './models/entrant-details';
+import {of} from 'rxjs/internal/observable/of';
+import {map} from 'rxjs/operators';
+import {angularInnerClassDecoratorKeys} from 'codelyzer/util/utils';
 
 @Injectable()
 export class EntryService {
@@ -75,19 +78,39 @@ export class EntryService {
   }
 
   getIncompleteEntry(meetId: number) {
-    // console.log(this.incompleteEntries);
-    if (this.incompleteEntries) {
-      return this.incompleteEntries.find(x => x.meet_id === meetId, 10);
-    }
-    return null;
+    return new Observable((observer) => {
+
+      if (this.userService.isLoggedIn()) {
+        if (this.incompleteEntries !== undefined && this.incompleteEntries !== null && this.incompleteEntries.length === 0) {
+          this.http.get(environment.api + 'entry_incomplete').subscribe((incompleteEntries: any) => {
+
+
+            this.incompleteEntries = incompleteEntries;
+            observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+          });
+        } else {
+          observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+        }
+      } else {
+        if (this.incompleteEntries) {
+          observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+        } else {
+          observer.next(of(null));
+        }
+      }
+    });
   }
 
   getIncompleteEntryFO(meetId: number) {
-    const incompleteEntry = this.getIncompleteEntry(meetId);
-    if (incompleteEntry !== undefined && incompleteEntry !== null) {
-      return incompleteEntry.entrydata;
-    }
-    return null;
+    return new Observable((observer) => {
+      this.getIncompleteEntry(meetId).subscribe((incompleteEntry: any) => {
+        if (incompleteEntry !== undefined && incompleteEntry !== null) {
+          observer.next(incompleteEntry.entrydata);
+        } else {
+          observer.next(null);
+        }
+      });
+    });
   }
 
   getPendingEntries(meetId: number) {
@@ -145,175 +168,193 @@ export class EntryService {
 
   setMemberDetails(meetId: number, membershipDetails: MembershipDetails) {
     return new Observable((observer) => {
-      const entry = this.getIncompleteEntryFO(meetId);
+      this.getIncompleteEntryFO(meetId).subscribe((entry: EntryFormObject) => {
 
-      if (entry !== null) {
-        entry.membershipDetails = membershipDetails;
+        if (entry !== null) {
+          entry.membershipDetails = membershipDetails;
 
-        console.log(membershipDetails);
+          console.log(membershipDetails);
 
-        // Get the member history cached
-        if (membershipDetails.member_number != null) {
-          // TODO: add further screening here including checking the name matches the number
-          this.memberHistoryService.downloadHistory(parseInt(membershipDetails.member_number, 10));
-        }
+          // Get the member history cached
+          if (membershipDetails.member_number != null) {
+            // TODO: add further screening here including checking the name matches the number
+            this.memberHistoryService.downloadHistory(parseInt(membershipDetails.member_number, 10));
+          }
 
-        // If logged in store to server
-        if (this.userService.getUsers() !== null) {
-          console.log('User is logged in, store to server');
+          // If logged in store to server
+          if (this.userService.getUsers() !== null) {
+            console.log('User is logged in, store to server');
 
-          this.storeIncompleteEntry(entry).subscribe((result) => {
-            console.log('Stored member details to server');
-            observer.next(result);
-          });
+            this.storeIncompleteEntry(entry).subscribe((result: any) => {
+              console.log('Stored member details to server');
+              observer.next(result.entrydata);
+            });
+          } else {
+            this.storeEntries();
+            observer.next(entry);
+          }
+
         } else {
-          this.storeEntries();
-          observer.next(entry);
+          console.error('Unable to find entry');
         }
-
-      } else {
-        console.error('Unable to find entry');
-      }
+      });
     });
   }
 
   setMedicalDetails(meetId: number, medicalDetails: MedicalDetails) {
     return new Observable((observer) => {
-      const entry = this.getIncompleteEntryFO(meetId);
+      this.getIncompleteEntryFO(meetId).subscribe((entry: EntryFormObject) => {
 
-      if (entry !== null) {
-        entry.medicalDetails = medicalDetails;
+        if (entry !== null) {
+          entry.medicalDetails = medicalDetails;
 
-        // If logged in store to server
-        if (this.userService.getUsers() !== null) {
-          console.log('User is logged in, store to server');
+          // If logged in store to server
+          if (this.userService.getUsers() !== null) {
+            console.log('User is logged in, store to server');
 
-          this.storeIncompleteEntry(entry).subscribe((result) => {
-            console.log('Stored medical details to server');
-            console.log(result);
-            observer.next(result);
-          });
+            this.storeIncompleteEntry(entry).subscribe((result: any) => {
+              console.log('Stored medical details to server');
+              console.log(result);
+              observer.next(result.entrydata);
+            });
+          } else {
+            this.storeEntries();
+            observer.next(entry);
+          }
+
         } else {
-          this.storeEntries();
-          observer.next(entry);
+          console.error('Unable to find entry');
         }
 
-      } else {
-        console.error('Unable to find entry');
-      }
+      });
 
     });
 
   }
 
   setPaymentOptions(meetId: number, paymentOptions: PaymentOption) {
-    const entry = this.getIncompleteEntryFO(meetId);
+    return new Observable((observer) => {
+      this.getIncompleteEntryFO(meetId).subscribe((entry: EntryFormObject) => {
 
-    if (entry !== null) {
-      entry.paymentOptions = paymentOptions;
+        console.log('got entry');
 
-      // If logged in store to server
-      if (this.userService.getUsers() !== null) {
-        console.log('User is logged in, store to server');
+        if (entry !== null) {
+          entry.paymentOptions = paymentOptions;
 
-        this.storeIncompleteEntry(entry).subscribe((result) => {
-          console.log('Stored payment option to server');
-          console.log(result);
-        });
-      } else {
-        this.storeEntries();
-      }
+          // If logged in store to server
+          if (this.userService.getUsers() !== null) {
+            console.log('User is logged in, store to server');
 
-    } else {
-      console.error('Unable to find entry');
-    }
+            this.storeIncompleteEntry(entry).subscribe((result: any) => {
+              console.log('Stored payment option to server');
+              console.log(result);
+              observer.next(result.entrydata);
+            });
+          } else {
+            this.storeEntries();
+            observer.next(entry);
+          }
 
+        } else {
+          console.error('Unable to find entry');
+        }
+      });
+    });
 
   }
 
   addEventEntry(meetEvent) {
 
-    const entry = this.getIncompleteEntryFO(meetEvent.meet_id);
-    if (entry !== null) {
-      if (entry.entryEvents === undefined) {
-        entry.entryEvents = [];
-      }
-      entry.entryEvents.push(<EntryEvent>{
-        id: null,
-        entry_id: null,
-        program_no: (meetEvent.prognumber + meetEvent.progsuffix),
-        event_id: meetEvent.id,
-        discipline: meetEvent.event_discipline.discipline,
-        distance: meetEvent.event_distance.distance,
-        classification: null,
-        seedtime: null
-      });
-      entry.validEvents = this.validateEntryEvents(entry);
-      this.incompleteChanged.next(this.incompleteEntries);
+    this.getIncompleteEntryFO(meetEvent.meet_id).subscribe((entry: EntryFormObject) => {
 
-    } else {
-      console.error('Unable to add event to meet entry')
-    }
+
+      if (entry !== null) {
+        if (entry.entryEvents === undefined) {
+          entry.entryEvents = [];
+        }
+        entry.entryEvents.push(<EntryEvent>{
+          id: null,
+          entry_id: null,
+          program_no: (meetEvent.prognumber + meetEvent.progsuffix),
+          event_id: meetEvent.id,
+          discipline: meetEvent.event_discipline.discipline,
+          distance: meetEvent.event_distance.distance,
+          classification: null,
+          seedtime: null
+        });
+        entry.validEvents = this.validateEntryEvents(entry);
+        this.incompleteChanged.next(this.incompleteEntries);
+
+      } else {
+        console.error('Unable to add event to meet entry')
+      }
+    });
 
   }
 
   removeEventEntry(meetEvent) {
-    const entry = this.getIncompleteEntryFO(meetEvent.meet_id);
-    if (entry) {
-      if (entry.entryEvents === undefined) {
-        return;
+    this.getIncompleteEntryFO(meetEvent.meet_id).subscribe((entry: EntryFormObject) => {
+
+
+      if (entry) {
+        if (entry.entryEvents === undefined) {
+          return;
+        }
+
+        // Remove the event from the events array
+        // TODO: change to keep cancelled event but mark as cancelled
+        entry.entryEvents = entry.entryEvents.filter(x => x.event_id !== meetEvent.id);
+
+        // this.entries = this.entries.filter(x => x.meetId !== entry.meetId);
+        // this.entries.push(entry);
+        entry.validEvents = this.validateEntryEvents(entry);
+        this.incompleteChanged.next(this.incompleteEntries);
+
+        // If logged in store to server
+        if (this.authService.isAuthorized()) {
+          console.log('User is logged in, store to server');
+
+          this.storeIncompleteEntry(entry).subscribe((result) => {
+            console.log('Stored payment option to server');
+            console.log(result);
+          });
+        } else {
+          this.storeEntries();
+        }
+
       }
-
-      // Remove the event from the events array
-      // TODO: change to keep cancelled event but mark as cancelled
-      entry.entryEvents = entry.entryEvents.filter(x => x.event_id !== meetEvent.id);
-
-      // this.entries = this.entries.filter(x => x.meetId !== entry.meetId);
-      // this.entries.push(entry);
-      entry.validEvents = this.validateEntryEvents(entry);
-      this.incompleteChanged.next(this.incompleteEntries);
-
-      // If logged in store to server
-      if (this.authService.isAuthorized()) {
-        console.log('User is logged in, store to server');
-
-        this.storeIncompleteEntry(entry).subscribe((result) => {
-          console.log('Stored payment option to server');
-          console.log(result);
-        });
-      } else {
-        this.storeEntries();
-      }
-
-    }
+    });
   }
 
   updateEventEntry(meetEvent, seedtime) {
-    const entry = this.getIncompleteEntryFO(meetEvent.meet_id);
-    if (entry) {
-      if (entry.entryEvents === undefined) {
-        return;
+    this.getIncompleteEntryFO(meetEvent.meet_id).subscribe((entry: EntryFormObject) => {
+
+
+      if (entry) {
+        if (entry.entryEvents === undefined) {
+          return;
+        }
+
+        const entryEvent = entry.entryEvents.filter(x => x.event_id === meetEvent.id);
+
+        if (entryEvent.length === 1) {
+          entryEvent[0].seedtime = seedtime;
+        }
+
+        // Check that entry is now valid with this seed time change
+        entry.validEvents = this.validateEntryEvents(entry);
+        this.storeEntries();
+
+        // If logged in store to server
+        if (this.userService.getUsers() !== null) {
+          console.log('User is logged in, store to server');
+
+          this.storeIncompleteEntry(entry).subscribe((result) => {
+            console.log(result);
+          });
+        }
       }
-
-      const entryEvent = entry.entryEvents.filter(x => x.event_id === meetEvent.id);
-
-      if (entryEvent.length === 1) {
-        entryEvent[0].seedtime = seedtime;
-      }
-
-      // Check that entry is now valid with this seed time change
-      entry.validEvents = this.validateEntryEvents(entry);
-      this.storeEntries();
-
-      // If logged in store to server
-      if (this.userService.getUsers() !== null) {
-        console.log('User is logged in, store to server');
-
-        this.storeIncompleteEntry(entry).subscribe((result) => {
-          console.log(result);
-        });
-      }
-    }
+    });
   }
 
   /**
@@ -331,32 +372,37 @@ export class EntryService {
     }
 
     if (entryFO.entryEvents === undefined) {
+      console.log('validateEntryEvents: invalid - entryEvents undefined');
       return false;
     }
 
     const eventCount = this.getIndividualEventCount(entryFO);
 
     if (eventCount < minIndividualEvents) {
+      console.log('validateEntryEvents: less than minimum individual events selected');
       return false;
     }
 
     if (eventCount > maxIndividualEvents) {
+      console.log('validateEntryEvents: more than maximum individual events selected');
       return false;
     }
 
     if (this.checkForNT(entryFO)) {
-      console.log('Disable form because of NT');
+      console.log('validateEntryEvents: Disable form because of NT');
       return false;
     }
 
+    console.log('validateEntryEvents: valid')
     return true;
   }
 
   checkEvents(meet_id) {
-    const entryFO = this.getIncompleteEntryFO(meet_id);
-    entryFO.validEvents = this.validateEntryEvents(entryFO);
-    console.log('Check events: ' + entryFO.validEvents);
-    this.incompleteChanged.next(this.incompleteEntries);
+    this.getIncompleteEntryFO(meet_id).subscribe((entryFO: EntryFormObject) => {
+      entryFO.validEvents = this.validateEntryEvents(entryFO);
+      console.log('Check events: ' + entryFO.validEvents);
+      this.incompleteChanged.next(this.incompleteEntries);
+    });
   }
 
   checkForNT(entryFO: EntryFormObject) {
@@ -514,43 +560,49 @@ export class EntryService {
 
   storeIncompleteEntry(meetEntryFO) {
 
-    let incompleteEntry = this.getIncompleteEntry(meetEntryFO.meetId);
+    return new Observable((observer) => {
 
-    if (incompleteEntry === undefined || incompleteEntry === null || incompleteEntry.id === undefined
-      || incompleteEntry.id === null) {
-      console.log('Incomplete entry not yet saved.');
+      console.log(meetEntryFO);
 
-      incompleteEntry = <IncompleteEntry>{
-        meet_id: meetEntryFO.meetId,
-        user_id: null,
-        status_id: null,
-        member_id: null,
-        entrydata: meetEntryFO
-      };
+      this.getIncompleteEntry(meetEntryFO.meetId).subscribe((incompleteEntry: IncompleteEntry) => {
 
-      return new Observable((observer) => {
-        this.http.post(environment.api + 'entry_incomplete', incompleteEntry).subscribe((entry: IncompleteEntry) => {
-          // this.deleteEntry(entry.meet_id);
-          //
-          // this.incompleteEntries.push(entry);
-          // this.incompleteChanged.next(this.incompleteEntries);
+        if (incompleteEntry === undefined || incompleteEntry === null || incompleteEntry.id === undefined
+          || incompleteEntry.id === null) {
+          console.log('Incomplete entry not yet saved.');
 
-          this.storeEntries();
-          observer.next(entry);
-        });
-      });
-    } else {
-      // console.log('Incomplete entry ' + incompleteEntry.id + ' update');
+          incompleteEntry = <IncompleteEntry>{
+            meet_id: meetEntryFO.meetId,
+            user_id: null,
+            status_id: null,
+            member_id: null,
+            entrydata: meetEntryFO
+          };
 
-      return new Observable((observer) => {
-        this.http.put(environment.api + 'entry_incomplete/' + incompleteEntry.code, incompleteEntry)
-          .subscribe((entry: IncompleteEntry) => {
-            // console.log('updated entry');
-            // console.log(entry);
+          console.log(incompleteEntry);
+
+
+          this.http.post(environment.api + 'entry_incomplete', incompleteEntry).subscribe((entry: IncompleteEntry) => {
+            // this.deleteEntry(entry.meet_id);
+            //
+            // this.incompleteEntries.push(entry);
+            // this.incompleteChanged.next(this.incompleteEntries);
+
+            this.storeEntries();
             observer.next(entry);
           });
+
+        } else {
+          // console.log('Incomplete entry ' + incompleteEntry.id + ' update');
+
+          this.http.put(environment.api + 'entry_incomplete/' + incompleteEntry.code, incompleteEntry)
+            .subscribe((entry: IncompleteEntry) => {
+              // console.log('updated entry');
+              // console.log(entry);
+              observer.next(entry);
+            });
+        }
       });
-    }
+    });
   }
 
   deleteIncompleteEntry(meetEntry) {
@@ -600,8 +652,8 @@ export class EntryService {
     return new Observable((observer) => {
       this.http.get(environment.api + 'meet_entry/' + meetEntryId).subscribe((entry: any) => {
 
-        const incompleteEntry = this.convertMeetEntryToEntryFO(entry);
-        observer.next(incompleteEntry);
+          const incompleteEntry = this.convertMeetEntryToEntryFO(entry);
+          observer.next(incompleteEntry);
 
         },
         (err) => {

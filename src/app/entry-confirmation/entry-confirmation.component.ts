@@ -9,7 +9,7 @@ import {EntryService} from '../entry.service';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {IPayPalConfig, ICreateOrderRequest, IPayPalButtonStyle} from 'ngx-paypal';
 
-import { environment } from '../../environments/environment';
+import {environment} from '../../environments/environment';
 
 import {PaymentOption} from '../models/paymentoption';
 import {EntryEvent} from '../models/entryevent';
@@ -85,12 +85,13 @@ export class EntryConfirmationComponent implements OnInit {
               private ngxSpinner: NgxSpinnerService,
               private statuses: MeetEntryStatusService,
               private paypalService: PaypalService,
-              private clubService: ClubsService) { }
+              private clubService: ClubsService) {
+  }
 
   ngOnInit() {
     this.ngxSpinner.show();
     this.meet_id = +this.route.snapshot.paramMap.get('meet');
-    this.pending_entry_code = this.route.snapshot.paramMap.get('pendingCode');
+    this.pending_entry_code = this.route.snapshot.paramMap.get('pendingId');
     this.meet_entry_code = this.route.snapshot.paramMap.get('entryId');
 
     console.log(this.meet_id);
@@ -104,10 +105,15 @@ export class EntryConfirmationComponent implements OnInit {
     if (this.meet_id !== undefined && this.meet_id !== null && this.meet_id !== 0) {
       this.meet = this.meetService.getMeet(this.meet_id);
       this.meetName = this.meet.meetname;
-      this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
-      this.paidAmount = parseFloat(this.entry.edit_paid);
-      console.log(this.entry);
-      this.loadEntry();
+      this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((entry: EntryFormObject) => {
+        this.entry = entry;
+        console.log(this.entry);
+        if (this.entry !== undefined && this.entry !== null) {
+          this.paidAmount = parseFloat(this.entry.edit_paid);
+          this.loadEntry();
+        }
+      });
+
     } else if (this.pending_entry_code !== undefined && this.pending_entry_code !== null && this.pending_entry_code !== 0) {
       this.entryService.getPendingEntry(this.pending_entry_code).subscribe((entry: IncompleteEntry) => {
         console.log(entry);
@@ -174,22 +180,21 @@ export class EntryConfirmationComponent implements OnInit {
     }
 
 
-
     // this.entryService.incompleteChanged.subscribe((entries) => {
-      // this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
-      // console.log(this.entry);
-      //
-      // if (this.entry !== undefined && this.entry !== null) {
-      //
-      //   this.statusCode = this.entry.status;
-      //   this.statuses.getStatus(this.entry.status).subscribe((status) => {
-      //     if (status !== null) {
-      //       this.statusLabel = status.label;
-      //       this.statusText = status.description;
-      //     }
-      //   });
-      //
-      // }
+    // this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
+    // console.log(this.entry);
+    //
+    // if (this.entry !== undefined && this.entry !== null) {
+    //
+    //   this.statusCode = this.entry.status;
+    //   this.statuses.getStatus(this.entry.status).subscribe((status) => {
+    //     if (status !== null) {
+    //       this.statusLabel = status.label;
+    //       this.statusText = status.description;
+    //     }
+    //   });
+    //
+    // }
 
     // });
 
@@ -234,7 +239,7 @@ export class EntryConfirmationComponent implements OnInit {
     }
     return str.replace(
       /\w\S*/g,
-      function(txt) {
+      function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
@@ -249,97 +254,106 @@ export class EntryConfirmationComponent implements OnInit {
         this.saveEntry();
         break;
       case 'submit':
-        this.saveEntry();
-        this.submit();
+        this.saveEntry().subscribe((saved: any) => {
+          this.entry = saved;
+          console.log(saved);
+          this.submit();
+        });
         break;
     }
   }
 
   saveEntry() {
     const paymentOption: PaymentOption = Object.assign({}, this.paymentOptionForm.value);
-    this.entryService.setPaymentOptions(this.meet_id, paymentOption);
-    console.log('saveentry');
+    return this.entryService.setPaymentOptions(this.meet_id, paymentOption);
   }
 
   submit() {
     // this.ngxSpinner.show();
     console.log('submit');
-    this.entryService.storeIncompleteEntry(this.entryService.getIncompleteEntryFO(this.meet_id))
+    this.entryService.storeIncompleteEntry(this.entry)
       .subscribe((entrySaved: IncompleteEntry) => {
-      console.log('Saved entry to incomplete store');
-      this.entry = entrySaved.entrydata;
-      console.log(entrySaved);
-        this.statusLabel = entrySaved.status_label;
-        this.statusText = entrySaved.status_description;
-      this.pending_entry_code = this.entry.id;
-      this.entryService.finalise(entrySaved).subscribe((finalised: any) => {
-        console.log('Finalise entry');
-        console.log(finalised);
+          console.log('Saved entry to incomplete store');
+          this.entry = entrySaved.entrydata;
+          console.log(entrySaved);
+          this.statusLabel = entrySaved.status_label;
+          this.statusText = entrySaved.status_description;
+          this.pending_entry_code = this.entry.id;
+          this.entryService.finalise(entrySaved).subscribe((finalised: any) => {
+            console.log('Finalise entry');
+            console.log(finalised);
 
-        // if (finalised.meet_entry !== undefined && finalised.meet_entry !== null) {
-        //   this.meet_entry_id = finalised.meet_entry.id;
-        // }
+            // if (finalised.meet_entry !== undefined && finalised.meet_entry !== null) {
+            //   this.meet_entry_id = finalised.meet_entry.id;
+            // }
 
-        // this.entryService.setStatus(this.entryService.getIncompleteEntry(this.meet_id), finalised.status);
+            // this.entryService.setStatus(this.entryService.getIncompleteEntry(this.meet_id), finalised.status);
 
-        this.statusLabel = finalised.status_label;
-        this.statusText = finalised.status_description;
+            this.statusLabel = finalised.status_label;
+            this.statusText = finalised.status_description;
 
-        // Disable the form
-        this.showPaymentChoice = false;
-        this.workflowNav.enableFinishButton();
-
-        if (this.userService.getUsers() === null) {
-          this.entryService.deleteEntry(this.meet_id);
-          this.unauthenticatedEntryService.addMeetEntry(finalised.meet_entry);
-        }
-
-        if (this.paymentOptionForm.controls.paymentOption.value === 'paypal') {
-
-          let paypalPayment;
-          if (finalised.pending_entry !== undefined) {
-            paypalPayment = this.paypalService.createPaymentIncompleteEntry(finalised.pending_entry);
-          } else if (finalised.meet_entry !== undefined) {
-            paypalPayment = this.paypalService.createPaymentFinalisedEntry(finalised.meet_entry);
-          }
-
-          this.router.navigate(['/', 'paypal-depart']);
-
-          paypalPayment.subscribe((paymentDetails: any) => {
-            this.ngxSpinner.hide();
-            window.location.assign(paymentDetails.approvalUrl);
-          }, (error: any) => {
-
-            // Handle paypal error
-            console.log('Got error can\'t go to paypal');
-
-            this.ngxSpinner.hide();
+            // Disable the form
             this.showPaymentChoice = false;
             this.workflowNav.enableFinishButton();
 
+            if (this.userService.getUsers() === null) {
+              this.entryService.deleteEntry(this.meet_id);
+
+              if (finalised.meet_entry !== undefined && finalised.meet_entry !== null) {
+                this.unauthenticatedEntryService.addMeetEntry(finalised.meet_entry);
+              }
+
+              if (finalised.pending_entry !== undefined && finalised.pending_entry !== null) {
+                this.unauthenticatedEntryService.addPendingEntry(finalised.pending_entry);
+              }
+            }
+
+            if (this.paymentOptionForm.controls.paymentOption.value === 'paypal') {
+
+              let paypalPayment;
+              if (finalised.pending_entry !== undefined) {
+                paypalPayment = this.paypalService.createPaymentIncompleteEntry(finalised.pending_entry);
+              } else if (finalised.meet_entry !== undefined) {
+                paypalPayment = this.paypalService.createPaymentFinalisedEntry(finalised.meet_entry);
+              }
+
+              this.router.navigate(['/', 'paypal-depart']);
+
+              paypalPayment.subscribe((paymentDetails: any) => {
+                this.ngxSpinner.hide();
+                window.location.assign(paymentDetails.approvalUrl);
+              }, (error: any) => {
+
+                // Handle paypal error
+                console.log('Got error can\'t go to paypal');
+
+                this.ngxSpinner.hide();
+                this.showPaymentChoice = false;
+                this.workflowNav.enableFinishButton();
+
+              });
+
+            } else {
+              this.ngxSpinner.hide();
+              // Remove finished entry from entry service
+              if (this.userService.getUsers() !== null) {
+                this.entryService.retrieveIncompleteEntries();
+              } else {
+                this.entryService.deleteEntry(this.meet_id);
+              }
+
+            }
+
+          }, (error: any) => {
+            console.log(error);
+            this.ngxSpinner.hide();
+            this.error = error.explanation;
           });
-
-        } else {
+        },
+        (error: any) => {
+          console.log(error);
           this.ngxSpinner.hide();
-          // Remove finished entry from entry service
-          if (this.userService.getUsers() !== null) {
-            this.entryService.retrieveIncompleteEntries();
-          } else {
-            this.entryService.deleteEntry(this.meet_id);
-          }
-
-        }
-
-      }, (error: any) => {
-        console.log(error);
-        this.ngxSpinner.hide();
-        this.error = error.explanation;
-      });
-    },
-      (error: any) => {
-      console.log(error);
-      this.ngxSpinner.hide();
-      });
+        });
 
   }
 
