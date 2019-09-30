@@ -18,7 +18,8 @@ export class MeetEvent {
     eventname: string;
     prognumber: string;
     progsuffix: string;
-    eventfee: string;
+    eventfee: number;
+    eventfee_non_member: number;
     deadline: string;
     exhibition: boolean;
     freetime: boolean;

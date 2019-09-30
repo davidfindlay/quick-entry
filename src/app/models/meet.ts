@@ -22,10 +22,12 @@ export class Meet {
   public email: Email;
   public contactphone;
   public meetfee;
+  public meetfee_non_member;
   public mealfee;
   public location;
   public status;
   public maxevents;
+  public minevents;
   public mealsincluded;
   public mealname;
   public massagefee;
