@@ -364,8 +364,8 @@ export class EntryService {
 
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
 
-    const minIndividualEvents = 1;
-    let maxIndividualEvents = 5;
+    const minIndividualEvents = meetDetails.minevents;
+    let maxIndividualEvents = meetDetails.maxevents;
 
     if (meetDetails !== undefined && meetDetails !== null) {
       maxIndividualEvents = meetDetails.maxevents;
