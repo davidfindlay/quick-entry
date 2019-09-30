@@ -447,10 +447,36 @@ export class EntryService {
   }
 
   getEntryCost(entryFO: EntryFormObject) {
-    // TODO: Add additional rules
+    let entryFee = 0;
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
     if (meetDetails !== undefined && meetDetails !== null) {
-      return meetDetails.meetfee;
+
+      // Get the Meet Fee
+      if (entryFO.membershipDetails.member_type === 'msa' || entryFO.membershipDetails.member_number === 'international') {
+        entryFee += meetDetails.meetfee;
+      } else {
+        if (meetDetails.meetfee_non_member !== undefined || meetDetails.meetfee_non_member !== null) {
+          entryFee += meetDetails.meetfee_non_member;
+        } else {
+          entryFee += meetDetails.meetfee;
+        }
+      }
+
+      // Get Event Fees
+      for (const eventEntry of entryFO.entryEvents) {
+        const eventDetails = meetDetails.events.find(x => x.id === eventEntry.event_id);
+        if (entryFO.membershipDetails.member_type === 'msa' || entryFO.membershipDetails.member_number === 'international') {
+          entryFee += eventDetails.eventfee;
+        } else {
+          if (meetDetails.meetfee_non_member !== undefined || meetDetails.meetfee_non_member !== null) {
+            entryFee += eventDetails.eventfee_non_member;
+          } else {
+            entryFee += eventDetails.eventfee;
+          }
+        }
+      }
+
+      return entryFee;
     } else {
       return null;
     }
