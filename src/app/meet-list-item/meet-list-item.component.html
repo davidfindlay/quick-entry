@@ -25,11 +25,11 @@
         </tr>
         <tr>
           <th>Phone: </th>
-          <td><a href="tel:{{meet.phone.phonenumber}}">{{meet.phone.phonenumber}}</a></td>
+          <td><a href="tel:{{meet.phone.phonenumber}}" *ngIf="meet.phone !== undefined && meet.phone !== null">{{meet.phone.phonenumber}}</a></td>
         </tr>
         <tr>
           <th>Email: </th>
-          <td><a href="mailto:{{meet.email.address}}">{{meet.email.address}}</a></td>
+          <td><a href="mailto:{{meet.email.address}}" *ngIf="meet.email !== undefined && meet.email !== null">{{meet.email.address}}</a></td>
         </tr>
       </table>
     </div>
@@ -41,9 +41,9 @@
     <div class="mt-3" *ngIf="submittedEntries.length > 0 || incompleteEntries.length > 0">
       <h3>Submitted Entries:</h3>
 
-      <app-pending-entry *ngFor="let incompleteEntry of incompleteEntries"
+      <app-pending-entry *ngFor="let pendingEntry of pendingEntries"
                          [meet]="meet"
-                         [incompleteEntry]="incompleteEntry">
+                         [incompleteEntry]="pendingEntry">
       </app-pending-entry>
 
       <app-submitted-entry *ngFor="let submittedEntry of submittedEntries"

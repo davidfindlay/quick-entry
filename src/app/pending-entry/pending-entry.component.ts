@@ -16,7 +16,8 @@ export class PendingEntryComponent implements OnInit {
   constructor(private statuses: MeetEntryStatusService) { }
 
   ngOnInit() {
-    console.log(this.incompleteEntry.entrydata);
+
+    console.log(this.incompleteEntry);
     // this.incompleteEntry.entrydata = JSON.parse(<any>this.incompleteEntry.entrydata);
   }
 

@@ -3,17 +3,20 @@
     <h2 class="card-title">
       {{incompleteEntry.entrydata.entrantDetails.entrantFirstName}} {{incompleteEntry.entrydata.entrantDetails.entrantSurname}}
     </h2>
-    {{incompleteEntry.entrydata.membershipDetails.club_name}} ({{incompleteEntry.entrydata.membershipDetails.club_code}})
+    <span *ngIf="incompleteEntry.entrydata.membershipDetails.club_name !== undefined">
+      {{incompleteEntry.entrydata?.membershipDetails?.club_name}}
+      ({{incompleteEntry.entrydata?.membershipDetails?.club_code}})
+    </span>
   </div>
   <div class="card-body">
-    <strong>Lodged: </strong>{{incompleteEntry.created_at | date: 'medium'}}<br />
-    <strong>Status: </strong> {{incompleteEntry.status.label}}: {{incompleteEntry.status.description}}<br />
+    <strong>Lodged: </strong>{{incompleteEntry.created_at | date: 'medium'}}<br/>
+    <strong>Status: </strong> {{incompleteEntry.status?.label}}: {{incompleteEntry.status?.description}}<br/>
     <strong>Reason: </strong> {{incompleteEntry.pending_reason}}
-<!--    <div>-->
-<!--      <button class="btn btn-primary" (click)="editIncompleteEntry(incompleteEntry)" *ngIf="entriesOpen()">-->
-<!--        Edit-->
-<!--      </button>-->
-<!--    </div>-->
+    <!--    <div>-->
+    <!--      <button class="btn btn-primary" (click)="editIncompleteEntry(incompleteEntry)" *ngIf="entriesOpen()">-->
+    <!--        Edit-->
+    <!--      </button>-->
+    <!--    </div>-->
   </div>
   <div class="card-footer">
     <strong>Lodged: </strong> {{incompleteEntry.created_at | date: 'medium'}}<br/>

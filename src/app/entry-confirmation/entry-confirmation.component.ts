@@ -70,6 +70,10 @@ export class EntryConfirmationComponent implements OnInit {
   medicalCertificate = 'No';
   medicalCondition = 'No';
 
+  meetFee = 0;
+  eventFee = 0;
+  totalFee = 0;
+
   showPaymentChoice = true;
 
   constructor(private fb: FormBuilder,
@@ -179,25 +183,6 @@ export class EntryConfirmationComponent implements OnInit {
       this.formValidSubject.next(false);
     }
 
-
-    // this.entryService.incompleteChanged.subscribe((entries) => {
-    // this.entry = this.entryService.getIncompleteEntryFO(this.meet_id);
-    // console.log(this.entry);
-    //
-    // if (this.entry !== undefined && this.entry !== null) {
-    //
-    //   this.statusCode = this.entry.status;
-    //   this.statuses.getStatus(this.entry.status).subscribe((status) => {
-    //     if (status !== null) {
-    //       this.statusLabel = status.label;
-    //       this.statusText = status.description;
-    //     }
-    //   });
-    //
-    // }
-
-    // });
-
     switch (this.entry.membershipDetails.member_type) {
       case 'msa':
         this.membershipType = 'Masters Swimming Australia member';
@@ -228,6 +213,10 @@ export class EntryConfirmationComponent implements OnInit {
     if (this.entry.medicalDetails.medicalCondition === 'true') {
       this.medicalCondition = 'Yes';
     }
+
+    this.meetFee = this.entryService.getMeetFee(this.entry);
+    this.eventFee = this.entryService.getEventFees(this.entry);
+    this.totalFee = this.meetFee + this.eventFee;
 
     this.ngxSpinner.hide();
 

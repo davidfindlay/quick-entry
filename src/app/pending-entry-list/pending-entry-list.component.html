@@ -5,7 +5,11 @@
 </div>
 
 <form [formGroup]="meetSelectorForm">
-  <fieldset class="qe-fieldset">
+  <div class="card mb-1">
+    <div class="card-header">
+      <h2>Meet Selection</h2>
+    </div>
+    <div class="card-body">
     <div class="form-group row">
       <label for="meet-year" class="form-control-label col-sm-6">Year: </label>
       <select id="meet-year" class="form-control col-sm-6" formControlName="meetYear">
@@ -18,7 +22,27 @@
         <option value="{{meet.id}}" *ngFor="let meet of meets">{{meet.meetname}}</option>
       </select>
     </div>
-  </fieldset>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+    <h2>Display Options</h2>
+    </div>
+    <div class="card-body">
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="showPending" value="showPending" formControlName="showPending">
+      <label class="form-check-label" for="showPending">Show Pending</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="showFinalised" value="showFinalised" formControlName="showFinalised">
+      <label class="form-check-label" for="showFinalised">Show Finalised</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="showIncomplete" value="showIncomplete" formControlName="showIncomplete">
+      <label class="form-check-label" for="showIncomplete">Show Incomplete</label>
+    </div>
+  </div>
+  </div>
 </form>
 
 <ngx-datatable

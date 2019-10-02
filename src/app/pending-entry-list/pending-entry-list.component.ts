@@ -5,6 +5,7 @@ import {MeetService} from '../meet.service';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {ActivatedRoute, Router} from '@angular/router';
+import {NgxSpinnerService} from 'ngx-spinner';
 
 @Component({
   selector: 'app-pending-entry-list',
@@ -32,6 +33,10 @@ export class PendingEntryListComponent implements OnInit {
 
   ];
 
+  showFinalised = false;
+  showPending = true;
+  showIncomplete = false;
+
   meetSelectorForm: FormGroup;
   meetSelectorFormSub;
 
@@ -39,7 +44,8 @@ export class PendingEntryListComponent implements OnInit {
               private meetService: MeetService,
               private http: HttpClient,
               private router: Router,
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute,
+              private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
     this.meets = this.meetService.getMeets();
@@ -62,14 +68,43 @@ export class PendingEntryListComponent implements OnInit {
   createForm() {
     this.meetSelectorForm = this.fb.group({
       meetYear: [2019, Validators.required],
-      meet: [this.meetId, Validators.required]
+      meet: [this.meetId, Validators.required],
+      showPending: true,
+      showFinalised: false,
+      showIncomplete: false
     });
 
     this.meetSelectorFormSub = this.meetSelectorForm.valueChanges.subscribe((change) => {
-      this.router.navigate(['/', 'pending-entries', change.meet]);
-      console.log('Selected meet ' + this.meetId);
-      // this.loadMeet();
+      this.spinner.show();
+      if (change.meet !== this.meetId) {
+        this.router.navigate(['/', 'pending-entries', change.meet]);
+        console.log('Selected meet ' + this.meetId);
+      }
+
+      console.log(change);
+
+      if (change.showPending) {
+        this.showPending = true;
+      } else {
+        this.showPending = false;
+      }
+
+      if (change.showFinalised) {
+        this.showFinalised = true;
+      } else {
+        this.showFinalised = false;
+      }
+
+      if (change.showIncomplete) {
+        this.showIncomplete = true;
+      } else {
+        this.showIncomplete = false;
+      }
+
+      this.loadMeet();
+
     });
+
   }
 
   loadMeet() {
@@ -79,7 +114,7 @@ export class PendingEntryListComponent implements OnInit {
       this.tableRows = [];
 
       for (const entry of this.entries) {
-        // console.log(entry);
+        console.log(entry);
         const row = {
           'id': entry.id,
           'code': entry.code,
@@ -90,11 +125,32 @@ export class PendingEntryListComponent implements OnInit {
           'Reason': entry.pending_reason,
           'Updated': entry.updated_at
         };
+
+        if (!this.showPending) {
+          if (entry.status_id === 1 || entry.status_id === 14) {
+            continue;
+          }
+        }
+
+        if (!this.showIncomplete) {
+          if (entry.status_id === 12) {
+            continue;
+          }
+        }
+
+        if (!this.showFinalised) {
+          if (entry.finalised_at !== null) {
+            continue;
+          }
+        }
+
         this.tableRows.push(row);
       }
 
       this.tableRows = [...this.tableRows];
       this.table.recalculate();
+
+      this.spinner.hide();
 
       // console.log(this.tableRows);
 

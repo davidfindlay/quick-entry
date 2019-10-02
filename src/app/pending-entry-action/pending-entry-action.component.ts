@@ -46,6 +46,7 @@ export class PendingEntryActionComponent implements OnInit {
 
   created_at;
   updated_at;
+  finalised_at;
 
   canBeActioned = false;
   existingEntryShow = false;
@@ -100,6 +101,7 @@ export class PendingEntryActionComponent implements OnInit {
     this.pendingReason = entry.pending_reason;
     this.created_at = entry.created_at;
     this.updated_at = entry.updated_at;
+    this.finalised_at = entry.finalised_at;
 
     if (this.entry.membershipDetails.club_selector !== '') {
       const club = this.clubService.getClubById(parseInt(this.entry.membershipDetails.club_selector, 10));

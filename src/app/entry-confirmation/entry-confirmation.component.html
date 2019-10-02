@@ -289,10 +289,23 @@
         Meet Entry Fee
       </td>
       <td class="moneycol">
-        {{meet.meetfee | currency}}
+        {{meetFee | currency}}
       </td>
       <td class="moneycol">
-        {{meet.meetfee | currency}}
+        {{meetFee | currency}}
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        Event Fees
+      </td>
+      <td class="moneycol">
+        {{eventFee | currency}}
+      </td>
+      <td class="moneycol">
+        {{eventFee | currency}}
       </td>
     </tr>
     <tr>
@@ -300,7 +313,7 @@
         Total
       </td>
       <td class="moneycol">
-        {{meet.meetfee | currency}}
+        {{totalFee | currency}}
       </td>
     </tr>
     <tr>
