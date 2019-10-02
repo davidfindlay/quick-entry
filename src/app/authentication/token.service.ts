@@ -26,7 +26,7 @@ export class TokenStorage {
    * Set access token
    * @returns {TokenStorage}
    */
-  public setAccessToken(token: string): TokenStorage {
+  public setAccessToken(token: string, expires: Date): TokenStorage {
     localStorage.setItem('accessToken', token);
 
     return this;
@@ -36,7 +36,7 @@ export class TokenStorage {
    * Set refresh token
    * @returns {TokenStorage}
    */
-  public setRefreshToken(token: string): TokenStorage {
+  public setRefreshToken(token: string, expires: Date): TokenStorage {
     localStorage.setItem('refreshToken', token);
 
     return this;

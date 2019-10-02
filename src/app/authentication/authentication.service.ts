@@ -182,7 +182,7 @@ export class AuthenticationService implements AuthService {
 
     if (access_data.access_token !== null) {
       console.log('Store access token');
-      this.tokenStorage.setAccessToken(access_data.access_token);
+      this.tokenStorage.setAccessToken(access_data.access_token, new Date);
       this.user = access_data.user;
       localStorage.setItem('user', JSON.stringify(this.user));
       this.authenticationChanged.next(this.user);
