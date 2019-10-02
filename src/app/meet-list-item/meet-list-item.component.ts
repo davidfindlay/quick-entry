@@ -27,6 +27,9 @@ export class MeetListItemComponent implements OnInit {
   incompleteSubscription;
   incompleteEntries: IncompleteEntry[] = [];
 
+  pendingSubscription;
+  pendingEntries: IncompleteEntry[] = [];
+
   submittedSubscription;
   submittedEntries: MeetEntry[] = [];
 
@@ -46,21 +49,25 @@ export class MeetListItemComponent implements OnInit {
 
   ngOnInit() {
 
+    this.incompleteSubscription = this.entryService.incompleteChanged.subscribe((incomplete: IncompleteEntry[]) => {
+      console.log(incomplete);
+
+      if (incomplete !== undefined && incomplete !== null) {
+
+        this.incompleteEntries = incomplete.filter(x => x.meet_id === this.meet.id
+          && (x.status_id === 1 || x.status_id === 14));
+        if (this.incompleteEntries.length > 0) {
+          this.hasEntry = true;
+        } else {
+          this.hasEntry = false;
+        }
+      }
+    });
+
     // console.log(this.meet);
     if (this.userService.isLoggedIn()) {
       this.loggedIn = true;
       // console.log('user is logged in');
-      this.incompleteSubscription = this.entryService.incompleteChanged.subscribe((incomplete: IncompleteEntry[]) => {
-        if (incomplete !== undefined && incomplete !== null) {
-          this.incompleteEntries = incomplete.filter(x => x.meet_id === this.meet.id
-            && (x.status_id === 1 || x.status_id === 14));
-          if (this.incompleteEntries.length > 0) {
-            this.hasEntry = true;
-          } else {
-            this.hasEntry = false;
-          }
-        }
-      });
 
       this.submittedSubscription = this.entryService.submittedChanged.subscribe((submitted: MeetEntry[]) => {
         // console.log(submitted);
@@ -78,21 +85,21 @@ export class MeetListItemComponent implements OnInit {
         // console.log(submitted);
         if (submitted !== undefined && submitted !== null) {
           this.submittedEntries = submitted.filter(x => x.meet_id === this.meet.id);
-          console.log(this.submittedEntries);
+          // console.log(this.submittedEntries);
         }
       });
 
-      this.incompleteSubscription = this.unauthenticatedEntryService.unauthenticatedPendingEntriesChanged
+      this.pendingSubscription = this.unauthenticatedEntryService.unauthenticatedPendingEntriesChanged
         .subscribe((submitted: IncompleteEntry[]) => {
           // console.log(submitted);
           if (submitted !== undefined && submitted !== null) {
-            this.incompleteEntries = submitted.filter(x => x.meet_id === this.meet.id);
-            console.log(this.submittedEntries);
+            this.pendingEntries = submitted.filter(x => x.meet_id === this.meet.id);
+            // console.log(this.submittedEntries);
           }
         });
 
       this.submittedEntries = this.unauthenticatedEntryService.getEntriesByMeet(this.meet.id);
-      this.incompleteEntries = this.unauthenticatedEntryService.getPendingByMeet(this.meet.id);
+      this.pendingEntries = this.unauthenticatedEntryService.getPendingByMeet(this.meet.id);
     }
   }
 

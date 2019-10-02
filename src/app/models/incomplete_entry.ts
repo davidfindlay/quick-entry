@@ -17,4 +17,5 @@ export class IncompleteEntry {
   entrydata: EntryFormObject;
   created_at: Date;
   updated_at: Date;
+  finalised_at: Date;
 }

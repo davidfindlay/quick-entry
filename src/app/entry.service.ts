@@ -176,7 +176,8 @@ export class EntryService {
           console.log(membershipDetails);
 
           // Get the member history cached
-          if (membershipDetails.member_number != null) {
+          if (membershipDetails.member_type === 'msa' && membershipDetails.member_number !== null &&
+            membershipDetails.member_number !== '') {
             // TODO: add further screening here including checking the name matches the number
             this.memberHistoryService.downloadHistory(parseInt(membershipDetails.member_number, 10));
           }
@@ -364,8 +365,8 @@ export class EntryService {
 
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
 
-    const minIndividualEvents = 1;
-    let maxIndividualEvents = 5;
+    const minIndividualEvents = meetDetails.minevents;
+    let maxIndividualEvents = meetDetails.maxevents;
 
     if (meetDetails !== undefined && meetDetails !== null) {
       maxIndividualEvents = meetDetails.maxevents;
@@ -446,14 +447,51 @@ export class EntryService {
     return eventCount;
   }
 
-  getEntryCost(entryFO: EntryFormObject) {
-    // TODO: Add additional rules
+  getMeetFee(entryFO: EntryFormObject) {
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
     if (meetDetails !== undefined && meetDetails !== null) {
-      return meetDetails.meetfee;
-    } else {
-      return null;
+      if (entryFO.membershipDetails.member_type === 'msa' || entryFO.membershipDetails.member_number === 'international') {
+        return meetDetails.meetfee;
+      } else {
+        if (meetDetails.meetfee_non_member !== undefined && meetDetails.meetfee_non_member !== null) {
+          return meetDetails.meetfee_non_member;
+        } else {
+          return meetDetails.meetfee;
+        }
+      }
     }
+    return null;
+  }
+
+  getEventFees(entryFO: EntryFormObject) {
+    let entryFee = 0;
+    const meetDetails = this.meetService.getMeet(entryFO.meetId);
+    if (meetDetails !== undefined && meetDetails !== null) {
+      if (entryFO.entryEvents !== undefined && entryFO.entryEvents !== null) {
+        for (const eventEntry of entryFO.entryEvents) {
+          const eventDetails = meetDetails.events.find(x => x.id === eventEntry.event_id);
+
+          // Only add cost of individual events
+          if (eventDetails.legs === 1) {
+
+            if (entryFO.membershipDetails.member_type === 'msa' || entryFO.membershipDetails.member_number === 'international') {
+              entryFee += eventDetails.eventfee;
+            } else {
+              if (eventDetails.eventfee_non_member !== undefined && eventDetails.eventfee_non_member !== null) {
+                entryFee += eventDetails.eventfee_non_member;
+              } else {
+                entryFee += eventDetails.eventfee;
+              }
+            }
+          }
+        }
+      }
+    }
+    return entryFee;
+  }
+
+  getEntryCost(entryFO: EntryFormObject) {
+    return this.getMeetFee(entryFO) + this.getEventFees(entryFO);
   }
 
   deleteEntry(meetId: number) {
@@ -464,9 +502,10 @@ export class EntryService {
     if (this.userService.getUsers() !== null) {
       console.log('User is logged in, store to server');
 
-      const meetEntry = this.getIncompleteEntry(meetId);
-      this.incompleteEntries = this.incompleteEntries.filter(x => x.meet_id !== meetId);
-      this.deleteIncompleteEntry(meetEntry);
+      this.getIncompleteEntry(meetId).subscribe((meetEntry: any) => {
+        this.incompleteEntries = this.incompleteEntries.filter(x => x.meet_id !== meetId);
+        this.deleteIncompleteEntry(meetEntry);
+      });
 
     } else {
       this.incompleteEntries = this.incompleteEntries.filter(x => x.meet_id !== meetId);
@@ -606,6 +645,7 @@ export class EntryService {
   }
 
   deleteIncompleteEntry(meetEntry) {
+    console.log(meetEntry);
     this.http.delete(environment.api + 'entry_incomplete/' + meetEntry.code)
       .subscribe((response: any) => {
         console.log(response);
@@ -664,6 +704,14 @@ export class EntryService {
   }
 
   convertMeetEntryToEntryFO(entry) {
+    if (entry === undefined || entry === null) {
+      return null;
+    }
+
+    if (entry.meet_entry === undefined || entry === null) {
+      return null;
+    }
+
     const meetEntry = entry.meet_entry;
     console.log(meetEntry);
 

@@ -37,6 +37,7 @@ export class WorkflowNavComponent implements OnInit {
 
   ngOnInit() {
     this.nextActivated.subscribe((nextActivate) => {
+      console.log('next activate: ' + nextActivate);
       this.btnNextDisable = !nextActivate;
     });
   }
@@ -47,7 +48,7 @@ export class WorkflowNavComponent implements OnInit {
       this.clickCancel();
     } else {
       this.router.navigate([this.previous]);
-      this.submitEvent.emit('submit');
+      this.submitEvent.emit('saveAndExit');
     }
   }
 
