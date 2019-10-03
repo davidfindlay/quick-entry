@@ -8,6 +8,7 @@ import {NgxSpinnerService} from 'ngx-spinner';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {User} from '../models/user';
 import {environment} from '../../environments/environment';
+import {of} from 'rxjs/internal/observable/of';
 
 interface AccessData {
   access_token: string;
@@ -31,10 +32,15 @@ export class AuthenticationService implements AuthService {
     private spinner: NgxSpinnerService,
   ) {
     // Check if we have token
-    if (this.isAuthorized()) {
-      this.user = JSON.parse(localStorage.getItem('user'));
-      this.authenticationChanged.next(this.user);
-    }
+    this.isAuthorized().subscribe((authorized: boolean) => {
+      if (authorized) {
+        this.user = JSON.parse(localStorage.getItem('user'));
+        this.authenticationChanged.next(this.user);
+      } else {
+        this.authenticationChanged.next(null);
+      }
+    });
+
 
   }
 
@@ -48,17 +54,21 @@ export class AuthenticationService implements AuthService {
     // return this.tokenStorage
     //   .getAccessToken()
     //   .pipe(map(token => !!token));
+    console.log('isAuthorized');
 
-    return this.tokenStorage
-      .getAccessToken()
-      .pipe(map((token) => {
+    return new Observable((observer) => {
+      this.tokenStorage.getAccessToken().subscribe((token: string) => {
+        console.log('test');
         console.log(token);
         if (token !== undefined && token !== null) {
-          return true;
+          console.log('isAuthorized true');
+          observer.next(true);
         } else {
-          return false;
+          console.log('isAuthorized false');
+          observer.next(false);
         }
-      }));
+      });
+    });
   }
 
   /**
@@ -79,10 +89,10 @@ export class AuthenticationService implements AuthService {
    */
   public refreshToken(): Observable <AccessData> {
 
-    this.spinner.show();
-
-    console.log('refreshToken');
-    console.log(environment.api + 'refresh');
+    // this.spinner.show();
+    //
+    // console.log('refreshToken');
+    // console.log(environment.api + 'refresh');
 
     // return this.http.post(environment.api + `refresh`, {})
     //   .pipe(tap((tokens: AccessData) => {
@@ -93,29 +103,30 @@ export class AuthenticationService implements AuthService {
     //     // }
     //   }));
 
-    return this.tokenStorage
-      .getRefreshToken()
-      .pipe(
-        switchMap((refreshToken: string) =>
-          this.http.post(environment.api + `refresh`, {})
-        ),
-        timeout(5000),
-        tap((tokens: AccessData) => {
-          console.log('got tokens');
-          console.log(tokens);
-          this.saveAccessData(tokens);
-          this.spinner.hide();
-        }),
-        catchError((err) => {
-          console.log('caught error, do logout');
-          console.log(err);
-          this.logout();
-
-          this.router.navigate(['/login']);
-
-          return Observable.throw(err);
-        })
-      );
+    // return this.tokenStorage
+    //   .getRefreshToken()
+    //   .pipe(
+    //     switchMap((refreshToken: string) =>
+    //       this.http.post(environment.api + `refresh`, {})
+    //     ),
+    //     timeout(5000),
+    //     tap((tokens: AccessData) => {
+    //       console.log('got tokens');
+    //       console.log(tokens);
+    //       this.saveAccessData(tokens);
+    //       this.spinner.hide();
+    //     }),
+    //     catchError((err) => {
+    //       console.log('caught error, do logout');
+    //       console.log(err);
+    //       this.logout();
+    //
+    //       this.router.navigate(['/login']);
+    //
+    //       return Observable.throw(err);
+    //     })
+    //   );
+    return of(null);
   }
 
   /**
@@ -182,7 +193,10 @@ export class AuthenticationService implements AuthService {
 
     if (access_data.access_token !== null) {
       console.log('Store access token');
-      this.tokenStorage.setAccessToken(access_data.access_token, new Date);
+
+      const expiry = new Date();
+      expiry.setSeconds(expiry.getSeconds() + access_data.expires_in);
+      this.tokenStorage.setAccessToken(access_data.access_token, expiry);
       this.user = access_data.user;
       localStorage.setItem('user', JSON.stringify(this.user));
       this.authenticationChanged.next(this.user);

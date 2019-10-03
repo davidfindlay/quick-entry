@@ -10,7 +10,17 @@ export class TokenStorage {
    */
   public getAccessToken(): Observable<string> {
     const token: string = <string>localStorage.getItem('accessToken');
-    return of(token);
+    const tokenExpiry = localStorage.getItem('accessTokenExpires');
+    const tokenExpireDate = new Date(tokenExpiry);
+    const now = new Date();
+
+    if (now > tokenExpireDate) {
+      console.log('token.service: getAccessToken: token expired');
+      return of(null);
+    } else {
+      console.log('token.service: getAccessToken: token valid');
+      return of(token);
+    }
   }
 
   /**
@@ -19,6 +29,7 @@ export class TokenStorage {
    */
   public getRefreshToken(): Observable<string> {
     const token: string = <string>localStorage.getItem('accessToken');
+
     return of(token);
   }
 
@@ -28,6 +39,7 @@ export class TokenStorage {
    */
   public setAccessToken(token: string, expires: Date): TokenStorage {
     localStorage.setItem('accessToken', token);
+    localStorage.setItem('accessTokenExpires', expires.toISOString());
 
     return this;
   }
