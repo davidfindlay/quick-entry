@@ -9,5 +9,6 @@ export const environment = {
   // api: 'https://msqprod.davsoft.com.au/api/',
   resultsPortal: 'https://b4wt31qb36.execute-api.ap-southeast-2.amazonaws.com/production/',
   payPalLegacyUrl: 'https://forum.mastersswimmingqld.org.au/swimman/api/paypalpayment.php',
-  paypalApi: 'https://api.sandbox.paypal.com'
+  paypalApi: 'https://api.sandbox.paypal.com',
+  sentryDsn: ''
 };

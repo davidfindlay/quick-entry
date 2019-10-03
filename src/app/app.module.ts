@@ -52,6 +52,7 @@ import { MeetEntryActionComponent } from './meet-entry-action/meet-entry-action.
 import { ClubMemberSelectorComponent } from './club-member-selector/club-member-selector.component';
 
 import * as Sentry from '@sentry/browser';
+import {environment} from '../environments/environment';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -78,7 +79,7 @@ const appRoutes: Routes = [
 ];
 
 Sentry.init({
-  dsn: 'https://42bf4739de1440ff92f4ffd3475ab87a@sentry.io/1768736'
+  dsn: environment.sentryDsn
 });
 
 @Injectable()
