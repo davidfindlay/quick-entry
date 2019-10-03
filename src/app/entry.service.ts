@@ -745,10 +745,12 @@ export class EntryService {
       }
     }
 
-    entrantDetailsFO.emergencyFirstName = meetEntry.member.emergency.firstname;
-    entrantDetailsFO.emergencySurname = meetEntry.member.emergency.surname;
-    entrantDetailsFO.emergencyPhone = meetEntry.member.emergency.phone.phonenumber;
-    entrantDetailsFO.emergencyEmail = ''; // TODO: Fix
+    if (meetEntry.member.emergency !== undefined && meetEntry.meet_entry.emergency !== null) {
+      entrantDetailsFO.emergencyFirstName = meetEntry.member.emergency.firstname;
+      entrantDetailsFO.emergencySurname = meetEntry.member.emergency.surname;
+      entrantDetailsFO.emergencyPhone = meetEntry.member.emergency.phone.phonenumber;
+      entrantDetailsFO.emergencyEmail = ''; // TODO: Fix
+    }
 
     entrantDetailsFO.who = 'me'; // TODO: Temporary
     entryFO.entrantDetails = entrantDetailsFO;

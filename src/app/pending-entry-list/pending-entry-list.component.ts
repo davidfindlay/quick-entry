@@ -78,10 +78,10 @@ export class PendingEntryListComponent implements OnInit {
       this.spinner.show();
       if (change.meet !== this.meetId) {
         this.router.navigate(['/', 'pending-entries', change.meet]);
-        console.log('Selected meet ' + this.meetId);
+        // console.log('Selected meet ' + this.meetId);
       }
 
-      console.log(change);
+      // console.log(change);
 
       if (change.showPending) {
         this.showPending = true;
@@ -115,12 +115,24 @@ export class PendingEntryListComponent implements OnInit {
 
       for (const entry of this.entries) {
         console.log(entry);
+        let club_code = '';
+        let club_name = '';
+
+        if (entry.entrydata.entrantDetails === undefined || entry.entrydata.entrantDetails === null) {
+          continue;
+        }
+
+        if (entry.entrydata.membershipDetails !== undefined && entry.entrydata.membershipDetails !== null) {
+          club_code = entry.entrydata.membershipDetails.club_code;
+          club_name = entry.entrydata.membershipDetails.club_name;
+        }
+
         const row = {
           'id': entry.id,
           'code': entry.code,
           'Entrant': entry.entrydata.entrantDetails.entrantSurname + ', ' + entry.entrydata.entrantDetails.entrantFirstName,
-          'Club':  entry.entrydata.membershipDetails.club_code,
-          'clubname': entry.entrydata.membershipDetails.club_name,
+          'Club':  club_code,
+          'clubname': club_name,
           'Status': entry.status.label,
           'Reason': entry.pending_reason,
           'Updated': entry.updated_at

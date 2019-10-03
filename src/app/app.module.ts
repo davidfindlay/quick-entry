@@ -1,5 +1,5 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
+import {ErrorHandler, Injectable, NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -51,6 +51,8 @@ import {MemberService} from './member.service';
 import { MeetEntryActionComponent } from './meet-entry-action/meet-entry-action.component';
 import { ClubMemberSelectorComponent } from './club-member-selector/club-member-selector.component';
 
+import * as Sentry from '@sentry/browser';
+
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
     { path: 'login', component: LoginComponent },
@@ -74,6 +76,20 @@ const appRoutes: Routes = [
   { path: 'pending-entry/:pendingId', component: PendingEntryActionComponent },
     { path: '**', component: MeetListComponent }
 ];
+
+Sentry.init({
+  dsn: 'https://42bf4739de1440ff92f4ffd3475ab87a@sentry.io/1768736'
+});
+
+@Injectable()
+export class SentryErrorHandler implements ErrorHandler {
+  constructor() {}
+  handleError(error) {
+    const eventId = Sentry.captureException(error.originalError || error);
+    Sentry.showReportDialog({ eventId });
+  }
+}
+
 
 @NgModule({
     declarations: [
@@ -126,7 +142,8 @@ const appRoutes: Routes = [
         EntryService,
       TimePipe,
       MeetEntryStatusService,
-      MemberService
+      MemberService,
+      { provide: ErrorHandler, useClass: SentryErrorHandler }
     ],
     bootstrap: [AppComponent]
 })
