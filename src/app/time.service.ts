@@ -53,7 +53,10 @@ export class TimeService {
       const timeArray = timeString.split(':');
 
       // Check how many colons are in the time
-      if (timeArray.length === 2) {
+      if (timeArray.length === 3) {
+        seconds = (parseFloat(timeArray[0]) * 3600) + (parseFloat(timeArray[1]) * 60) + parseFloat(timeArray[2]);
+
+      } else if (timeArray.length === 2) {
 
         // Time in minutes and seconds
         seconds = (parseFloat(timeArray[0]) * 60) + parseFloat(timeArray[1]);
