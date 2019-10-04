@@ -135,6 +135,7 @@ export class MembershipClubDetailsComponent implements OnInit {
     this.memberDetailsForm.controls['member_type'].valueChanges.subscribe(val => {
       if (val === 'non_member') {
         this.showClubDetailsSection = false;
+        this.showMemberNumberField = false;
       } else {
         this.showClubDetailsSection = true;
       }
