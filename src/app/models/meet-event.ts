@@ -1,6 +1,9 @@
 /**
  * Created by david on 7/9/17.
  */
+import {EventType} from './event-type';
+import {EventDistance} from './event-distance';
+import {EventDiscipline} from './event-discipline';
 
 export class MeetEvent {
 
@@ -15,7 +18,15 @@ export class MeetEvent {
     eventname: string;
     prognumber: string;
     progsuffix: string;
-    eventfee: string;
+    eventfee: number;
+    eventfee_non_member: number;
     deadline: string;
+    exhibition: boolean;
+    freetime: boolean;
+    times_required: boolean;
+
+    event_type: EventType;
+    event_distance: EventDistance;
+    event_discipline: EventDiscipline;
 
 }

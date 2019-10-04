@@ -22,7 +22,7 @@
   </div>
 
   <form [formGroup]="seedTimeForm">
-    <div class="card">
+    <div class="card" *ngIf="!freetime || !historyAvailable">
       <div class="card-header">
         <h4>
           Enter a time
@@ -47,13 +47,13 @@
             <input type="text" id="millis" class="form-control" formControlName="millis" placeholder="00"/>
           </div>
         </div>
-        <div class="row p-1 m-1">
-          <strong>Formatted Time:</strong>
-          {{formattedTime}}
-        </div>
       </div>
     </div>
   </form>
+  <div class="row p-1 m-1">
+    <strong>Formatted Time:</strong>
+    {{formattedTime}}
+  </div>
   <div class="card" *ngIf="historyAvailable">
     <div class="card-header">
       <h4>
@@ -73,7 +73,7 @@
                 <th>Time</th>
               </tr>
               </thead>
-              <tr *ngFor="let pb of pbRows" (click)="selectResultRow(pb.seconds)" class="resultRow">
+              <tr *ngFor="let pb of pbRows; let i = index" (click)="selectResultRow(pb.seconds, i)" class="resultRow">
                 <td>{{pb.event_date | date: 'dd/MM/yyyy'}}</td>
                 <td>{{pb.age_min}}-{{pb.age_max}}</td>
                 <td>{{pb.location}}</td>
@@ -94,7 +94,7 @@
                 <th>Time</th>
               </tr>
               </thead>
-              <tr *ngFor="let pb of recentRows" (click)="selectResultRow(pb.seconds)" class="resultRow">
+              <tr *ngFor="let pb of recentRows; let i = index" (click)="selectResultRow(pb.seconds, i)" class="resultRow">
                 <td>{{pb.event_date | date: 'dd/MM/yyyy'}}</td>
                 <td>{{pb.age_min}}-{{pb.age_max}}</td>
                 <td>{{pb.location}}</td>

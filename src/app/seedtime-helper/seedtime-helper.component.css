@@ -1,3 +1,7 @@
 tr.resultRow:hover {
   background-color: lightcyan;
 }
+
+tr.selectedRow {
+  background-color: lightgrey;
+}

@@ -6,14 +6,12 @@ import {Subject} from 'rxjs/Subject';
 import {User} from './models/user';
 import { AuthService } from 'ngx-auth';
 import {HttpClient, HttpErrorResponse, HttpResponse} from '@angular/common/http';
-import {EnvironmentSpecificService} from './environment-specific.service';
-import {EnvSpecific} from './models/env-specific';
+
+import { environment } from '../environments/environment';
 
 
 @Injectable()
 export class AuthenticationService implements AuthService {
-  private api;
-
   public token: string;
   public user: User;
 
@@ -21,9 +19,7 @@ export class AuthenticationService implements AuthService {
 
   authenticationChanged = new Subject<User>();
 
-  constructor(private http: HttpClient,
-              private envSpecificSvc: EnvironmentSpecificService) {
-    envSpecificSvc.subscribe(this, this.setApi);
+  constructor(private http: HttpClient) {
       const currentUser = localStorage.getItem('currentUser');
 
       if (currentUser) {
@@ -37,13 +33,8 @@ export class AuthenticationService implements AuthService {
       }
   }
 
-  setApi(caller: any, es: EnvSpecific) {
-    const thisCaller = caller as AuthenticationService;
-    thisCaller.api = es.api;
-  }
-
   login(username: string, password: string): Observable<boolean> {
-    return this.http.post(this.api + 'auth/login',
+    return this.http.post(environment.api + 'auth/login',
         JSON.stringify({username: username, password: password}))
         .map((response: any) => {
         // Login successful if there's a JWT in the response
@@ -115,7 +106,7 @@ export class AuthenticationService implements AuthService {
         const refreshToken: string = localStorage.getItem('refreshToken');
 
         return this.http
-            .post(this.api + 'auth/refresh-token', { refreshToken });
+            .post(environment.api + 'auth/refresh-token', { refreshToken });
     }
 
     public refreshShouldHappen(response: HttpErrorResponse): boolean {

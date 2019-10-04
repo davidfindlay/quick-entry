@@ -2,7 +2,7 @@
   <div class="row align-items-center no-gutters">
     <div class="col-md-2 h-100 eventSelect">
       <button type="button" [className]="enterClass" (click)="clickEnter()" (mouseenter)="mouseEnter()"
-              (mouseleave)="mouseLeave()" id="btnEnter" aria-label="eventAriaLabel">
+              (mouseleave)="mouseLeave()" id="btnEnter" [disabled]="enterButtonDisabled" aria-label="eventAriaLabel">
         <fa-icon [icon]="btnIconClass" *ngIf="btnIconClass != null"></fa-icon>
         {{enterText}}</button>
     </div>
@@ -12,12 +12,14 @@
     <div class="col-md-9 h-100">
       <div class="card-body">
           <span class="eventName">
-          <span *ngIf="meetEvent.legs > 1">{{meetEvent.legs}}x</span>{{meetEvent.distance}}
-            {{meetEvent.discipline}}
+            <span *ngIf="hasEventName()">{{meetEvent.eventname}}: </span>
+          <span *ngIf="meetEvent.legs > 1">{{meetEvent.legs}}x</span>{{meetEvent.event_distance.distance}}
+            {{meetEvent.event_discipline.discipline}}
             </span>
-        <br/>{{meetEvent.type}}
+        <br/>{{meetEvent.event_type.typename}}
+        <span *ngIf="meetEvent.exhibition"><br />Exhibition Event</span>
 
-        <div class="card mb-3 bg-info text-white" *ngIf="meetEvent.type.includes('Postal') && eventSelected()">
+        <div class="card mb-3 bg-info text-white" *ngIf="isPostal() && eventSelected()">
           <div class="card-body">
             <p class="card-text">
               No seed time is required for this event. Please ensure you lodge a postal form
@@ -25,7 +27,7 @@
             </p>
           </div>
         </div>
-        <div class="card mb-3 bg-info text-white" *ngIf="meetEvent.type.includes('Relay') && eventSelected()">
+        <div class="card mb-3 bg-info text-white" *ngIf="isRelay() && eventSelected()">
           <div class="card-body">
             <p class="card-text">
               Nominating for a relay team does not necessarily mean you'll be placed in a team. It simply indicates
@@ -35,23 +37,65 @@
           </div>
         </div>
 
+        <div class="card mb-3 bg-warning text-white" *ngIf="meetEvent.times_required && entry.seconds === 0 && eventSelected()">
+          <div class="card-body">
+            <p class="card-text">
+              The rules for this event require you to supply a valid seed time. No time(NT) is not allowed.
+            </p>
+          </div>
+        </div>
+
+        <div class="card mb-3 bg-warning text-white" *ngIf="seedTimeTooShort && eventSelected()">
+          <div class="card-body">
+            <p class="card-text">
+              The seed time you have supplied for this event is unreasonably short. Please check your time. Use the More
+              button for help.
+            </p>
+          </div>
+        </div>
+
+        <div class="card mb-3 bg-danger text-white" *ngIf="seedTimeMandatory && seedTimeNT && eventSelected()">
+          <div class="card-body">
+            <p class="card-text">
+              This event does not allow No Time entries. An entry seed time must supplied.
+            </p>
+          </div>
+        </div>
+
+        <div class="card mb-3 bg-warning text-white" *ngIf="seedTimeTooLong && eventSelected()">
+          <div class="card-body">
+            <p class="card-text">
+              The seed time you have supplied for this event is unreasonably long. Please check your time. Use the More
+              button for help.
+            </p>
+          </div>
+        </div>
+
+        <div class="card mb-3 bg-info text-white" *ngIf="meetEvent.freetime && historyAvailable && eventSelected()">
+          <div class="card-body">
+            <p class="card-text">
+              The rules for this event require you to select one of the Personal Bests or Recent Times supplied. Click PB, LT or More.
+            </p>
+          </div>
+        </div>
+
         <div class="form-group row mt-2"
-             *ngIf="eventSelected() && meetEvent.type.includes('Finals')">
+             *ngIf="eventSelected() && seedTimeRequired">
 
           <label for="seedTime" class="col-sm-3 col-form-label">Seed Time:</label>
 
           <div class="input-group col-sm-9">
             <input type="text" class="form-control" id="seedTime" formControlName="seedTime"
                    ngbTooltip triggers="manual" #seedTimeTip="ngbTooltip" placement="bottom"
-                   (blur)="fixSeedTime()">
+                   (blur)="fixSeedTime()" (keyup.enter)="enterPressed($event)">
             <div class="input-group-append">
-              <button class="btn btn-outline-info" placement="bottom" ngbTooltip="Personal Best"
+              <button type="button" class="btn btn-outline-info" placement="bottom" ngbTooltip="Personal Best"
                       (click)="clickPersonalBest()" *ngIf="historyAvailable">PB
               </button>
-              <button class="btn btn-outline-info" placement="bottom" ngbTooltip="Last Result Time"
+              <button type="button" class="btn btn-outline-info" placement="bottom" ngbTooltip="Last Result Time"
                       (click)="clickLastTime()" *ngIf="historyAvailable">LT
               </button>
-              <button class="btn btn-outline-info" placement="bottom" ngbTooltip="More Options"
+              <button type="button" class="btn btn-outline-info" placement="bottom" ngbTooltip="More Options"
                       (click)="clickMore()">More
               </button>
             </div>

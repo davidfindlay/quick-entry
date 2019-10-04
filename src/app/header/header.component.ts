@@ -4,6 +4,7 @@ import {User} from '../models/user';
 import {UserService} from '../user.service';
 import {AuthenticationService} from '../authentication/authentication.service';
 import {Subscription} from 'rxjs/Subscription';
+import {EntryService} from '../entry.service';
 
 @Component({
   selector: 'app-header',
@@ -19,7 +20,8 @@ export class HeaderComponent implements OnInit {
   isExpanded = false;
 
   constructor(private userService: UserService,
-              private authenticationService: AuthenticationService) {
+              private authenticationService: AuthenticationService,
+              private entryService: EntryService) {
   }
 
   ngOnInit() {
@@ -42,6 +44,8 @@ export class HeaderComponent implements OnInit {
     console.log('onLogOutClick()');
 
     this.authenticationService.logout();
+    this.entryService.clear();
+
     this.updateDisplayName();
 
   }
@@ -57,5 +61,10 @@ export class HeaderComponent implements OnInit {
       this.displayName = '';
     }
   }
+
+  openSidebar() {
+
+  }
+
 
 }

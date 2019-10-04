@@ -1,10 +1,11 @@
 <fieldset class="qe-fieldset">
   <div class="d-flex justify-content-between">
-    <button type="button" class="btn btn-primary" id="btnBack" (click)="clickBack()">Back</button>
+    <button type="button" class="btn btn-primary" id="btnBack" (click)="clickBack()" [disabled]="btnBackDisable">Back</button>
     <div>
-      <button type="button" class="btn btn-danger" id="btnCancel" (click)="clickCancel()">Cancel</button>
-      <button type="button" class="btn btn-secondary" id="btnSave" (click)="clickSaveAndExit()">Save and Exit</button>
+      <button type="button" class="btn btn-danger" id="btnCancel" (click)="clickCancel()" [disabled]="btnCancelDisable">Cancel</button>
+      <button type="button" class="btn btn-secondary" id="btnSave" (click)="clickSaveAndExit()" [disabled]="btnSaveDisable">Save and Exit</button>
     </div>
-    <button type="submit" class="btn btn-success" id="btnNext" (click)="clickNext()" [disabled]="btnNextDisable">Next</button>
+    <button type="submit" class="btn btn-success" id="btnNext" (click)="clickNext()" [disabled]="btnNextDisable" *ngIf="showNextButton">{{nextText}}</button>
+    <button type="submit" class="btn btn-success" id="btnFinish" (click)="clickFinish()" *ngIf="showFinishButton">Finish</button>
   </div>
 </fieldset>

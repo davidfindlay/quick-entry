@@ -1,5 +1,5 @@
-<h1>Step 4</h1>
-<h2>Entry Details</h2>
+<h1>Enter {{meetName}}</h1>
+<h2>Event Details</h2>
 <form [formGroup]="entryDetailsForm">
 
   <div class="card mb-3 bg-info text-white">
@@ -22,8 +22,7 @@
       </ul>
       <p class="card-text">
         If you supply no time you'll be placed in the slowest heat of the event. Note: you can supply a seed time even
-        if
-        it's the first time you've competed in this event. Just choose a time you've recorded in training.
+        if it's the first time you've competed in this event. Just choose a time you've recorded in training.
       </p>
     </div>
   </div>
@@ -34,14 +33,18 @@
         Meet Rules:
       </h4>
       <p class="card-text">
-        You may enter 5 events.
-      </p>
+        <ul>
+      <li>You may enter {{meet.maxevents}} individual events.</li>
+      <li *ngFor="let rule of rules">
+        {{rule}}
+      </li>
+    </ul>
     </div>
   </div>
 
   <div class="card">
     <div class="card-header">
-      <h2>Event List</h2>
+      <h2>{{meetName}} - Event List</h2>
     </div>
     <div class="card-body">
       <div *ngFor="let e of this.meet.events; let i = index">

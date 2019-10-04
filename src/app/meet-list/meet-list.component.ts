@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MeetService} from '../meet.service';
 import {Meet} from '../models/meet';
+import {EntryService} from '../entry.service';
+import {UserService} from '../user.service';
 
 @Component({
     selector: 'app-meet-list',
@@ -12,7 +14,9 @@ export class MeetListComponent implements OnInit {
     openMeets: Meet[];
     meetSub;
 
-    constructor(private meetService: MeetService) {
+    constructor(private meetService: MeetService,
+                private entryService: EntryService,
+                private userService: UserService) {
     }
 
     ngOnInit() {
@@ -30,6 +34,11 @@ export class MeetListComponent implements OnInit {
               this.sortMeets();
         });
 
+
+        if (this.userService.isLoggedIn()) {
+          this.entryService.retrieveIncompleteEntries();
+          this.entryService.retrieveSubmittedEntries();
+        }
     }
 
   sortMeets() {

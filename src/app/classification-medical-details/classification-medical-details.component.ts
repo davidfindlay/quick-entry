@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PlatformLocation} from '@angular/common';
@@ -10,6 +10,8 @@ import {ReplaySubject, Subject} from 'rxjs';
 import {MembershipDetails} from '../models/membership-details';
 import {EntryService} from '../entry.service';
 import {MedicalDetails} from '../models/medical-details';
+import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
+import {EntryFormObject} from '../models/entry-form-object';
 
 @Component({
   selector: 'app-classification-medical-details',
@@ -18,6 +20,7 @@ import {MedicalDetails} from '../models/medical-details';
 })
 export class ClassificationMedicalDetailsComponent implements OnInit {
 
+  @ViewChild(WorkflowNavComponent, {static: true}) workflow: WorkflowNavComponent;
   public formValidSubject: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
   meet_id: number;
@@ -76,26 +79,20 @@ export class ClassificationMedicalDetailsComponent implements OnInit {
       this.formValidSubject.next(false);
     }
 
-    const existingEntry = this.getExistingEntry();
-
-    if (existingEntry != null) {
-      console.log('Got existing entry');
-      console.log(existingEntry);
-      this.medicalDetailsForm.patchValue(existingEntry);
-    }
+    this.getExistingEntry();
 
   }
 
   getExistingEntry() {
-    const entry = this.entryService.getEntry(this.meet_id);
-    console.log(entry);
-    if (entry !== undefined && entry !== null) {
-      const medicalDetails = entry.medicalDetails;
-      if (medicalDetails !== undefined && medicalDetails != null) {
-        return medicalDetails;
+    this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((entry: EntryFormObject) => {
+      console.log(entry);
+      if (entry !== undefined && entry !== null) {
+        const medicalDetails = entry.medicalDetails;
+        if (medicalDetails !== undefined && medicalDetails != null) {
+          this.medicalDetailsForm.patchValue(medicalDetails);
+        }
       }
-    }
-    return null;
+    });
   }
 
   onSubmit($event) {
@@ -104,17 +101,22 @@ export class ClassificationMedicalDetailsComponent implements OnInit {
         this.entryService.deleteEntry(this.meet_id);
         break;
       case 'saveAndExit':
-        this.saveEntry();
+        this.saveEntry(false);
         break;
       case 'submit':
-        this.saveEntry();
+        this.saveEntry(true);
         break;
     }
   }
 
-  saveEntry() {
+  saveEntry(advance) {
     const medicalDetails: MedicalDetails = Object.assign({}, this.medicalDetailsForm.value);
-    this.entryService.setMedicalDetails(this.meet_id, medicalDetails);
+    this.entryService.setMedicalDetails(this.meet_id, medicalDetails).subscribe((updated) => {
+      console.log(updated);
+      if (advance) {
+        this.workflow.navigateNext();
+      }
+    });
   }
 
 }

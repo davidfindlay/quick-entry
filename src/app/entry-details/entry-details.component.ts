@@ -1,13 +1,15 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {MeetService} from '../meet.service';
 import {UserService} from '../user.service';
 import {PlatformLocation} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
-import {Subject} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 import {Meet} from '../models/meet';
 import {EntryService} from '../entry.service';
-import {Entry} from '../models/entry';
+import {EntryFormObject} from '../models/entry-form-object';
+import {IncompleteEntry} from '../models/incomplete_entry';
+import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
 
 @Component({
     selector: 'app-entry-details',
@@ -16,13 +18,16 @@ import {Entry} from '../models/entry';
 })
 export class EntryDetailsComponent implements OnInit {
 
-  public formValidSubject: Subject<boolean> = new Subject<boolean>();
+  @ViewChild(WorkflowNavComponent, {static: true}) workflow: WorkflowNavComponent;
+  public formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     entryDetailsForm: FormGroup;
 
     meet_id;
     meet: Meet;
     meetName;
+
+    rules = [];
 
     isAnonymousEntry = true;
 
@@ -43,21 +48,38 @@ export class EntryDetailsComponent implements OnInit {
             this.meetName = this.meet.meetname;
         }
 
-        console.log('Meet: ' + this.meetName);
-
-        console.log(this.meet);
+        if (this.meet.events === undefined || this.meet.events === null) {
+          this.meetService.getMeetDetails(this.meet).subscribe((updated) => {
+            console.log('Got Meet Details');
+            console.log(updated);
+            this.meet = updated;
+          });
+        }
 
         this.createForm();
 
         // Monitor changes to the entry
-      this.entryService.entriesChanged.subscribe((entries: Entry[]) => {
-        const meetEntry = entries.filter(x => x.meetId === this.meet_id);
-        console.log(meetEntry);
+      this.entryService.incompleteChanged.subscribe((entries: IncompleteEntry[]) => {
+        const meetEntry = entries.filter(x => x.meet_id === this.meet_id);
         if (meetEntry !== null && meetEntry.length === 1) {
-          console.log(meetEntry);
-          this.formValidSubject.next(meetEntry[0].validEvents);
+          // console.log('valid events: ');
+          // console.log(meetEntry[0].entrydata.validEvents);
+          this.formValidSubject.next(meetEntry[0].entrydata.validEvents);
         }
       });
+
+      this.entryService.checkEvents(this.meet_id);
+
+      console.log(this.meet.groups);
+      if (this.meet.groups !== undefined && this.meet.groups !== null) {
+        for (const group of this.meet.groups) {
+          for (const rule of group.rules) {
+            if (!this.rules.includes(rule.rule)) {
+              this.rules.push(rule.rule);
+            }
+          }
+        }
+      }
 
     }
 
@@ -89,16 +111,19 @@ export class EntryDetailsComponent implements OnInit {
           this.entryService.deleteEntry(this.meet_id);
           break;
         case 'saveAndExit':
-          this.saveEntry();
+          this.saveEntry(false);
           break;
         case 'submit':
-          this.saveEntry();
+          this.saveEntry(true);
           break;
       }
     }
 
-    saveEntry() {
+    saveEntry(advance) {
       this.entryService.storeEntries();
+      if (advance) {
+        this.workflow.navigateNext();
+      }
     }
 
 }

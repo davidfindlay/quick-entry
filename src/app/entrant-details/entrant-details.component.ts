@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {PlatformLocation} from '@angular/common';
 import {UserService} from '../user.service';
@@ -6,11 +6,12 @@ import {Subscription} from 'rxjs/Subscription';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MeetService} from '../meet.service';
 import {AuthenticationService} from '../authentication/authentication.service';
-import {Entry} from '../models/entry';
+import {EntryFormObject} from '../models/entry-form-object';
 import {EntryService} from '../entry.service';
 import {EntrantDetails} from '../models/entrant-details';
 import {BehaviorSubject, Subject} from 'rxjs';
-import {Behavior} from 'popper.js';
+import {RegisterUser} from '../models/register-user';
+import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
 
 @Component({
   selector: 'app-entrant-details',
@@ -19,6 +20,7 @@ import {Behavior} from 'popper.js';
 })
 export class EntrantDetailsComponent implements OnInit {
 
+  @ViewChild(WorkflowNavComponent, {static: true}) workflow: WorkflowNavComponent;
   public formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   meet_id: number;
@@ -26,7 +28,7 @@ export class EntrantDetailsComponent implements OnInit {
   meetSub: Subscription;
   meetName: String = '';
 
-  entry: Entry;
+  entry: EntryFormObject;
 
   entrantDetailsForm: FormGroup;
   inlineLoginForm: FormGroup;
@@ -42,6 +44,14 @@ export class EntrantDetailsComponent implements OnInit {
   isThirdPartyEntry = false;
   isAnonymousEntry = false;
   isMemberEntry = false;
+
+  missingEmergency = false;
+
+  existingSubmittedEntry = false;
+  existingSubmittedEntryId;
+
+  unableToRegister = false;
+  registeredUsername = null;
 
   constructor(private fb: FormBuilder,
               private route: ActivatedRoute,
@@ -78,11 +88,15 @@ export class EntrantDetailsComponent implements OnInit {
     console.log('Meet: ' + this.meetName);
 
     this.createForm();
+    this.getExistingEntry();
 
-    const existingEntry = this.getExistingEntry();
-
-    if (existingEntry != null) {
-      this.entrantDetailsForm.patchValue(existingEntry);
+    if (this.entryService.getSubmittedEntries(this.meet_id) !== undefined
+      && this.entryService.getSubmittedEntries(this.meet_id) !== null) {
+      this.existingSubmittedEntry = true;
+      this.existingSubmittedEntryId = this.entryService.getSubmittedEntries(this.meet_id).id;
+      this.entrantDetailsForm.patchValue({
+        who: 'me-edit'
+      });
     }
 
     if (this.authenticationService.getUser() == null) {
@@ -98,10 +112,7 @@ export class EntrantDetailsComponent implements OnInit {
       this.member = this.userService.getMember();
     }
 
-    // Get details from user account
-    if (this.userService.isLoggedIn()) {
-      this.prefillFromUser();
-    }
+
 
   }
 
@@ -115,7 +126,7 @@ export class EntrantDetailsComponent implements OnInit {
       gender = 'female';
     }
 
-    if (this.entrantDetailsForm.controls.who.value === 'me') {
+    if (this.entrantDetailsForm.controls.who.value === 'me' || this.entrantDetailsForm.controls.who.value === 'me-edit') {
       this.entrantDetailsForm.patchValue({
         entrantFirstName: userDetails.firstname,
         entrantSurname: userDetails.surname,
@@ -128,25 +139,45 @@ export class EntrantDetailsComponent implements OnInit {
         emergencyPhone: userDetails.emergency_phone,
         emergencyEmail: userDetails.emergency_email
       });
-    } else {
+      if (userDetails.emergency_surname === null || userDetails.emergency_surname === '') {
+        this.missingEmergency = true;
+      }
+    } else if (this.entrantDetailsForm.controls.who.value === 'else') {
       this.entrantDetailsForm.patchValue({
+        entrantFirstName: '',
+        entrantSurname: '',
+        entrantDob: '',
+        entrantGender: '',
+        entrantEmail: '',
+        entrantPhone: '',
+        emergencyFirstName: '',
+        emergencySurname: '',
+        emergencyPhone: '',
+        emergencyEmail: '',
         userFirstName: userDetails.firstname,
         userSurname: userDetails.surname,
         userEmail: userDetails.email,
         userPhone: userDetails.phone
       });
     }
+
+    console.log(this.entrantDetailsForm);
   }
 
   getExistingEntry() {
-    const entry = this.entryService.getEntry(this.meet_id);
-    if (entry !== undefined && entry !== null) {
-      const entrantDetails = entry.entrantDetails;
-      if (entrantDetails !== undefined && entrantDetails != null) {
-        return entrantDetails;
+    this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((entry: EntryFormObject) => {
+      if (entry !== undefined && entry !== null) {
+        const entrantDetails = entry.entrantDetails;
+        if (entrantDetails !== undefined && entrantDetails != null) {
+          this.entrantDetailsForm.patchValue(entrantDetails);
+        } else {
+          // Get details from user account
+          if (this.userService.isLoggedIn()) {
+            this.prefillFromUser();
+          }
+        }
       }
-    }
-    return null;
+    });
   }
 
   loadMembershipData() {
@@ -167,7 +198,7 @@ export class EntrantDetailsComponent implements OnInit {
 
     this.inlineRegisterForm = this.fb.group({
       register: ['no'],
-      usernameRegister: '',
+      usernameRegister: {value: '', disabled: true},
       password: '',
       confirmpassword: ''
     });
@@ -211,12 +242,22 @@ export class EntrantDetailsComponent implements OnInit {
 
     // Handle change from who from me to else
     this.entrantDetailsForm.controls['who'].valueChanges.subscribe(val => {
+      // Get details from user account
+      if (this.userService.isLoggedIn()) {
+        this.prefillFromUser();
+      }
+
       if (val === 'me') {
         this.inlineRegisterForm.patchValue({
           usernameRegister: this.entrantDetailsForm.value.entrantEmail
         });
         this.isThirdPartyEntry = false;
       }
+
+      if (val === 'me-edit') {
+        this.isThirdPartyEntry = false;
+      }
+
       // Maintain value for new registration usernames
       if (val === 'else') {
         this.inlineRegisterForm.patchValue({
@@ -224,13 +265,40 @@ export class EntrantDetailsComponent implements OnInit {
         });
         this.isThirdPartyEntry = true;
       }
+
     });
 
     this.entrantDetailsForm.valueChanges.subscribe(val => {
+      if (val === 'me') {
+        this.inlineRegisterForm.patchValue({
+          registerUsername: this.entrantDetailsForm.contains['entrantEmail'].value
+        });
+      }
+
+      if (val === 'else') {
+        this.inlineRegisterForm.patchValue({
+          registerUsername: this.entrantDetailsForm.contains['userEmail'].value
+        });
+      }
+
       if (this.entrantDetailsForm.valid) {
-        this.formValidSubject.next(true);
+        if (this.inlineRegisterForm.controls['register'].value === 'yes') {
+          this.formValidSubject.next(false);
+        } else {
+          this.formValidSubject.next(true);
+        }
       } else {
         this.formValidSubject.next(false);
+      }
+    });
+
+    this.inlineRegisterForm.valueChanges.subscribe(val => {
+      if (val.register === 'yes') {
+        this.formValidSubject.next(false);
+      } else {
+        if (this.entrantDetailsForm.valid) {
+          this.formValidSubject.next(true);
+        }
       }
     });
 
@@ -278,13 +346,15 @@ export class EntrantDetailsComponent implements OnInit {
 
     switch ($event) {
       case 'cancel':
+        console.log('cancel');
         this.entryService.deleteEntry(this.meet_id);
         break;
       case 'saveAndExit':
-        this.saveEntry();
+        this.saveEntry(false);
         break;
       case 'submit':
-        this.saveEntry();
+        console.log('submit');
+        this.saveEntry(true);
         break;
     }
 
@@ -327,12 +397,127 @@ export class EntrantDetailsComponent implements OnInit {
         });
   }
 
-  saveEntry() {
+  saveEntry(advance) {
+    if (this.existingSubmittedEntry) {
+      this.entryService.editSubmittedEntry(this.existingSubmittedEntryId).subscribe((edit: any) => {
+        this.processSave(advance);
+      });
+    } else {
+      this.processSave(advance);
+    }
+  }
+
+  processSave(advance) {
     const entrantDetails: EntrantDetails = Object.assign({}, this.entrantDetailsForm.value);
-    this.entry = new Entry();
-    this.entry.entrantDetails = entrantDetails;
-    this.entry.meetId = this.meet_id;
-    this.entryService.addEntry(this.entry);
+
+    // Check for existing entry
+    this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((existingEntry: EntryFormObject) => {
+      if (existingEntry == null) {
+        console.log('Create new EntryFormObject');
+        this.entry = new EntryFormObject();
+      } else {
+        console.log('Get existing EntryFormObject');
+        console.log(existingEntry);
+        this.entry = existingEntry;
+      }
+
+      this.entry.entrantDetails = entrantDetails;
+      this.entry.meetId = this.meet_id;
+      this.entryService.addEntry(this.entry).subscribe((incompleteEntry) => {
+        console.log(incompleteEntry);
+        if (advance) {
+          this.workflow.navigateNext();
+        }
+      });
+    });
+  }
+
+  register() {
+
+    let newUser;
+
+    if (this.inlineRegisterForm.controls.confirmpassword.touched) {
+      if (this.inlineRegisterForm.controls.password.value !== this.inlineRegisterForm.controls.confirmpassword.value) {
+        console.log('Passwords don\'t match');
+        return;
+      }
+    }
+
+    if (this.entrantDetailsForm.controls.who.value === 'me') {
+
+      let genderLetter;
+      if (this.entrantDetailsForm.controls.entrantGender.value === 'male') {
+        genderLetter = 'M';
+      } else {
+        genderLetter = 'F';
+      }
+
+      newUser = <RegisterUser>{
+        email: this.entrantDetailsForm.controls.entrantEmail.value,
+        password: this.inlineRegisterForm.controls.password.value,
+        confirmPassword: this.inlineRegisterForm.controls.confirmpassword.value,
+        firstname: this.entrantDetailsForm.controls.entrantFirstName.value,
+        surname: this.entrantDetailsForm.controls.entrantSurname.value,
+        dob: this.entrantDetailsForm.controls.entrantDob.value,
+        gender: genderLetter,
+        phone: this.entrantDetailsForm.controls.entrantPhone.value,
+        emergency_firstname: this.entrantDetailsForm.controls.emergencyFirstName.value,
+        emergency_surname: this.entrantDetailsForm.controls.emergencySurname.value,
+        emergency_phone: this.entrantDetailsForm.controls.emergencyPhone.value,
+        emergency_email: this.entrantDetailsForm.controls.emergencyEmail.value
+      };
+
+
+    } else if (this.entrantDetailsForm.controls.who.value === 'else') {
+
+      let genderLetter;
+      if (this.entrantDetailsForm.controls.entrantGender.value === 'male') {
+        genderLetter = 'M';
+      } else {
+        genderLetter = 'F';
+      }
+
+      newUser = <RegisterUser>{
+        email: this.entrantDetailsForm.controls.userEmail.value,
+        password: this.inlineRegisterForm.controls.password.value,
+        confirmPassword: this.inlineRegisterForm.controls.confirmpassword.value,
+        firstname: this.entrantDetailsForm.controls.userFirstName.value,
+        surname: this.entrantDetailsForm.controls.userSurname.value,
+        dob: null,
+        gender: null,
+        phone: this.entrantDetailsForm.controls.userPhone.value,
+        emergency_firstname: null,
+        emergency_surname: null,
+        emergency_phone: null,
+        emergency_email: null
+      };
+
+      this.userService.register(newUser).subscribe((userRegistration: any) => {
+        if (!userRegistration.success) {
+          console.log('unable to register');
+          this.unableToRegister = true;
+        } else {
+          console.log('registered');
+          this.unableToRegister = false;
+          this.isAnonymousEntry = false;
+          this.registeredUsername = userRegistration.user.email;
+          this.inlineRegisterForm.patchValue({'register': 'no'});
+        }
+      });
+    }
+
+    this.userService.register(newUser).subscribe((userRegistration: any) => {
+      if (!userRegistration.success) {
+        console.log('unable to register');
+        this.unableToRegister = true;
+      } else {
+        console.log('registered');
+        this.unableToRegister = false;
+        this.isAnonymousEntry = false;
+        this.registeredUsername = userRegistration.user.email;
+        this.inlineRegisterForm.patchValue({'register': 'no'});
+      }
+    });
   }
 
 }

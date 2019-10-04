@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PlatformLocation} from '@angular/common';
@@ -12,6 +12,8 @@ import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {debounceTime, map, pluck} from 'rxjs/operators';
 import {distinctUntilChanged} from 'rxjs/operators';
 import {ClubsService} from '../clubs.service';
+import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
+import {EntryFormObject} from '../models/entry-form-object';
 
 @Component({
   selector: 'app-membership-club-details',
@@ -20,6 +22,7 @@ import {ClubsService} from '../clubs.service';
 })
 export class MembershipClubDetailsComponent implements OnInit {
 
+  @ViewChild(WorkflowNavComponent, {static: true}) workflow: WorkflowNavComponent;
   public formValidSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   meet_id: number;
@@ -48,7 +51,7 @@ export class MembershipClubDetailsComponent implements OnInit {
     text$.pipe(
       debounceTime(200),
       distinctUntilChanged(),
-      map(term => term.length < 2 ? [] : this.clubsService.findClubName(term)),
+      map(term => term.length < 2 ? [] : this.clubsService.findClubName(term))
     );
 
   constructor(private fb: FormBuilder,
@@ -78,47 +81,43 @@ export class MembershipClubDetailsComponent implements OnInit {
       this.meetName = this.meet.meetname;
     }
 
-    const existingEntry = this.getExistingEntry();
-
-    if (existingEntry != null) {
-      console.log('Got existing entry');
-      console.log(existingEntry);
-      this.memberDetailsForm.patchValue(existingEntry);
-    }
-
     if (this.userService.isMember()) {
-      console.log('this is a member entry');
-      this.isMemberEntry = true;
-    }
-
-    this.currentEntry = this.entryService.getEntry(this.meet_id);
-
-    if (this.currentEntry.entrantDetails.who === 'else') {
-      this.isThirdPartyEntry = true;
-    }
-
-    if (this.userService.isMember()) {
+      // Got member entry
+      console.log('Got member entry');
       this.isMemberEntry = true;
 
       this.member = this.userService.getMember();
       this.currentMemberships = this.userService.getCurrentMemberships();
       this.previousMemberships = this.userService.getPreviousMemberships();
+
+      if (this.currentMemberships.length > 0) {
+        const firstValue = this.currentMemberships[0].club.id;
+        console.log('first club id: ' + firstValue);
+        this.memberDetailsForm.patchValue({
+          club_selector: firstValue
+        });
+      }
     }
 
-    this.clubsService.loadClubs();
+    // this.clubsService.loadClubs();
+    this.getExistingEntry();
 
   }
 
   getExistingEntry() {
-    const entry = this.entryService.getEntry(this.meet_id);
-    console.log(entry);
-    if (entry !== undefined && entry !== null) {
-      const membershipDetails = entry.membershipDetails;
-      if (membershipDetails !== undefined && membershipDetails != null) {
-        return membershipDetails;
+    this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((entry: EntryFormObject) => {
+      console.log(entry);
+      if (entry !== undefined && entry !== null) {
+        const membershipDetails = entry.membershipDetails;
+        if (membershipDetails !== undefined && membershipDetails != null) {
+          this.memberDetailsForm.patchValue(membershipDetails);
+        }
+
+        if (entry.entrantDetails.who === 'else') {
+          this.isThirdPartyEntry = true;
+        }
       }
-    }
-    return null;
+    });
   }
 
   createForm() {
@@ -136,6 +135,7 @@ export class MembershipClubDetailsComponent implements OnInit {
     this.memberDetailsForm.controls['member_type'].valueChanges.subscribe(val => {
       if (val === 'non_member') {
         this.showClubDetailsSection = false;
+        this.showMemberNumberField = false;
       } else {
         this.showClubDetailsSection = true;
       }
@@ -168,7 +168,7 @@ export class MembershipClubDetailsComponent implements OnInit {
 
     // Supply initial values
     this.memberDetailsForm.patchValue({
-      member_type: 'msa',
+      member_type: 'msa'
     });
 
     this.memberDetailsForm.valueChanges.subscribe(val => {
@@ -188,24 +188,48 @@ export class MembershipClubDetailsComponent implements OnInit {
         this.entryService.deleteEntry(this.meet_id);
         break;
       case 'saveAndExit':
-        this.saveEntry();
+        this.saveEntry(false);
         break;
       case 'submit':
-        this.saveEntry();
+        this.saveEntry(true);
         break;
     }
   }
 
-  saveEntry() {
-    console.log('Save Entry');
+  saveEntry(advance) {
+    console.log('Save EntryFormObject');
     const memberDetails: MembershipDetails = Object.assign({}, this.memberDetailsForm.value);
 
     if (this.userService.isLoggedIn() && !this.isThirdPartyEntry) {
       const member = this.userService.getMember();
-      memberDetails.member_number = member.number;
+      if (member !== undefined && member !== null) {
+        memberDetails.member_number = member.number;
+      } else {
+        // Lets see if we can get the user linked to a member
+        if (this.currentEntry.entrantDetails !== undefined && this.currentEntry.entrantDetails !== null) {
+          if (this.currentEntry.entrantDetails.who === 'me' && this.memberDetailsForm.controls['member_type'].value === 'msa') {
+            const memberNumber = this.memberDetailsForm.controls['member_number'].value;
+            if (memberNumber !== null && memberNumber !== '') {
+              console.log('Link this user to member ' + memberNumber);
+              this.userService.linkMember(memberNumber).subscribe((result) => {
+                console.log(result);
+              });
+            }
+          }
+        }
+      }
     }
 
-    this.entryService.setMemberDetails(this.meet_id, memberDetails);
+    if (memberDetails.club_selector !== null) {
+
+    }
+
+    this.entryService.setMemberDetails(this.meet_id, memberDetails).subscribe((updated) => {
+      console.log(updated);
+      if (advance) {
+        this.workflow.navigateNext();
+      }
+    });
   }
 
   clubSelected($event) {

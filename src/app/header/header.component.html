@@ -1,13 +1,13 @@
-<nav class="navbar navbar-expand-lg navbar-dark navbar-fixed-top bg-dark">
-    <button class="navbar-toggler navbar-toggler-right" type="button"
-            data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false"
-            aria-label="Toggle navigation" (click)="isExpanded = !isExpanded"
-            [attr.aria-expanded]="!isExpanded">
+<nav class="navbar navbar-expand navbar-dark navbar-fixed-top bg-dark">
+  <button class="navbar-toggler" type="button" (click)="openSidebar()">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand" routerLink="">Quick Entry</a>
+    <a class="navbar-brand" routerLink="">
+      <img src="assets/msqtriangle-transparent.png" height="40px"/>
+      MSQ Quick Entry
+    </a>
 
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault" [ngbCollapse]="!isExpanded">
+<!--    <div class="collapse navbar-collapse" id="navbarsExampleDefault" [ngbCollapse]="!isExpanded">-->
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
                 <a class="nav-link" routerLink="">Home</a>
@@ -19,8 +19,8 @@
                 <a class="nav-link" routerLink="login" (click)="onLogOutClick()" *ngIf="users">Log Off</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link">{{displayName}}</a>
+              <a class="nav-link" routerLink="profile">{{displayName}}</a>
             </li>
         </ul>
-    </div>
+<!--    </div>-->
 </nav>

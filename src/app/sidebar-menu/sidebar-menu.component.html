@@ -1,0 +1,10 @@
+<div class="navbar-dark">
+  <ul class="nav navbar-nav flex-column h-100 bg-dark">
+    <li class="nav-item"><a class="nav-link active" routerLink="/">Current Meets</a></li>
+<!--    <li class="nav-item"><a class="nav-link" href="calendar">Meet Calendar</a></li>-->
+    <li class="nav-item" *ngIf="userIsAdmin"><a class="nav-link" routerLink="meet-entries">Meet Entries</a></li>
+    <li class="nav-item" *ngIf="userIsAdmin"><a class="nav-link" routerLink="pending-entries">Pending Entries</a></li>
+<!--    <li class="nav-item"><a class="nav-link" routerLink="club-entries">Club Entries</a></li>-->
+    <li class="nav-item" *ngIf="userLoggedIn"><a class="nav-link" routerLink="my-profile">My Profile</a></li>
+  </ul>
+</div>

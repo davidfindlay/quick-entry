@@ -5,7 +5,16 @@ import {Injectable} from '@angular/core';
 })
 export class TimeService {
 
-  static timeStringToSeconds(timeString) {
+  static timeStringToSeconds(timeString: string) {
+
+    if (timeString === undefined || timeString === null) {
+      return 0;
+    }
+
+    if (timeString === 'NT' || timeString.trim() === '') {
+      return 0;
+    }
+
     let seconds;
 
     // Handle where user has separated with .'s instead of :
@@ -44,7 +53,10 @@ export class TimeService {
       const timeArray = timeString.split(':');
 
       // Check how many colons are in the time
-      if (timeArray.length === 2) {
+      if (timeArray.length === 3) {
+        seconds = (parseFloat(timeArray[0]) * 3600) + (parseFloat(timeArray[1]) * 60) + parseFloat(timeArray[2]);
+
+      } else if (timeArray.length === 2) {
 
         // Time in minutes and seconds
         seconds = (parseFloat(timeArray[0]) * 60) + parseFloat(timeArray[1]);
@@ -107,6 +119,10 @@ export class TimeService {
 
     const seconds = TimeService.timeStringToSeconds(timeString);
 
+    if (seconds === 0) {
+      return 'NT';
+    }
+
     let timeMin = Math.floor(seconds / 60);
     let timeHours = 0;
 
@@ -156,6 +172,10 @@ export class TimeService {
   }
 
   static formatTime(seconds: number): string {
+
+    if (seconds === null || seconds === 0) {
+      return 'NT';
+    }
 
     let nTimeString = '';
     let timeMin = Math.floor(seconds / 60);

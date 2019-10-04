@@ -5,11 +5,10 @@ import { AuthService } from 'ngx-auth';
 import {TokenStorage} from './token.service';
 import {Router} from '@angular/router';
 import {NgxSpinnerService} from 'ngx-spinner';
-import * as jwt_decode from 'jwt-decode';
-import {EnvironmentSpecificService} from '../environment-specific.service';
-import {EnvSpecific} from '../models/env-specific';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {User} from '../models/user';
+import {environment} from '../../environments/environment';
+import {of} from 'rxjs/internal/observable/of';
 
 interface AccessData {
   access_token: string;
@@ -21,8 +20,6 @@ interface AccessData {
 @Injectable()
 export class AuthenticationService implements AuthService {
 
-  private api: string;
-
   private interruptedUrl: string;
   private user: User;
 
@@ -33,14 +30,18 @@ export class AuthenticationService implements AuthService {
     private tokenStorage: TokenStorage,
     private router: Router,
     private spinner: NgxSpinnerService,
-    private envSpecificSvc: EnvironmentSpecificService
   ) {
-    envSpecificSvc.subscribe(this, this.setApi);
-  }
+    // Check if we have token
+    this.isAuthorized().subscribe((authorized: boolean) => {
+      if (authorized) {
+        this.user = JSON.parse(localStorage.getItem('user'));
+        this.authenticationChanged.next(this.user);
+      } else {
+        this.authenticationChanged.next(null);
+      }
+    });
 
-  setApi(caller: any, es: EnvSpecific) {
-    const thisCaller = caller as AuthenticationService;
-    thisCaller.api = es.api;
+
   }
 
   /**
@@ -53,14 +54,21 @@ export class AuthenticationService implements AuthService {
     // return this.tokenStorage
     //   .getAccessToken()
     //   .pipe(map(token => !!token));
+    console.log('isAuthorized');
 
-    return this.tokenStorage
-      .getAccessToken()
-      .pipe(map((token) => {
-        if (token !== null) {
-          return true;
+    return new Observable((observer) => {
+      this.tokenStorage.getAccessToken().subscribe((token: string) => {
+        console.log('test');
+        console.log(token);
+        if (token !== undefined && token !== null) {
+          console.log('isAuthorized true');
+          observer.next(true);
+        } else {
+          console.log('isAuthorized false');
+          observer.next(false);
         }
-      }));
+      });
+    });
   }
 
   /**
@@ -81,33 +89,46 @@ export class AuthenticationService implements AuthService {
    */
   public refreshToken(): Observable <AccessData> {
 
-    this.spinner.show();
+    // this.spinner.show();
+    //
+    // console.log('refreshToken');
+    // console.log(environment.api + 'refresh');
 
-    console.log('refreshToken');
+    // return this.http.post(environment.api + `refresh`, {})
+    //   .pipe(tap((tokens: AccessData) => {
+    //     this.saveAccessData(tokens);
+    //     // if (this.getInterruptedUrl() !== undefined && this.getInterruptedUrl() !== null) {
+    //     //   console.log('Attempt to navigate to interrupted route' + this.getInterruptedUrl());
+    //     //   // this.router.navigate()
+    //     // }
+    //   }));
 
-    return this.tokenStorage
-      .getRefreshToken()
-      .pipe(
-        switchMap((refreshToken: string) =>
-          this.http.post(this.api + `token/refresh/`, { 'refresh': refreshToken })
-        ),
-        timeout(5000),
-        tap((tokens: AccessData) => {
-          console.log('got tokens');
-          console.log(tokens);
-          this.saveAccessData(tokens);
-          this.spinner.hide();
-        }),
-        catchError((err) => {
-          console.log('caught error, do logout');
-          console.log(err);
-          this.logout();
-
-          this.router.navigate(['/login']);
-
-          return Observable.throw(err);
-        })
-      );
+    // return this.tokenStorage
+    //   .getRefreshToken()
+    //   .pipe(
+    //     switchMap((refreshToken: string) =>
+    //       this.http.post(environment.api + `refresh`, {})
+    //     ),
+    //     timeout(5000),
+    //     tap((tokens: AccessData) => {
+    //       console.log('got tokens');
+    //       console.log(tokens);
+    //       this.saveAccessData(tokens);
+    //       this.spinner.hide();
+    //     }),
+    //     catchError((err) => {
+    //       console.log('caught error, do logout');
+    //       console.log(err);
+    //       this.logout();
+    //
+    //       this.router.navigate(['/login']);
+    //
+    //       return Observable.throw(err);
+    //     })
+    //   );
+    this.logout();
+    this.router.navigate(['/login']);
+    return of(null);
   }
 
   /**
@@ -137,9 +158,13 @@ export class AuthenticationService implements AuthService {
 
   public login(username, password): Observable<any> {
     console.log('login request for ' + username);
-    return this.http.post(this.api + `login/`, {'username': username, 'password': password})
+    return this.http.post(environment.api + `login/`, {'username': username, 'password': password})
       .pipe(tap((tokens: AccessData) => {
         this.saveAccessData(tokens);
+        if (this.getInterruptedUrl() !== undefined && this.getInterruptedUrl() !== null) {
+          console.log('Attempt to navigate to interrupted route' + this.getInterruptedUrl());
+          // this.router.navigate()
+        }
       }));
   }
 
@@ -149,6 +174,7 @@ export class AuthenticationService implements AuthService {
   public logout(): void {
     this.tokenStorage.clear();
     this.user = null;
+    localStorage.removeItem('user');
     this.authenticationChanged.next(null);
   }
 
@@ -163,22 +189,29 @@ export class AuthenticationService implements AuthService {
     if (access_data.access_token == null) {
       console.log('Clear tokens cause new ones are null');
       this.tokenStorage.clear();
+      localStorage.removeItem('user');
       return;
     }
 
     if (access_data.access_token !== null) {
       console.log('Store access token');
-      this.tokenStorage.setAccessToken(access_data.access_token);
+
+      const expiry = new Date();
+      expiry.setSeconds(expiry.getSeconds() + access_data.expires_in);
+      this.tokenStorage.setAccessToken(access_data.access_token, expiry);
       this.user = access_data.user;
+      localStorage.setItem('user', JSON.stringify(this.user));
       this.authenticationChanged.next(this.user);
     }
   }
 
   public getInterruptedUrl(): string {
+    console.log('interruptedUrl was ' + this.interruptedUrl);
     return this.interruptedUrl;
   }
 
   public setInterruptedUrl(url: string): void {
+    console.log('interruptedUrl set to ' + url);
     this.interruptedUrl = url;
   }
 

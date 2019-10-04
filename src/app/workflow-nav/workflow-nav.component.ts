@@ -18,7 +18,16 @@ export class WorkflowNavComponent implements OnInit {
   @Input('next') next: string;
   // tslint:disable-next-line:no-input-rename
   @Input('nextActivated') nextActivated: Observable<boolean>;
+  // tslint:disable-next-line:no-input-rename
+  @Input('nextText') nextText = 'Next';
+
   btnNextDisable = true;
+  btnSaveDisable = false;
+  btnCancelDisable = false;
+  btnBackDisable = false;
+
+  showNextButton = true;
+  showFinishButton = false;
 
   @Output() submitEvent = new EventEmitter<string>();
 
@@ -28,6 +37,7 @@ export class WorkflowNavComponent implements OnInit {
 
   ngOnInit() {
     this.nextActivated.subscribe((nextActivate) => {
+      console.log('next activate: ' + nextActivate);
       this.btnNextDisable = !nextActivate;
     });
   }
@@ -38,7 +48,7 @@ export class WorkflowNavComponent implements OnInit {
       this.clickCancel();
     } else {
       this.router.navigate([this.previous]);
-      this.submitEvent.emit('submit');
+      this.submitEvent.emit('saveAndExit');
     }
   }
 
@@ -58,13 +68,37 @@ export class WorkflowNavComponent implements OnInit {
   }
 
   clickNext() {
-    this.router.navigate([this.next]);
+    // this.router.navigate([this.next]);
     this.submitEvent.emit('submit');
+  }
+
+  navigateNext() {
+    this.router.navigate([this.next]);
   }
 
   clickSaveAndExit() {
     this.router.navigate(['/']);
-    this.submitEvent.emit('submit');
+    this.submitEvent.emit('saveAndExit');
+  }
+
+  clickFinish() {
+    this.router.navigate(['/']);
+  }
+
+  disableBack() {
+    this.btnBackDisable = true;
+  }
+
+  disableCancel() {
+    this.btnCancelDisable = true;
+  }
+
+  enableFinishButton() {
+    this.btnBackDisable = true;
+    this.btnCancelDisable = true;
+    this.btnSaveDisable = true;
+    this.showNextButton = false;
+    this.showFinishButton = true;
   }
 
 }

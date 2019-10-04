@@ -1,6 +1,7 @@
 <h1>Enter {{meetName}}</h1>
 <h2>Confirm Entry Details and Payment</h2>
-<div class="card mb-3 bg-info text-white">
+<div *ngIf="entry !== undefined && entry !== null">
+<div class="card mb-3 bg-info text-white" *ngIf="paypalSuccess === null">
   <div class="card-body">
     <h4 class="card-title">
       Please Check Your Entry
@@ -14,7 +15,18 @@
   </div>
 </div>
 
-<div class="confirmationSection">
+<div class="card mb-3 bg-info text-white">
+  <div class="card-body">
+    <h4 class="card-title">
+      Entry Status
+    </h4>
+    <p class="card-text">
+      {{statusLabel}}: {{statusText}}
+    </p>
+  </div>
+</div>
+
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
   <h3>Entrant Details</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
@@ -29,7 +41,7 @@
       Gender:
     </div>
     <div class="fieldValue">
-      {{entry.entrantDetails.entrantGender}}
+      {{entry.entrantDetails.entrantGender | titlecase}}
     </div>
   </div>
   <div class="row">
@@ -86,7 +98,7 @@
   </div>
 </div>
 
-<div class="confirmationSection">
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
   <h3>Emergency Contact</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
@@ -114,14 +126,14 @@
   </div>
 </div>
 
-<div class="confirmationSection">
-  <h3>Memebership Details</h3>
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
+  <h3>Membership Details</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
       Member Type:
     </div>
     <div class="fieldValue">
-      {{entry.membershipDetails.member_type}}
+      {{membershipType}}
     </div>
   </div>
   <div class="row">
@@ -143,19 +155,19 @@
   </div>
 </div>
 
-<div class="confirmationSection">
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
   <h3>Classification and Medical Details</h3>
   <div class="row">
     <div class="fieldName col-sm-3">
       Disability Classification:
     </div>
     <div class="fieldValue">
-      {{entry.medicalDetails.classification}}
+      {{disabilityClassificationRequired}}
     </div>
   </div>
   <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
     <div class="fieldName col-sm-3">
-      Freestyle Classfication:
+      Freestyle Classification:
     </div>
     <div class="fieldValue">
       {{entry.medicalDetails.classFreestyle}}
@@ -163,7 +175,7 @@
   </div>
   <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
     <div class="fieldName col-sm-3">
-      Breaststroke Classfication:
+      Breaststroke Classification:
     </div>
     <div class="fieldValue">
       {{entry.medicalDetails.classBreaststroke}}
@@ -171,7 +183,7 @@
   </div>
   <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
     <div class="fieldName col-sm-3">
-      Medley Classfication:
+      Medley Classification:
     </div>
     <div class="fieldValue">
       {{entry.medicalDetails.classMedley}}
@@ -182,7 +194,7 @@
       Stroke Dispensation Required:
     </div>
     <div class="fieldValue">
-      {{entry.medicalDetails.dispensation}}
+      {{strokeDispensationRequired | titlecase}}
     </div>
   </div>
   <div class="row" *ngIf="entry.medicalDetails.dispensation === 'true'">
@@ -190,7 +202,7 @@
       Medical Certificate:
     </div>
     <div class="fieldValue">
-      {{entry.medicalDetails.medicalCertificate}}
+      {{medicalCertificate | titlecase}}
     </div>
   </div>
   <div class="row">
@@ -198,7 +210,7 @@
       Medical Condition:
     </div>
     <div class="fieldValue">
-      {{entry.medicalDetails.medicalCondition}}
+      {{medicalCondition | titlecase}}
     </div>
   </div>
   <div class="row" *ngIf="entry.medicalDetails.medicalCondition === 'true'">
@@ -211,18 +223,34 @@
   </div>
 </div>
 
-<div class="confirmationSection">
+<div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
   <h3>Events Selected</h3>
   <table>
-    <tr *ngFor="let event of entry.entryEvents">
-      <td>
+    <thead>
+    <tr>
+      <th class="pr-4">Event</th>
+      <th class="pr-4">Description</th>
+      <th>Seed Time</th>
+    </tr>
+    </thead>
+    <tr *ngFor="let event of eventEntries">
+      <td class="pr-4">
         {{event.program_no}}
       </td>
-      <td>
-        {{event.distance}} {{event.discipline}}
+      <td class="pr-4">
+        <span *ngIf="getEventName(event.event_id) !== ''">
+          {{getEventName(event.event_id)}}:
+        </span>
+        <span *ngIf="getLegs(event.event_id) > 1">
+          {{getLegs(event.event_id)}}x</span>{{event.distance}} {{event.discipline}}
+        <span *ngIf="getLegs(event.event_id) > 1">
+          Relay
+        </span>
       </td>
-      <td>
-        {{event.seedtime | time}}
+      <td class="seedtimeCol">
+        <span *ngIf="getLegs(event.event_id) === 1">
+          {{event.seedtime | time}}
+        </span>
       </td>
     </tr>
   </table>
@@ -238,16 +266,16 @@
   <table>
     <thead>
     <tr>
-      <th>
+      <th class="pr-4">
         Qty
       </th>
-      <th>
+      <th class="pr-4">
         Item
       </th>
-      <th class="moneycol">
+      <th class="moneycol pr-4">
         Each
       </th>
-      <th class="moneycol">
+      <th class="moneycol pr-4">
         Subtotal
       </th>
     </tr>
@@ -261,10 +289,23 @@
         Meet Entry Fee
       </td>
       <td class="moneycol">
-        $25.00
+        {{meetFee | currency}}
       </td>
       <td class="moneycol">
-        $25.00
+        {{meetFee | currency}}
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        Event Fees
+      </td>
+      <td class="moneycol">
+        {{eventFee | currency}}
+      </td>
+      <td class="moneycol">
+        {{eventFee | currency}}
       </td>
     </tr>
     <tr>
@@ -272,7 +313,7 @@
         Total
       </td>
       <td class="moneycol">
-        $25.00
+        {{totalFee | currency}}
       </td>
     </tr>
     <tr>
@@ -280,62 +321,98 @@
         Paid
       </td>
       <td class="moneycol">
-        $0.00
+        {{paidAmount | currency}}
       </td>
     </tr>
     </tbody>
   </table>
 
-  <h2>
-    Payment Method
-  </h2>
-  <div class="card mb-3 bg-info text-white">
-    <div class="card-body">
-      <h4 class="card-title">
-        Payment Options
-      </h4>
+  <div *ngIf="showPaymentChoice">
+    <h2>
+      Payment Method
+    </h2>
+    <div class="card mb-3 bg-info text-white">
+      <div class="card-body">
+        <h4 class="card-title">
+          Payment Options
+        </h4>
         <ul>
-      <li>
-        Credit/Debit Card: We accept payment via Credit or Debit card using PayPal's card payment processing.
-        You do not need to have a PayPal account to use this option.
-      </li>
-          <li>
-            Pay Later: You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
-            for your entry by the Meet Entry Deadline your entry may not be accepted.
+          <li *ngIf="enablePaymentOption('paypal')">
+            Credit/Debit Card: We accept payment via Credit or Debit card using PayPal's card payment processing.
+            You do not need to have a PayPal account to use this option.
           </li>
-          <li>
+          <li *ngIf="enablePaymentOption('club')">
             Pay via Club: Your club may make a bulk payment on behalf of members. Please check with your Club Recorder
             or Club Captain. Note that if you do not pay for your entry by the Meet Entry Deadline your entry may not
             be accepted.
           </li>
-    </ul>
+          <li>
+            Pay Later: You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
+            for your entry by the Meet Entry Deadline your entry <strong><u>may be rejected</u></strong>.
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-  <form>
-  <div class="fieldName col-sm-3">
-    Select Payment Option:
-  </div>
-  <div class="fieldValue">
-    <div class="form-check">
-      <input type="radio" name="paymentOption" class="form-check-input" value="paypal" id="paypal" />
-      <label for="paypal" class="form-check-label">Credit/Debit Card or PayPal Account</label>
-      <ngx-paypal [config]="payPalConfig"></ngx-paypal>
-    </div>
-    <div class="form-check">
-      <input type="radio" name="paymentOption" class="form-check-input" value="later" id="later" />
-      <label for="later" class="form-check-label">Pay Later</label>
-    </div>
-    <div class="form-check">
-      <input type="radio" name="paymentOption" class="form-check-input" value="club" id="club" />
-      <label for="club" class="form-check-label">Pay via Club</label>
-    </div>
-  </div>
 
+    <form [formGroup]="paymentOptionForm">
+      <fieldset class="qe-fieldset">
+        <div class="form-group row">
+          <label class="col-form-legend col-sm-2">Select Payment Option:</label>
 
-  </form>
+          <div class="col-sm-8">
+            <div class="form-check" *ngIf="enablePaymentOption('paypal')">
+              <label for="paypal" class="form-check-label">
+                <input type="radio" name="paymentOption" class="form-check-input" value="paypal" id="paypal"
+                       formControlName="paymentOption"/>
+                Credit/Debit Card or PayPal Account<br />
+                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/PP_AcceptanceMarkTray-NoDiscover_243x40.png">
+              </label>
+            </div>
+            <div class="form-check" *ngIf="enablePaymentOption('club')">
+              <label for="club" class="form-check-label">
+                <input type="radio" name="paymentOption" class="form-check-input" value="club" id="club"
+                       formControlName="paymentOption"/>
+                Pay via Club
+              </label>
+            </div>
+            <div class="form-check">
+              <label for="later" class="form-check-label">
+                <input type="radio" name="paymentOption" class="form-check-input" value="later" id="later"
+                       formControlName="paymentOption"/>
+                Pay Later
+              </label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <h4 class="card-title">
+        Entry Status
+      </h4>
+      <p class="card-text">
+        {{statusLabel}}: {{statusText}}
+      </p>
+    </div>
+    <div class="card-body" *ngIf="paypalData !== null">
+      <h4 class="card-title">
+        Paypal Payment Received
+      </h4>
+      <p class="card-text">
+        Invoice: {{paypalData.invoice_id}}<br />
+        Paid By: {{paypalData.payer_name}} <{{paypalData.payer_email}}><br />
+        Amount: {{paypalData.paid}}<br />
+        Date/Time: {{paypalData.updated_at | date: 'medium'}}
+      </p>
+    </div>
+  </div>
+</div>
 </div>
 
 <app-workflow-nav next="/enter/{{meet_id}}/confirmation" previous="/enter/{{meet_id}}/step4"
                   [nextActivated]="formValidSubject.asObservable()"
-                  (submitEvent)="onSubmit($event)"></app-workflow-nav>
+                  (submitEvent)="onSubmit($event)" nextText="Submit Entry"></app-workflow-nav>
 
+<ngx-spinner></ngx-spinner>
