@@ -155,7 +155,13 @@ export class SubmittedEntryComponent implements OnInit {
     this.router.navigate(['/', 'paypal-depart']);
 
     this.paypalService.createPaymentFinalisedEntry(submittedEntry).subscribe((payment: any) => {
-      window.location.assign(payment.approvalUrl);
+      if (payment.success !== false) {
+        window.location.assign(payment.approvalUrl);
+      } else {
+        // This shouldn't be hit
+        this.paymentOwed = false;
+      }
+
     }, (error: any) => {
       // Handle paypal error
       console.log('Got error can\'t go to paypal');

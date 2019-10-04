@@ -704,6 +704,7 @@ export class EntryService {
   }
 
   convertMeetEntryToEntryFO(entry) {
+    console.log('convertMeetEntryToEntryFO');
     if (entry === undefined || entry === null) {
       return null;
     }
@@ -713,13 +714,18 @@ export class EntryService {
     }
 
     const meetEntry = entry.meet_entry;
-    console.log(meetEntry);
 
     // Convert meet entry to entry form object
     const entryFO = new EntryFormObject();
     const entrantDetailsFO = new EntrantDetails();
     const membershipDetailsFO = new MembershipDetails();
     const medicalDetailsFO = new MedicalDetails();
+
+    if (meetEntry.member === undefined || meetEntry.member === null) {
+      console.log('convertMeetEntryToEntryFO: member is undefined or null');
+      console.log(meetEntry);
+      return null;
+    }
 
     entrantDetailsFO.entrantFirstName = meetEntry.member.firstname;
     entrantDetailsFO.entrantSurname = meetEntry.member.surname;
@@ -745,7 +751,7 @@ export class EntryService {
       }
     }
 
-    if (meetEntry.member.emergency !== undefined && meetEntry.meet_entry.emergency !== null) {
+    if (meetEntry.member.emergency !== undefined && meetEntry.member.emergency !== null) {
       entrantDetailsFO.emergencyFirstName = meetEntry.member.emergency.firstname;
       entrantDetailsFO.emergencySurname = meetEntry.member.emergency.surname;
       entrantDetailsFO.emergencyPhone = meetEntry.member.emergency.phone.phonenumber;
@@ -845,6 +851,8 @@ export class EntryService {
     }
     incompleteEntry.paid_amount = paidAmount;
 
+    console.log(incompleteEntry);
+
     return incompleteEntry;
   }
 
@@ -911,11 +919,11 @@ export class EntryService {
     }
   }
 
-  updatePending(pendingId, pendingEntry) {
-    console.log('Update Pending: ' + pendingId);
+  updatePending(pendingCode, pendingEntry) {
+    console.log('Update Pending: ' + pendingCode);
     console.log(pendingEntry);
 
-    return this.http.put(environment.api + 'entry_incomplete/' + pendingId, pendingEntry);
+    return this.http.put(environment.api + 'entry_incomplete/' + pendingCode, pendingEntry);
   }
 
 }

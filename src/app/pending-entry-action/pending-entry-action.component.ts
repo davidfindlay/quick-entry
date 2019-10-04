@@ -114,18 +114,27 @@ export class PendingEntryActionComponent implements OnInit {
       this.clubName = this.entry.membershipDetails.club_name;
     }
 
-    this.memberService.getMemberByNumber(this.entry.membershipDetails.member_number).subscribe((member: any) => {
-      console.log(member);
-      this.memberSearchResult = member.member;
+    if (this.entry.membershipDetails.member_number !== null && this.entry.membershipDetails.member_number !== '') {
+      this.memberService.getMemberByNumber(this.entry.membershipDetails.member_number).subscribe((member: any) => {
+        console.log(member);
+        this.memberSearchResult = member.member;
 
-      this.entryService.getSubmittedEntriesByMemberNumber(this.entry.membershipDetails.member_number, this.meet_id)
-        .subscribe((entries: any) => {
-          this.existingEntries = entries;
-          console.log(this.existingEntries);
-          if (this.existingEntries !== undefined && this.existingEntries !== null) {
-            if (this.existingEntries.length > 0) {
-              this.existingEntryShow = true;
-              this.canBeActioned = false;
+        this.entryService.getSubmittedEntriesByMemberNumber(this.entry.membershipDetails.member_number, this.meet_id)
+          .subscribe((entries: any) => {
+            this.existingEntries = entries;
+            console.log(this.existingEntries);
+            if (this.existingEntries !== undefined && this.existingEntries !== null) {
+              if (this.existingEntries.length > 0) {
+                this.existingEntryShow = true;
+                this.canBeActioned = false;
+              } else {
+                if (this.memberSearchResult.number === this.entry.membershipDetails.member_number) {
+                  this.canBeActioned = true;
+                } else {
+                  this.canBeActioned = false;
+                  console.log('Membership number does not match');
+                }
+              }
             } else {
               if (this.memberSearchResult.number === this.entry.membershipDetails.member_number) {
                 this.canBeActioned = true;
@@ -134,19 +143,12 @@ export class PendingEntryActionComponent implements OnInit {
                 console.log('Membership number does not match');
               }
             }
-          } else {
-            if (this.memberSearchResult.number === this.entry.membershipDetails.member_number) {
-              this.canBeActioned = true;
-            } else {
-              this.canBeActioned = false;
-              console.log('Membership number does not match');
-            }
-          }
-        });
-    }, (error: any) => {
-      console.log('unable to find member');
-      this.memberSearchResult = null;
-    });
+          });
+      }, (error: any) => {
+        console.log('unable to find member');
+        this.memberSearchResult = null;
+      });
+    }
   }
 
   toTitleCase(str: string) {
@@ -237,7 +239,7 @@ export class PendingEntryActionComponent implements OnInit {
     this.entry.entrantDetails.entrantGender = this.pendingActionForm.controls['entrantGender'].value;
     this.entry.entrantDetails.entrantDob = this.pendingActionForm.controls['entrantDob'].value;
     this.entry.membershipDetails.member_number = this.pendingActionForm.controls['entrantNumber'].value;
-    this.entryService.updatePending(this.pendingEntryId, this.incompleteEntry).subscribe((entry) => {
+    this.entryService.updatePending(this.pendingEntryCode, this.incompleteEntry).subscribe((entry) => {
       this.loadEntry(entry);
     });
   }

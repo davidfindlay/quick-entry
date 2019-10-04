@@ -114,7 +114,7 @@ export class PendingEntryListComponent implements OnInit {
       this.tableRows = [];
 
       for (const entry of this.entries) {
-        console.log(entry);
+        // console.log(entry);
         let club_code = '';
         let club_name = '';
 

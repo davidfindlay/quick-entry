@@ -306,21 +306,28 @@ export class EntryConfirmationComponent implements OnInit {
                 paypalPayment = this.paypalService.createPaymentFinalisedEntry(finalised.meet_entry);
               }
 
-              this.router.navigate(['/', 'paypal-depart']);
+              if (paypalPayment.success !== false) {
 
-              paypalPayment.subscribe((paymentDetails: any) => {
-                this.ngxSpinner.hide();
-                window.location.assign(paymentDetails.approvalUrl);
-              }, (error: any) => {
+                this.router.navigate(['/', 'paypal-depart']);
 
-                // Handle paypal error
-                console.log('Got error can\'t go to paypal');
+                paypalPayment.subscribe((paymentDetails: any) => {
+                  this.ngxSpinner.hide();
+                  window.location.assign(paymentDetails.approvalUrl);
+                }, (error: any) => {
 
+                  // Handle paypal error
+                  console.log('Got error can\'t go to paypal');
+
+                  this.ngxSpinner.hide();
+                  this.showPaymentChoice = false;
+                  this.workflowNav.enableFinishButton();
+
+                });
+              } else {
                 this.ngxSpinner.hide();
                 this.showPaymentChoice = false;
                 this.workflowNav.enableFinishButton();
-
-              });
+              }
 
             } else {
               this.ngxSpinner.hide();

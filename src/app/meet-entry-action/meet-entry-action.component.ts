@@ -52,8 +52,10 @@ export class MeetEntryActionComponent implements OnInit {
               private fb: FormBuilder) { }
 
   ngOnInit() {
+    console.log('meet entry action ');
     this.meetEntryId = this.route.snapshot.paramMap.get('entryId');
     this.entryService.getMeetEntryFO(this.meetEntryId).subscribe((entry: any) => {
+      console.log('got entry');
       this.loadEntry(entry);
     });
 
@@ -63,6 +65,7 @@ export class MeetEntryActionComponent implements OnInit {
   }
 
   loadEntry(entry) {
+    console.log('load entry');
     this.entry = entry.entrydata;
     this.incompleteEntry = entry;
     this.meet_id = entry.meet_id;
