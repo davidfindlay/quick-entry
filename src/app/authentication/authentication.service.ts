@@ -126,6 +126,8 @@ export class AuthenticationService implements AuthService {
     //       return Observable.throw(err);
     //     })
     //   );
+    this.logout();
+    this.router.navigate(['/login']);
     return of(null);
   }
 
