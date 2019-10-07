@@ -53,6 +53,7 @@ import { ClubMemberSelectorComponent } from './club-member-selector/club-member-
 
 import * as Sentry from '@sentry/browser';
 import {environment} from '../environments/environment';
+import { MeetEntryContactListComponent } from './meet-entry-contact-list/meet-entry-contact-list.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -75,6 +76,7 @@ const appRoutes: Routes = [
   { path: 'pending-entries/:meetId', component: PendingEntryListComponent },
   { path: 'pending-entries', component: PendingEntryListComponent },
   { path: 'pending-entry/:pendingId', component: PendingEntryActionComponent },
+  { path: 'entrant-contact-list', component: MeetEntryContactListComponent},
     { path: '**', component: MeetListComponent }
 ];
 
@@ -121,7 +123,8 @@ export class SentryErrorHandler implements ErrorHandler {
         PendingEntryListComponent,
         PendingEntryActionComponent,
         MeetEntryActionComponent,
-        ClubMemberSelectorComponent
+        ClubMemberSelectorComponent,
+        MeetEntryContactListComponent
     ],
     entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
   imports: [
