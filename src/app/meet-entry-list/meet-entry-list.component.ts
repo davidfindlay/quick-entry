@@ -1,15 +1,16 @@
+import {HttpClient} from '@angular/common/http';
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
+import {NgxSpinnerService} from 'ngx-spinner';
+import {environment} from '../../environments/environment';
 import {MeetService} from '../meet.service';
 import {Meet} from '../models/meet';
-import {HttpClient} from '@angular/common/http';
-import {environment} from '../../environments/environment';
-import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-meet-entry-list',
   templateUrl: './meet-entry-list.component.html',
-  styleUrls: ['./meet-entry-list.component.css']
+  styleUrls: ['./meet-entry-list.component.css'],
 })
 export class MeetEntryListComponent implements OnInit {
 
@@ -25,7 +26,7 @@ export class MeetEntryListComponent implements OnInit {
     { name: 'Club' },
     { name: 'Cost' },
     { name: 'Paid' },
-    { name: 'Status' }
+    { name: 'Status' },
 
   ];
 
@@ -35,7 +36,9 @@ export class MeetEntryListComponent implements OnInit {
   constructor(private fb: FormBuilder,
               private meetService: MeetService,
               private http: HttpClient,
-              private router: Router) { }
+              private router: Router,
+              private route: ActivatedRoute,
+              private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
     this.meets = this.meetService.getMeets();
@@ -45,7 +48,7 @@ export class MeetEntryListComponent implements OnInit {
   createForm() {
     this.meetSelectorForm = this.fb.group({
       meetYear: [2019, Validators.required],
-      meet: [0, Validators.required]
+      meet: [0, Validators.required],
     });
 
     this.meetSelectorFormSub = this.meetSelectorForm.valueChanges.subscribe((change) => {
@@ -72,15 +75,15 @@ export class MeetEntryListComponent implements OnInit {
           }
 
           const row = {
-            'id': entry.id,
-            'code': entry.code,
-            'Entrant': entry.member.surname + ', ' + entry.member.firstname,
-            'Club': entry.club.code,
-            'clubname': entry.club.clubname,
-            'Cost': entry.cost,
-            'Paid': paid,
-            'Updated': entry.updated_at,
-            'Status': status_label
+            id: entry.id,
+            code: entry.code,
+            Entrant: entry.member.surname + ', ' + entry.member.firstname,
+            Club: entry.club.code,
+            clubname: entry.club.clubname,
+            Cost: entry.cost,
+            Paid: paid,
+            Updated: entry.updated_at,
+            Status: status_label,
           };
           this.tableRows.push(row);
         }

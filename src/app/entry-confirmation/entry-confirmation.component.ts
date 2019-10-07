@@ -183,35 +183,39 @@ export class EntryConfirmationComponent implements OnInit {
       this.formValidSubject.next(false);
     }
 
-    switch (this.entry.membershipDetails.member_type) {
-      case 'msa':
-        this.membershipType = 'Masters Swimming Australia member';
-        break;
-      case 'international':
-        this.membershipType = 'International Masters Swimming member';
-        break;
-      case 'guest':
-        this.membershipType = 'Guest swimmer';
-        break;
-      case 'non_member':
-        this.membershipType = 'Non-member';
-        break;
+    if (this.entry.membershipDetails !== undefined && this.entry.membershipDetails !== null) {
+      switch (this.entry.membershipDetails.member_type) {
+        case 'msa':
+          this.membershipType = 'Masters Swimming Australia member';
+          break;
+        case 'international':
+          this.membershipType = 'International Masters Swimming member';
+          break;
+        case 'guest':
+          this.membershipType = 'Guest swimmer';
+          break;
+        case 'non_member':
+          this.membershipType = 'Non-member';
+          break;
+      }
     }
 
-    if (this.entry.medicalDetails.classification !== 'no') {
-      this.disabilityClassificationRequired = this.entry.medicalDetails.classification;
-    }
+    if (this.entry.medicalDetails !== undefined && this.entry.medicalDetails !== null) {
+      if (this.entry.medicalDetails.classification !== 'no') {
+        this.disabilityClassificationRequired = this.entry.medicalDetails.classification;
+      }
 
-    if (this.entry.medicalDetails.dispensation === 'true') {
-      this.strokeDispensationRequired = 'Yes';
-    }
+      if (this.entry.medicalDetails.dispensation === 'true') {
+        this.strokeDispensationRequired = 'Yes';
+      }
 
-    if (this.entry.medicalDetails.medicalCertificate === 'true') {
-      this.medicalCertificate = 'Yes';
-    }
+      if (this.entry.medicalDetails.medicalCertificate === 'true') {
+        this.medicalCertificate = 'Yes';
+      }
 
-    if (this.entry.medicalDetails.medicalCondition === 'true') {
-      this.medicalCondition = 'Yes';
+      if (this.entry.medicalDetails.medicalCondition === 'true') {
+        this.medicalCondition = 'Yes';
+      }
     }
 
     this.meetFee = this.entryService.getMeetFee(this.entry);

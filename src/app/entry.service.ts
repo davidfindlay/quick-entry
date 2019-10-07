@@ -18,6 +18,8 @@ import {EntrantDetails} from './models/entrant-details';
 import {of} from 'rxjs/internal/observable/of';
 import {map} from 'rxjs/operators';
 import {angularInnerClassDecoratorKeys} from 'codelyzer/util/utils';
+import {EntryPaymentComponent} from './entry-payment/entry-payment.component';
+import {EntryPayment} from './models/entry-payment';
 
 @Injectable()
 export class EntryService {
@@ -829,7 +831,6 @@ export class EntryService {
     entryFO.meetId = meetEntry.meet_id;
     entryFO.validEvents = true;
 
-    // console.log(entryFO);
     const incompleteEntry = new IncompleteEntry();
     if (meetEntry.status !== undefined && meetEntry.status !== null) {
       const currentStatus = meetEntry.status;
@@ -839,16 +840,28 @@ export class EntryService {
       incompleteEntry.status_description = currentStatus.status.description;
 
     }
-    incompleteEntry.entrydata = entryFO;
-    incompleteEntry.meet_id = meetEntry.meet_id;
 
     let paidAmount = 0;
-
+    const payments = [];
     if (meetEntry.payments !== undefined && meetEntry.payments !== null) {
       for (const payment of meetEntry.payments) {
         paidAmount += payment.amount;
+        const paymentObj = new EntryPayment();
+        paymentObj.amount = payment.amount;
+        paymentObj.received = payment.received;
+        paymentObj.comment = payment.comment;
+        paymentObj.method = payment.method;
+        paymentObj.created_at = payment.created_at;
+        paymentObj.updated_at = payment.updated_at;
+        payments.push(paymentObj);
       }
     }
+
+    entryFO.payments = payments;
+    entryFO.cost = meetEntry.cost;
+    incompleteEntry.entrydata = entryFO;
+    incompleteEntry.meet_id = meetEntry.meet_id;
+
     incompleteEntry.paid_amount = paidAmount;
 
     console.log(incompleteEntry);

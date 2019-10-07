@@ -62,8 +62,6 @@ export class EntryDetailsComponent implements OnInit {
       this.entryService.incompleteChanged.subscribe((entries: IncompleteEntry[]) => {
         const meetEntry = entries.filter(x => x.meet_id === this.meet_id);
         if (meetEntry !== null && meetEntry.length === 1) {
-          // console.log('valid events: ');
-          // console.log(meetEntry[0].entrydata.validEvents);
           this.formValidSubject.next(meetEntry[0].entrydata.validEvents);
         }
       });

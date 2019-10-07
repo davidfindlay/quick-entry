@@ -118,6 +118,9 @@ export class EntryDetailsEventComponent implements OnInit {
               this.eventEntryForm.controls.seedTime.disable();
             }
           }
+        }, (error: any) => {
+          console.error('No entry form object found');
+          console.log(error);
         });
       }
 
