@@ -63,6 +63,13 @@ export class EntryService {
           observer.next(updated);
         });
       } else {
+        // Delete existing entries to prevent duplicates
+        if (this.incompleteEntries === null) {
+          this.incompleteEntries = [];
+        } else {
+          this.incompleteEntries = this.incompleteEntries.filter(x => x.meet_id !== entry.meetId);
+        }
+
         const incompleteEntry = <IncompleteEntry>{
           meet_id: entry.meetId,
           entrydata: entry
@@ -84,12 +91,22 @@ export class EntryService {
         if (this.incompleteEntries !== undefined && this.incompleteEntries !== null && this.incompleteEntries.length === 0) {
           this.http.get(environment.api + 'entry_incomplete').subscribe((incompleteEntries: any) => {
 
-
-            this.incompleteEntries = incompleteEntries;
-            observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+            if (incompleteEntries !== null) {
+              this.incompleteEntries = incompleteEntries;
+              observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+            } else {
+              console.error('Unable to retrieve incomplete entries from server');
+            }
+          }, (error: any) => {
+            console.error('Unable to retrieve incomplete enries from server');
+            console.error(error);
           });
         } else {
-          observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+          if (this.incompleteEntries) {
+            observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+          } else {
+            observer.next(of(null));
+          }
         }
       } else {
         if (this.incompleteEntries) {
@@ -121,24 +138,37 @@ export class EntryService {
   }
 
   retrieveIncompleteEntries() {
-    this.http.get(environment.api + 'entry_incomplete').subscribe((incomplete: IncompleteEntry[]) => {
-      this.incompleteEntries = incomplete;
-      this.incompleteChanged.next(this.incompleteEntries);
-      this.incompleteEntries = [];
-      this.pendingEntries = [];
+    if (this.userService.isLoggedIn()) {
 
-      for (const incompleteEntry of incomplete) {
-        if (incompleteEntry.status_id === 12) {
-          this.incompleteEntries.push(incompleteEntry);
-        } else {
-          this.pendingEntries.push(incompleteEntry)
+      this.http.get(environment.api + 'entry_incomplete').subscribe((incomplete: IncompleteEntry[]) => {
+        this.incompleteEntries = incomplete;
+        this.incompleteChanged.next(this.incompleteEntries);
+        this.incompleteEntries = [];
+        this.pendingEntries = [];
+
+        for (const incompleteEntry of incomplete) {
+          if (incompleteEntry.status_id === 12) {
+            this.incompleteEntries.push(incompleteEntry);
+          } else {
+            this.pendingEntries.push(incompleteEntry)
+          }
         }
-      }
 
-      console.log('Update incomplete entries');
+        console.log('Update incomplete entries');
+        this.incompleteChanged.next(this.incompleteEntries);
+        this.pendingChanged.next(this.pendingEntries);
+      });
+    } else {
+      const incompleteEntries = JSON.parse(localStorage.getItem('entries'));
+      if (incompleteEntries !== undefined && incompleteEntries !== null) {
+        this.incompleteEntries = incompleteEntries;
+      } else {
+        this.incompleteEntries = [];
+      }
       this.incompleteChanged.next(this.incompleteEntries);
-      this.pendingChanged.next(this.pendingEntries);
-    });
+      console.log('loaded incomplete entries');
+      console.log(this.incompleteEntries);
+    }
   }
 
   getSubmittedEntries(meetId: number) {
@@ -149,6 +179,7 @@ export class EntryService {
   }
 
   retrieveSubmittedEntries() {
+    // TODO: retrieve submitted entries for unauthenticated?
     this.http.get(environment.api + 'meet_entries').subscribe((entries: MeetEntry[]) => {
       this.submittedEntries = entries;
       this.submittedChanged.next(this.submittedEntries);
@@ -283,6 +314,18 @@ export class EntryService {
           classification: null,
           seedtime: null
         });
+
+        // If logged in store to server
+        if (this.userService.getUsers() !== null) {
+          console.log('User is logged in, store to server');
+
+          this.storeIncompleteEntry(entry).subscribe((result) => {
+            console.log(result);
+          });
+        } else {
+          this.storeEntries();
+        }
+
         entry.validEvents = this.validateEntryEvents(entry);
         this.incompleteChanged.next(this.incompleteEntries);
 
@@ -312,7 +355,7 @@ export class EntryService {
         this.incompleteChanged.next(this.incompleteEntries);
 
         // If logged in store to server
-        if (this.authService.isAuthorized()) {
+        if (this.userService.isLoggedIn()) {
           console.log('User is logged in, store to server');
 
           this.storeIncompleteEntry(entry).subscribe((result) => {
@@ -344,7 +387,7 @@ export class EntryService {
 
         // Check that entry is now valid with this seed time change
         entry.validEvents = this.validateEntryEvents(entry);
-        this.storeEntries();
+        this.incompleteChanged.next(this.incompleteEntries);
 
         // If logged in store to server
         if (this.userService.getUsers() !== null) {
@@ -353,6 +396,8 @@ export class EntryService {
           this.storeIncompleteEntry(entry).subscribe((result) => {
             console.log(result);
           });
+        } else {
+          this.storeEntries();
         }
       }
     });
@@ -394,7 +439,7 @@ export class EntryService {
       return false;
     }
 
-    console.log('validateEntryEvents: valid')
+    console.log('validateEntryEvents: valid');
     return true;
   }
 
@@ -511,6 +556,7 @@ export class EntryService {
       this.incompleteEntries = this.incompleteEntries.filter(x => x.meet_id !== meetId);
       // console.log(this.incompleteEntries);
       this.storeEntries();
+      this.incompleteChanged.next(this.incompleteEntries);
     }
   }
 

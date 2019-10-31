@@ -23,6 +23,16 @@ export class MemberHistoryService {
   }
 
   downloadHistory(member_no: number) {
+    if (isNaN(member_no)) {
+      console.error('Attempt to get member history for NaN');
+      return false;
+    }
+
+    if (member_no === undefined || member_no === null) {
+      console.error('Attempt to get member history for undefined or null');
+      return false;
+    }
+
     if (this.results === undefined || this.results === null || this.results.length === 0) {
       // console.log('downloadHistory of ' + member_no);
       const historyDownload = this.getHistory(member_no);
@@ -31,10 +41,9 @@ export class MemberHistoryService {
           console.log('Got history and stored it');
           this.storeResults(results, member_no);
         });
-      } else {
-        // console.log('history undefined or null');
       }
     }
+    return true;
   }
 
   getHistory(member_no) {

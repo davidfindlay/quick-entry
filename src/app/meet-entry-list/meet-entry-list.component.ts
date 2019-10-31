@@ -71,12 +71,26 @@ export class MeetEntryListComponent implements OnInit {
             }
           }
 
+          let clubCode = '';
+          let clubName = '';
+          if (entry.club !== undefined && entry.club !== null) {
+            clubCode = entry.club.code;
+            clubName = entry.club.clubname;
+          }
+
+          let memberSurname = '';
+          let memberFirstname = '';
+          if (entry.member !== undefined && entry.member !== null) {
+            memberSurname = entry.member.surname;
+            memberFirstname = entry.member.firstname;
+          }
+
           const row = {
             'id': entry.id,
             'code': entry.code,
-            'Entrant': entry.member.surname + ', ' + entry.member.firstname,
-            'Club': entry.club.code,
-            'clubname': entry.club.clubname,
+            'Entrant': memberSurname + ', ' + memberFirstname,
+            'Club': clubCode,
+            'clubname': clubName,
             'Cost': entry.cost,
             'Paid': paid,
             'Updated': entry.updated_at,

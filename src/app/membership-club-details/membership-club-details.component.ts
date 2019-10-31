@@ -14,6 +14,8 @@ import {distinctUntilChanged} from 'rxjs/operators';
 import {ClubsService} from '../clubs.service';
 import {WorkflowNavComponent} from '../workflow-nav/workflow-nav.component';
 import {EntryFormObject} from '../models/entry-form-object';
+import {logging} from 'selenium-webdriver';
+import Entry = logging.Entry;
 
 @Component({
   selector: 'app-membership-club-details',
@@ -197,31 +199,31 @@ export class MembershipClubDetailsComponent implements OnInit {
   }
 
   saveEntry(advance) {
-    console.log('Save EntryFormObject');
+    console.log('Save MemberDetails to EntryFormObject');
     const memberDetails: MembershipDetails = Object.assign({}, this.memberDetailsForm.value);
 
     if (this.userService.isLoggedIn() && !this.isThirdPartyEntry) {
+      console.log('Logged in and not third party');
       const member = this.userService.getMember();
       if (member !== undefined && member !== null) {
         memberDetails.member_number = member.number;
       } else {
         // Lets see if we can get the user linked to a member
-        if (this.currentEntry.entrantDetails !== undefined && this.currentEntry.entrantDetails !== null) {
-          if (this.currentEntry.entrantDetails.who === 'me' && this.memberDetailsForm.controls['member_type'].value === 'msa') {
-            const memberNumber = this.memberDetailsForm.controls['member_number'].value;
-            if (memberNumber !== null && memberNumber !== '') {
-              console.log('Link this user to member ' + memberNumber);
-              this.userService.linkMember(memberNumber).subscribe((result) => {
-                console.log(result);
-              });
+        console.log('Try to link user to member');
+        this.entryService.getMeetEntryFO(this.meet_id).subscribe((currentEntry: EntryFormObject) => {
+          if (currentEntry.entrantDetails !== undefined && currentEntry.entrantDetails !== null) {
+            if (currentEntry.entrantDetails.who === 'me' && this.memberDetailsForm.controls['member_type'].value === 'msa') {
+              const memberNumber = this.memberDetailsForm.controls['member_number'].value;
+              if (memberNumber !== null && memberNumber !== '') {
+                console.log('Link this user to member ' + memberNumber);
+                this.userService.linkMember(memberNumber).subscribe((result) => {
+                  console.log(result);
+                });
+              }
             }
           }
-        }
+        });
       }
-    }
-
-    if (memberDetails.club_selector !== null) {
-
     }
 
     this.entryService.setMemberDetails(this.meet_id, memberDetails).subscribe((updated) => {

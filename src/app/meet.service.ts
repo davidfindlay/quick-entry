@@ -73,12 +73,18 @@ export class MeetService {
 
   loadMeetDetails(meet_id: number) {
     this.http.get(environment.api + 'meets/' + meet_id).subscribe((result: Meet) => {
-      const index = this.meets.indexOf(this.getMeet(meet_id));
 
-      if (index !== -1) {
-        this.meets[index] = result;
+      if (this.meets === undefined || this.meets === null) {
+        // If meets is for some reason undefined or null, just put this one in
+        this.meets = [];
+        this.meets.push(result);
+      } else {
+        const index = this.meets.indexOf(this.getMeet(meet_id));
+
+        if (index !== -1) {
+          this.meets[index] = result;
+        }
       }
-
       localStorage.setItem('meets', JSON.stringify(this.meets));
       this.meetsChanged.next(this.meets);
     });

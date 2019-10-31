@@ -5,41 +5,42 @@ import {EntryService} from '../entry.service';
 import {UserService} from '../user.service';
 
 @Component({
-    selector: 'app-meet-list',
-    templateUrl: './meet-list.component.html',
-    styleUrls: ['./meet-list.component.css']
+  selector: 'app-meet-list',
+  templateUrl: './meet-list.component.html',
+  styleUrls: ['./meet-list.component.css']
 })
 export class MeetListComponent implements OnInit {
 
-    openMeets: Meet[];
-    meetSub;
+  openMeets: Meet[];
+  meetSub;
 
-    constructor(private meetService: MeetService,
-                private entryService: EntryService,
-                private userService: UserService) {
+  constructor(private meetService: MeetService,
+              private entryService: EntryService,
+              private userService: UserService) {
+  }
+
+  ngOnInit() {
+
+    let openMeets: Meet[];
+
+    if (openMeets = this.meetService.getOpenMeets()) {
+      this.openMeets = openMeets;
+      this.sortMeets();
     }
 
-    ngOnInit() {
-
-        let openMeets: Meet[];
-
-        if (openMeets = this.meetService.getOpenMeets()) {
-            this.openMeets = openMeets;
-            this.sortMeets();
-        }
-
-        this.meetSub = this.meetService.meetsChanged
-            .subscribe((meets: Meet[]) => {
-                this.openMeets = this.meetService.getOpenMeets();
-              this.sortMeets();
-        });
+    this.meetSub = this.meetService.meetsChanged
+      .subscribe((meets: Meet[]) => {
+        this.openMeets = this.meetService.getOpenMeets();
+        this.sortMeets();
+      });
 
 
-        if (this.userService.isLoggedIn()) {
-          this.entryService.retrieveIncompleteEntries();
-          this.entryService.retrieveSubmittedEntries();
-        }
+    this.entryService.retrieveIncompleteEntries();
+    if (this.userService.isLoggedIn()) {
+
+      this.entryService.retrieveSubmittedEntries();
     }
+  }
 
   sortMeets() {
     this.openMeets.sort(this.dateCompare);

@@ -105,22 +105,23 @@ export class EntryDetailsEventComponent implements OnInit {
       }
 
       // Download member history if it's not already available
-      if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
-        this.memberHistoryService.downloadHistory(this.memberNo);
-        this.memberHistoryService.resultsAvailable.subscribe((resultsAvailable) => {
-          // Once results are available, check if there's a previous result for this event
-          if (resultsAvailable) {
-            this.isMemberHistoryAvailable();
+      if (!isNaN(this.memberNo)) {
+        if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
+          this.memberHistoryService.downloadHistory(this.memberNo);
+          this.memberHistoryService.resultsAvailable.subscribe((resultsAvailable) => {
+            // Once results are available, check if there's a previous result for this event
+            if (resultsAvailable) {
+              this.isMemberHistoryAvailable();
 
-            // Freetime not available
-            if (this.historyAvailable && this.meetEvent.freetime) {
-              // console.log('Disable free time entry on event ' + this.meetEvent.prognumber);
-              this.eventEntryForm.controls.seedTime.disable();
+              // Freetime not available
+              if (this.historyAvailable && this.meetEvent.freetime) {
+                // console.log('Disable free time entry on event ' + this.meetEvent.prognumber);
+                this.eventEntryForm.controls.seedTime.disable();
+              }
             }
-          }
-        });
+          });
+        }
       }
-
 
     });
 
@@ -164,19 +165,25 @@ export class EntryDetailsEventComponent implements OnInit {
   }
 
   isMemberHistoryAvailable() {
-    if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
-      // console.log('Look for member history for ' + this.meetEvent.event_discipline.discipline);
-      this.historyAvailable = this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.event_distance.metres,
-        this.meetEvent.event_discipline.discipline, this.meetEvent.event_distance.course);
-      if (this.historyAvailable) {
-        // console.log('History available for event ' + this.meetEvent.prognumber);
+    console.log(this.memberNo);
+    if (!isNaN(this.memberNo)) {
+      if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
+        // console.log('Look for member history for ' + this.meetEvent.event_discipline.discipline);
+        this.historyAvailable = this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.event_distance.metres,
+          this.meetEvent.event_discipline.discipline, this.meetEvent.event_distance.course);
+        if (this.historyAvailable) {
+          // console.log('History available for event ' + this.meetEvent.prognumber);
+        } else {
+          // console.log('No member history for event ' + this.meetEvent.prognumber);
+        }
       } else {
         // console.log('No member history for event ' + this.meetEvent.prognumber);
+        this.historyAvailable = false;
       }
     } else {
-      // console.log('No member history for event ' + this.meetEvent.prognumber);
       this.historyAvailable = false;
     }
+
   }
 
   eventSelected() {

@@ -55,7 +55,10 @@ export class MeetListItemComponent implements OnInit {
       if (incomplete !== undefined && incomplete !== null) {
 
         this.incompleteEntries = incomplete.filter(x => x.meet_id === this.meet.id
-          && (x.status_id === 1 || x.status_id === 14));
+          && (x.status_id === undefined || x.status_id === 1 || x.status_id === 14));
+
+        console.log(this.incompleteEntries);
+
         if (this.incompleteEntries.length > 0) {
           this.hasEntry = true;
         } else {
@@ -100,6 +103,8 @@ export class MeetListItemComponent implements OnInit {
 
       this.submittedEntries = this.unauthenticatedEntryService.getEntriesByMeet(this.meet.id);
       this.pendingEntries = this.unauthenticatedEntryService.getPendingByMeet(this.meet.id);
+      console.log(this.submittedEntries);
+      console.log(this.pendingEntries);
     }
   }
 
