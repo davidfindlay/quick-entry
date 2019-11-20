@@ -4,7 +4,8 @@ import {MeetService} from '../meet.service';
 import {Meet} from '../models/meet';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {NgxSpinnerService} from 'ngx-spinner';
 
 @Component({
   selector: 'app-meet-entry-list',
@@ -35,76 +36,98 @@ export class MeetEntryListComponent implements OnInit {
   constructor(private fb: FormBuilder,
               private meetService: MeetService,
               private http: HttpClient,
-              private router: Router) { }
+              private router: Router,
+              private route: ActivatedRoute,
+              private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
     this.meets = this.meetService.getMeets();
+
+    this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.createForm();
+    this.loadMeet();
+
+    this.route.params.subscribe(
+      params => {
+        this.meetId = params['meetId'];
+        this.loadMeet();
+      });
+
+    this.createForm();
+  }
+
+  loadMeet() {
+
+    this.http.get(environment.api + 'meet_entries/' + this.meetId).subscribe((entries: any) => {
+      this.entries = entries.meet_entries;
+
+      this.tableRows = [];
+
+      for (const entry of this.entries) {
+        let paid = 0;
+
+        for (const payment of entry.payments) {
+          paid += payment.amount;
+        }
+
+        let status_label = '';
+        if (entry.status !== undefined && entry.status !== null) {
+          if (entry.status.status !== undefined && entry.status.status !== null) {
+            status_label = entry.status.status.label;
+          }
+        }
+
+        let clubCode = '';
+        let clubName = '';
+        if (entry.club !== undefined && entry.club !== null) {
+          clubCode = entry.club.code;
+          clubName = entry.club.clubname;
+        }
+
+        let memberSurname = '';
+        let memberFirstname = '';
+        if (entry.member !== undefined && entry.member !== null) {
+          memberSurname = entry.member.surname;
+          memberFirstname = entry.member.firstname;
+        }
+
+        const row = {
+          'id': entry.id,
+          'code': entry.code,
+          'Entrant': memberSurname + ', ' + memberFirstname,
+          'Club': clubCode,
+          'clubname': clubName,
+          'Cost': entry.cost,
+          'Paid': paid,
+          'Updated': entry.updated_at,
+          'Status': status_label
+        };
+        this.tableRows.push(row);
+      }
+
+      this.tableRows = [...this.tableRows];
+      this.table.recalculate();
+
+      console.log(this.tableRows);
+      this.spinner.hide();
+
+    });
+
   }
 
   createForm() {
     this.meetSelectorForm = this.fb.group({
       meetYear: [2019, Validators.required],
-      meet: [0, Validators.required]
+      meet: [this.meetId, Validators.required]
     });
 
     this.meetSelectorFormSub = this.meetSelectorForm.valueChanges.subscribe((change) => {
-      this.meetId = change.meet;
-      console.log('Selected meet ' + this.meetId);
+      this.spinner.show();
+      if (change.meet !== this.meetId) {
+        this.router.navigate(['/', 'meet-entries', change.meet]);
+        console.log('Selected meet ' + this.meetId);
+      }
 
-      this.http.get(environment.api + 'meet_entries/' + this.meetId).subscribe((entries: any) => {
-        this.entries = entries.meet_entries;
-
-        this.tableRows = [];
-
-        for (const entry of this.entries) {
-          let paid = 0;
-
-          for (const payment of entry.payments) {
-            paid += payment.amount;
-          }
-
-          let status_label = '';
-          if (entry.status !== undefined && entry.status !== null) {
-            if (entry.status.status !== undefined && entry.status.status !== null) {
-              status_label = entry.status.status.label;
-            }
-          }
-
-          let clubCode = '';
-          let clubName = '';
-          if (entry.club !== undefined && entry.club !== null) {
-            clubCode = entry.club.code;
-            clubName = entry.club.clubname;
-          }
-
-          let memberSurname = '';
-          let memberFirstname = '';
-          if (entry.member !== undefined && entry.member !== null) {
-            memberSurname = entry.member.surname;
-            memberFirstname = entry.member.firstname;
-          }
-
-          const row = {
-            'id': entry.id,
-            'code': entry.code,
-            'Entrant': memberSurname + ', ' + memberFirstname,
-            'Club': clubCode,
-            'clubname': clubName,
-            'Cost': entry.cost,
-            'Paid': paid,
-            'Updated': entry.updated_at,
-            'Status': status_label
-          };
-          this.tableRows.push(row);
-        }
-
-        this.tableRows = [...this.tableRows];
-        this.table.recalculate();
-
-        console.log(this.tableRows);
-
-      });
     });
   }
 

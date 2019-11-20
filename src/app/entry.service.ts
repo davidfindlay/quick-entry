@@ -752,10 +752,12 @@ export class EntryService {
   convertMeetEntryToEntryFO(entry) {
     console.log('convertMeetEntryToEntryFO');
     if (entry === undefined || entry === null) {
+      console.error('entry is undefined');
       return null;
     }
 
-    if (entry.meet_entry === undefined || entry === null) {
+    if (entry.meet_entry === undefined) {
+      console.error('meet_entry is undefined');
       return null;
     }
 
@@ -823,7 +825,7 @@ export class EntryService {
       medicalDetailsFO.classification = 'classified';
     }
 
-    if (meetEntry.disability_status !== 0) {
+    if (meetEntry.disability_status !== null && meetEntry.disability_status !== 0) {
       if (meetEntry.disability_s.classification !== undefined && meetEntry.disability_s.classification !== null) {
         medicalDetailsFO.classFreestyle = meetEntry.disability_s.classification;
       }
@@ -834,6 +836,8 @@ export class EntryService {
         medicalDetailsFO.classMedley = meetEntry.disability_sm.classification;
       }
     }
+
+    console.log('got here');
 
     if (meetEntry.medical_condition) {
       medicalDetailsFO.dispensation = 'true';

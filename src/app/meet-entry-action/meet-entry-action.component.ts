@@ -5,6 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {EntryService} from '../entry.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {MeetService} from '../meet.service';
+import {NgxSpinnerService} from 'ngx-spinner';
 
 @Component({
   selector: 'app-meet-entry-action',
@@ -43,20 +44,29 @@ export class MeetEntryActionComponent implements OnInit {
   updated_at;
 
   editing = false;
+  unableToLoad = false;
 
   meetActionForm: FormGroup;
 
   constructor(private route: ActivatedRoute,
               private entryService: EntryService,
               private meetService: MeetService,
-              private fb: FormBuilder) { }
+              private fb: FormBuilder,
+              private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
-    console.log('meet entry action ');
+    this.spinner.show();
     this.meetEntryId = this.route.snapshot.paramMap.get('entryId');
     this.entryService.getMeetEntryFO(this.meetEntryId).subscribe((entry: any) => {
-      console.log('got entry');
-      this.loadEntry(entry);
+
+      if (entry === undefined || entry === null) {
+        this.unableToLoad = true;
+        console.error('Unable to load entry: ' + this.meetEntryId);
+      } else {
+
+        this.loadEntry(entry);
+      }
+
     });
 
     this.meetActionForm = this.fb.group({
@@ -65,18 +75,17 @@ export class MeetEntryActionComponent implements OnInit {
   }
 
   loadEntry(entry) {
-    console.log('load entry');
     this.entry = entry.entrydata;
     this.incompleteEntry = entry;
     this.meet_id = entry.meet_id;
     this.meet = this.meetService.getMeet(this.meet_id);
     this.meetName = this.meet.meetname;
     this.meetFee = this.meet.meetfee;
-    console.log(entry);
     this.statusLabel = entry.status_label;
     this.statusText = entry.status_description;
     this.eventEntries = entry.entrydata.entryEvents;
     this.paidAmount = entry.paidAmount;
+    this.spinner.hide();
   }
 
   getLegs(event_id) {

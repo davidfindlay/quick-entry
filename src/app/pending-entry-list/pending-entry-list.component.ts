@@ -50,10 +50,6 @@ export class PendingEntryListComponent implements OnInit {
   ngOnInit() {
     this.meets = this.meetService.getMeets();
 
-    for (const meet in this.meets) {
-
-    }
-
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.createForm();
     this.loadMeet();
