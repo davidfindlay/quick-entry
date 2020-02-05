@@ -123,7 +123,8 @@
               First Name:
             </label>
             <div class="fieldValue">
-              <input class="form-control col-sm-12" type="text" formControlName="entrantFirstName" id="entrantFirstName"/>
+              <input class="form-control col-sm-12" type="text" formControlName="entrantFirstName"
+                     id="entrantFirstName"/>
             </div>
           </div>
           <div class="row" *ngIf="!editing">
@@ -302,41 +303,56 @@
       </div>
     </div>
 
-    <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
-      <h3>Membership Details</h3>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Member Type:
-        </div>
-        <div class="fieldValue">
-          {{membershipType}}
-        </div>
+    <div class="card mb-1" *ngIf="entry !== undefined && entry !== null">
+      <div class="card-header">
+        <h3>Membership Details</h3>
       </div>
-      <div class="row" *ngIf="!editing">
-        <div class="fieldName col-sm-3">
-          Membership Number:
+      <div class="card-body">
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Member Type:
+          </div>
+          <div class="fieldValue">
+            {{membershipType}}
+          </div>
         </div>
-        <div class="fieldValue" >
-          {{entry.membershipDetails.member_number}}
+        <div *ngIf="this.membershipType === 'Masters Swimming Australia Member'">
+          <div class="row" *ngIf="!editing">
+            <div class="fieldName col-sm-3">
+              Membership Number:
+            </div>
+            <div class="fieldValue">
+              {{entry.membershipDetails.member_number}}
+            </div>
+          </div>
+          <div class="row" *ngIf="editing">
+            <label class="fieldName col-sm-3">
+              Membership Number:
+            </label>
+            <div class="fieldValue">
+              <input class="form-control col-sm-12" type="text" formControlName="entrantNumber" id="entrantNumber"/>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="row" *ngIf="editing">
-        <label class="fieldName col-sm-3">
-          Membership Number:
-        </label>
-        <div class="fieldValue">
-          <input class="form-control col-sm-12" type="text" formControlName="entrantNumber" id="entrantNumber"/>
+        <div class="row"
+             *ngIf="this.membershipType === 'Masters Swimming Australia Member' || this.membershipType === 'Guest Member'">
+          <div class="fieldName col-sm-3">
+            Club:
+          </div>
+          <div class="fieldValue">
+            {{clubName}}
+            <span *ngIf="clubCode !== ''">({{clubCode}})</span>
+            <!--          {{entry.membershipDetails.club_name}}-->
+            <!--          <span *ngIf="entry.membershipDetails.club_code !== ''">({{entry.membershipDetails.club_code}})</span>-->
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Club:
-        </div>
-        <div class="fieldValue">
-          {{clubName}}
-          <span *ngIf="clubCode !== ''">({{clubCode}})</span>
-<!--          {{entry.membershipDetails.club_name}}-->
-<!--          <span *ngIf="entry.membershipDetails.club_code !== ''">({{entry.membershipDetails.club_code}})</span>-->
+        <div class="row" *ngIf="this.membershipType === 'Non-Member'">
+          <div class="col-sm-3">
+            Action:
+          </div>
+          <div class="fieldValue">
+          <button class="btn btn-primary">Approve Event Membership</button>
+          </div>
         </div>
       </div>
     </div>
@@ -498,6 +514,31 @@
         <td class="moneycol">
           {{paidAmount | currency}}
         </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h3>Payments</h3>
+    <table>
+      <thead>
+      <tr>
+        <th class="pr-4">
+          Date/Time
+        </th>
+        <th class="pr-4">
+          Transaction ID
+        </th>
+        <th class="pr-4">
+          Paid By
+        </th>
+        <th class="pr-4">
+          Amount
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+
       </tr>
       </tbody>
     </table>

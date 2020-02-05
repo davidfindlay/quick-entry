@@ -114,6 +114,9 @@ export class PendingEntryActionComponent implements OnInit {
       this.clubName = this.entry.membershipDetails.club_name;
     }
 
+    // Update the Membership Type field
+    this.updateMembershipType();
+
     if (this.entry.membershipDetails.member_number !== null && this.entry.membershipDetails.member_number !== '') {
       this.memberService.getMemberByNumber(this.entry.membershipDetails.member_number).subscribe((member: any) => {
         console.log(member);
@@ -182,6 +185,32 @@ export class PendingEntryActionComponent implements OnInit {
     }
 
     return '';
+  }
+
+  updateMembershipType() {
+    if (this.entry.membershipDetails.member_type !== undefined && this.entry.membershipDetails.member_type !== null) {
+      switch (this.entry.membershipDetails.member_type) {
+        case 'msa': {
+          this.membershipType = 'Masters Swimming Australia Member';
+          break;
+        }
+        case 'international': {
+          this.membershipType = 'International Masters Swimming Member';
+          break;
+        }
+        case 'guest': {
+          this.membershipType = 'Guest Member';
+          break;
+        }
+        case 'non_member': {
+          this.membershipType = 'Non-Member';
+          break;
+        }
+        default : {
+          this.membershipType = 'Unknown membership type';
+        }
+      }
+    }
   }
 
   approve() {

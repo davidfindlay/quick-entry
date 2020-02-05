@@ -9,6 +9,7 @@ import {MeetEvent} from './models/meet-event';
 import {EntryEvent} from './models/entryevent';
 
 import { environment } from '../environments/environment';
+import {Subscription} from 'rxjs';
 
 @Injectable()
 export class MeetService {
@@ -176,5 +177,9 @@ export class MeetService {
     }
 
     return eventIds;
+  }
+
+  getAllMeets():  Observable<Meet[]> {
+    return this.http.get<Meet[]>(environment.api + 'meets/all');
   }
 }

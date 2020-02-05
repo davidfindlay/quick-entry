@@ -17,19 +17,22 @@ export class PendingEntryListComponent implements OnInit {
   @ViewChild('entryTable', {static: true}) table: any;
 
   meets: Meet[];
+  filteredMeets: Meet[];
   meetId: number;
+  years: number[] = [];
+  yearSelected: number;
 
   meetList = [];
 
   entries;
   tableRows = [];
   columns = [
-    { name: 'Entrant' },
-    { name: 'Club' },
-    { name: 'Cost' },
-    { name: 'Paid' },
-    { name: 'Status' },
-    { name: 'Pending Reason'}
+    {name: 'Entrant'},
+    {name: 'Club'},
+    {name: 'Cost'},
+    {name: 'Paid'},
+    {name: 'Status'},
+    {name: 'Pending Reason'}
 
   ];
 
@@ -45,13 +48,41 @@ export class PendingEntryListComponent implements OnInit {
               private http: HttpClient,
               private router: Router,
               private route: ActivatedRoute,
-              private spinner: NgxSpinnerService) { }
+              private spinner: NgxSpinnerService) {
+  }
 
   ngOnInit() {
-    this.meets = this.meetService.getMeets();
+    this.spinner.show();
+    this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
+      this.meets = meets;
+
+      for (let i = 0, len = this.meets.length; i < len; i++) {
+        const meet = this.meets[i];
+        const startDate = new Date(meet.startdate);
+        // console.log(startDate);
+
+        const year = startDate.getFullYear();
+        // console.log('meet=' + meet.id + ' year=' + year);
+        if (!this.years.includes(year)) {
+          this.years.push(year);
+        }
+
+      }
+
+      const dt = new Date();
+      if (this.years.includes(dt.getFullYear())) {
+        this.meetSelectorForm.patchValue({
+          meetYear: dt.getFullYear()
+        });
+      } else {
+
+      }
+
+      // this.filterMeets()
+
+    });
 
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
-    this.createForm();
     this.loadMeet();
 
     this.route.params.subscribe(
@@ -59,11 +90,15 @@ export class PendingEntryListComponent implements OnInit {
         this.meetId = params['meetId'];
         this.loadMeet();
       });
+
+    this.createForm();
+
   }
 
   createForm() {
+    const dt = new Date();
     this.meetSelectorForm = this.fb.group({
-      meetYear: [2019, Validators.required],
+      meetYear: [dt.getFullYear(), Validators.required],
       meet: [this.meetId, Validators.required],
       showPending: true,
       showFinalised: false,
@@ -72,9 +107,18 @@ export class PendingEntryListComponent implements OnInit {
 
     this.meetSelectorFormSub = this.meetSelectorForm.valueChanges.subscribe((change) => {
       this.spinner.show();
+
+      if (change.meetYear !== this.yearSelected) {
+        this.yearSelected = parseInt(change.meetYear, 10);
+        console.log('Change selected year to ' + change.meetYear)
+        this.filterMeets();
+      }
+
+      console.log('Current meet: ' + this.meetId);
+      console.log(change);
       if (change.meet !== this.meetId) {
         this.router.navigate(['/', 'pending-entries', change.meet]);
-        // console.log('Selected meet ' + this.meetId);
+        console.log('Selected meet ' + this.meetId);
       }
 
       // console.log(change);
@@ -103,6 +147,26 @@ export class PendingEntryListComponent implements OnInit {
 
   }
 
+  filterMeets() {
+    this.filteredMeets = [];
+    for (let i = 0, len = this.meets.length; i < len; i++) {
+      const meet = this.meets[i];
+      const startDate = new Date(meet.startdate);
+      const year = startDate.getFullYear();
+
+      if (year === this.yearSelected) {
+        this.filteredMeets.push(meet);
+        console.log('Add Meet ' + meet.meetname);
+      }
+
+      if (this.filteredMeets.length > 0) {
+        this.meetSelectorForm.patchValue({meet: this.filteredMeets[0].id});
+        this.meetId = this.filteredMeets[0].id;
+        this.router.navigate(['/', 'pending-entries', this.meetId]);
+      }
+    }
+  }
+
   loadMeet() {
     this.http.get(environment.api + 'pending_entries/' + this.meetId).subscribe((entries: any) => {
       this.entries = entries.pending_entries;
@@ -127,7 +191,7 @@ export class PendingEntryListComponent implements OnInit {
           'id': entry.id,
           'code': entry.code,
           'Entrant': entry.entrydata.entrantDetails.entrantSurname + ', ' + entry.entrydata.entrantDetails.entrantFirstName,
-          'Club':  club_code,
+          'Club': club_code,
           'clubname': club_name,
           'Status': entry.status.label,
           'Reason': entry.pending_reason,

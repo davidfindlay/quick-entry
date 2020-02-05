@@ -18,6 +18,7 @@ export class MeetEntryListComponent implements OnInit {
 
   meets: Meet[];
   meetId: number;
+  years: number[] = [];
 
   entries;
   tableRows = [];
@@ -42,6 +43,14 @@ export class MeetEntryListComponent implements OnInit {
 
   ngOnInit() {
     this.meets = this.meetService.getMeets();
+
+    this.meets.forEach((meet: Meet) => {
+      const year = meet.startdate.getFullYear();
+      console.log(year);
+      if (!this.years.includes(year)) {
+        this.years.push(meet.startdate.getFullYear());
+      }
+    });
 
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.createForm();
@@ -116,8 +125,9 @@ export class MeetEntryListComponent implements OnInit {
   }
 
   createForm() {
+    const dt = new Date();
     this.meetSelectorForm = this.fb.group({
-      meetYear: [2019, Validators.required],
+      meetYear: [dt.getFullYear(), Validators.required],
       meet: [this.meetId, Validators.required]
     });
 
