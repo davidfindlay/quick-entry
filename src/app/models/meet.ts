@@ -32,6 +32,8 @@ export class Meet {
   public mealname;
   public massagefee;
   public programfee;
+  public included_events;
+  public extra_event_fee;
   public sessions: Session[];
   public events: MeetEvent[];
 
