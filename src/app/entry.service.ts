@@ -18,6 +18,7 @@ import {EntrantDetails} from './models/entrant-details';
 import {of} from 'rxjs/internal/observable/of';
 import {map} from 'rxjs/operators';
 import {angularInnerClassDecoratorKeys} from 'codelyzer/util/utils';
+import {findReadVarNames} from '@angular/compiler/src/output/output_ast';
 
 @Injectable()
 export class EntryService {
@@ -510,9 +511,12 @@ export class EntryService {
 
   getEventFees(entryFO: EntryFormObject) {
     let entryFee = 0;
+    let individualEvents = 0;
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
     if (meetDetails !== undefined && meetDetails !== null) {
       if (entryFO.entryEvents !== undefined && entryFO.entryEvents !== null) {
+
+        // Handle fees for specific events
         for (const eventEntry of entryFO.entryEvents) {
           const eventDetails = meetDetails.events.find(x => x.id === eventEntry.event_id);
 
@@ -530,6 +534,22 @@ export class EntryService {
             }
           }
         }
+
+        // Handle included events and extra event fee
+        if (meetDetails.included_events !== null) {
+          for (const eventEntry of entryFO.entryEvents) {
+            const eventDetails = meetDetails.events.find(x => x.id === eventEntry.event_id);
+
+            // Only charge for individual events, and if there isn't a specific fee for this event
+            if (eventDetails.legs === 1 && eventDetails.eventfee === null) {
+              individualEvents++;
+              if (individualEvents > meetDetails.included_events) {
+                entryFee += meetDetails.extra_event_fee;
+              }
+            }
+          }
+        }
+
       }
     }
     return entryFee;
