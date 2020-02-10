@@ -552,6 +552,9 @@ export class EntryService {
 
       }
     }
+
+    console.log('entry fee: ' + entryFee);
+
     return entryFee;
   }
 

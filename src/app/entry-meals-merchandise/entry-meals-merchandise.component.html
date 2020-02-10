@@ -1,0 +1,38 @@
+<h1>Enter {{meetName}}</h1>
+<h2>Meals and Merchandise</h2>
+
+<form [formGroup]="mealsMerchandiseForm">
+
+  <fieldset class="qe-fieldset">
+
+    <h3>Meals</h3>
+
+    <div class="card mb-3 bg-info text-white">
+      <div class="card-body">
+        <p>
+          This meet is offering a meal purchase as an option. Please see the meet flyer for more details of this meal
+          on offer.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-form-legend col-md-6" for="meals">Quantity of Meal Tickets:</label>
+
+      <div class="col-md-6">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <button class="btn btn-outline-secondary" type="button" id="button-removemeal" aria-label="Remove Meal">-</button>
+          </div>
+          <input class="form-control col-sm-6" type="text" formControlName="meals" id="meals"/>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="button-addmeal" aria-label="Add Meal">+</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </fieldset>
+
+</form>

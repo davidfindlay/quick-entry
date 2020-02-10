@@ -54,6 +54,7 @@ import { ClubMemberSelectorComponent } from './club-member-selector/club-member-
 import * as Sentry from '@sentry/browser';
 import {environment} from '../environments/environment';
 import { MeetEntryContactListComponent } from './meet-entry-contact-list/meet-entry-contact-list.component';
+import { EntryMealsMerchandiseComponent } from './entry-meals-merchandise/entry-meals-merchandise.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -63,6 +64,7 @@ const appRoutes: Routes = [
     { path: 'enter/:meet/step2', component: MembershipClubDetailsComponent},
   { path: 'enter/:meet/step3', component: ClassificationMedicalDetailsComponent},
   { path: 'enter/:meet/step4', component: EntryDetailsComponent},
+  { path: 'enter/:meet/merchandise', component: EntryMealsMerchandiseComponent},
   { path: 'enter/:meet/step5', component: EntryPaymentComponent},
   { path: 'enter/:meet/confirmation', component: EntryConfirmationComponent},
   { path: 'pending-entry-confirmation/:pendingId', component: EntryConfirmationComponent},
@@ -124,7 +126,8 @@ export class SentryErrorHandler implements ErrorHandler {
         PendingEntryActionComponent,
         MeetEntryActionComponent,
         ClubMemberSelectorComponent,
-        MeetEntryContactListComponent
+        MeetEntryContactListComponent,
+        EntryMealsMerchandiseComponent
     ],
     entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
   imports: [
