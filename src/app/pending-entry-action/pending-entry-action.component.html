@@ -224,7 +224,7 @@
             Gender:
           </div>
           <div class="fieldValue">
-            {{memberSearchResult.gender}}
+            {{(memberSearchResult.gender === 1) ? 'Male' : 'Female'}}
           </div>
         </div>
         <div class="row">
@@ -316,7 +316,7 @@
             {{membershipType}}
           </div>
         </div>
-        <div *ngIf="this.membershipType === 'Masters Swimming Australia Member'">
+        <div>
           <div class="row" *ngIf="!editing">
             <div class="fieldName col-sm-3">
               Membership Number:
@@ -334,26 +334,36 @@
             </div>
           </div>
         </div>
-        <div class="row"
-             *ngIf="this.membershipType === 'Masters Swimming Australia Member' || this.membershipType === 'Guest Member'">
+        <div class="row">
           <div class="fieldName col-sm-3">
-            Club:
+            Club Name:
           </div>
-          <div class="fieldValue">
+          <div class="fieldValue" *ngIf="!editing">
             {{clubName}}
-            <span *ngIf="clubCode !== ''">({{clubCode}})</span>
             <!--          {{entry.membershipDetails.club_name}}-->
             <!--          <span *ngIf="entry.membershipDetails.club_code !== ''">({{entry.membershipDetails.club_code}})</span>-->
           </div>
-        </div>
-        <div class="row" *ngIf="this.membershipType === 'Non-Member'">
-          <div class="col-sm-3">
-            Action:
-          </div>
-          <div class="fieldValue">
-          <button class="btn btn-primary">Approve Event Membership</button>
+          <div class="fieldValue" *ngIf="editing">
+            <input class="form-control col-sm-10" type="text" formControlName="entrantClub" id="club-name"
+                   [ngbTypeahead]="clubSearch" (selectItem)="clubSelected($event)"/>
+
           </div>
         </div>
+
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Club Code:
+          </div>
+          <div class="fieldValue" *ngIf="!editing">
+            <span *ngIf="entry.membershipDetails.club_code !== ''">{{entry.membershipDetails.club_code}}</span>
+          </div>
+          <div class="fieldValue" *ngIf="editing">
+            <input class="form-control col-sm-6" type="text" formControlName="entrantClubCode" id="club-code" />
+          </div>
+        </div>
+
+        <button class="btn btn-primary" (click)="createEventMembership()">Approve Event Membership</button>
+
       </div>
     </div>
 

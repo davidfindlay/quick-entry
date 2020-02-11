@@ -8,6 +8,8 @@ import {MemberService} from '../member.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {FormBuilder} from '@angular/forms';
 import {ClubsService} from '../clubs.service';
+import {Observable} from 'rxjs';
+import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-pending-entry-action',
@@ -57,6 +59,13 @@ export class PendingEntryActionComponent implements OnInit {
   editing = false;
   pendingActionForm;
 
+  clubSearch = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term.length < 2 ? [] : this.clubService.findClubName(term))
+    );
+
   constructor(private entryService: EntryService,
               private meetService: MeetService,
               private clubService: ClubsService,
@@ -74,7 +83,8 @@ export class PendingEntryActionComponent implements OnInit {
       entrantDob: '',
       entrantGender: '',
       entrantNumber: '',
-      entrantClub: ''
+      entrantClub: '',
+      entrantClubCode: ''
     });
 
     this.pendingEntryCode = this.route.snapshot.paramMap.get('pendingId');
@@ -253,7 +263,9 @@ export class PendingEntryActionComponent implements OnInit {
       entrantFirstName: this.entry.entrantDetails.entrantFirstName,
       entrantGender: this.entry.entrantDetails.entrantGender,
       entrantDob: this.entry.entrantDetails.entrantDob,
-      entrantNumber: this.entry.membershipDetails.member_number
+      entrantNumber: this.entry.membershipDetails.member_number,
+      entrantClub: this.entry.membershipDetails.club_name,
+      entrantClubCode: this.entry.membershipDetails.club_code
     });
 
     this.editing = true;
@@ -268,6 +280,8 @@ export class PendingEntryActionComponent implements OnInit {
     this.entry.entrantDetails.entrantGender = this.pendingActionForm.controls['entrantGender'].value;
     this.entry.entrantDetails.entrantDob = this.pendingActionForm.controls['entrantDob'].value;
     this.entry.membershipDetails.member_number = this.pendingActionForm.controls['entrantNumber'].value;
+    this.entry.membershipDetails.club_name = this.pendingActionForm.controls['entrantClub'].value;
+    this.entry.membershipDetails.club_code = this.pendingActionForm.controls['entrantClubCode'].value;
     this.entryService.updatePending(this.pendingEntryCode, this.incompleteEntry).subscribe((entry) => {
       this.loadEntry(entry);
     });
@@ -275,5 +289,47 @@ export class PendingEntryActionComponent implements OnInit {
 
   cancel() {
     this.editing = false;
+  }
+
+  clubSelected($event) {
+    let clubcode = '';
+    const clubs = this.clubService.findClub($event.item);
+
+    if (clubs != null) {
+      if (clubs.length > 0) {
+        clubcode = clubs[0].code;
+      }
+    }
+
+    this.pendingActionForm.controls['entrantClubCode'].patchValue(clubcode, {});
+  }
+
+  createEventMembership() {
+    console.log('Create Event Membership');
+    this.memberService.createMember({
+      surname: this.entry.entrantDetails.entrantSurname,
+      firstname: this.entry.entrantDetails.entrantFirstName,
+      dob: this.entry.entrantDetails.entrantDob,
+      gender: this.entry.entrantDetails.entrantGender,
+      number: this.entry.membershipDetails.member_number,
+      email: this.entry.entrantDetails.entrantEmail,
+      phone: this.entry.entrantDetails.entrantPhone,
+      club: this.entry.membershipDetails.club_code,
+      membershipType: 'Event Membership',
+      membershipStatus: 'Guest',
+      startdate: this.meet.startdate,
+      enddate: this.meet.enddate
+    }).subscribe((updates: any) => {
+      console.log(updates);
+      const memberNumber = updates.member.number;
+      this.pendingActionForm.patchValue({
+        entrantNumber: memberNumber
+      });
+      this.entry.membershipDetails.member_number = memberNumber;
+
+      this.entryService.updatePending(this.pendingEntryCode, this.incompleteEntry).subscribe((entry) => {
+        this.loadEntry(entry);
+      });
+    })
   }
 }

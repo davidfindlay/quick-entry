@@ -102,7 +102,8 @@ export class PendingEntryListComponent implements OnInit {
       meet: [this.meetId, Validators.required],
       showPending: true,
       showFinalised: false,
-      showIncomplete: false
+      showIncomplete: false,
+      showCancelled: false
     });
 
     this.meetSelectorFormSub = this.meetSelectorForm.valueChanges.subscribe((change) => {
