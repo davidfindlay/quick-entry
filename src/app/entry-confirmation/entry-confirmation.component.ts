@@ -70,9 +70,16 @@ export class EntryConfirmationComponent implements OnInit {
   medicalCertificate = 'No';
   medicalCondition = 'No';
 
+  mealName = 'Meal';
+  mealsQuantity = 0;
+  mealSubtotal = 0;
+
   meetFee = 0;
   eventFee = 0;
+  mealFee = 0;
   totalFee = 0;
+
+  previousScreen = '/enter/' + this.meet_id + '/step4';
 
   showPaymentChoice = true;
 
@@ -216,7 +223,18 @@ export class EntryConfirmationComponent implements OnInit {
 
     this.meetFee = this.entryService.getMeetFee(this.entry);
     this.eventFee = this.entryService.getEventFees(this.entry);
-    this.totalFee = this.meetFee + this.eventFee;
+    this.mealFee = this.entryService.getMealFees(this.entry);
+    this.totalFee = this.meetFee + this.eventFee + this.mealFee;
+
+    if (this.meet.mealname !== null && this.meet.mealname !== '') {
+      this.mealName = this.meet.mealname;
+    }
+
+    if (this.meet.mealfee !== null) {
+      this.previousScreen = '/enter/' + this.meet_id + '/merchandise';
+    }
+
+    this.mealsQuantity = this.entry.mealMerchandiseDetails.meals;
 
     this.ngxSpinner.hide();
 

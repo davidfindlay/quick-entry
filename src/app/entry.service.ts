@@ -19,6 +19,7 @@ import {of} from 'rxjs/internal/observable/of';
 import {map} from 'rxjs/operators';
 import {angularInnerClassDecoratorKeys} from 'codelyzer/util/utils';
 import {findReadVarNames} from '@angular/compiler/src/output/output_ast';
+import {MealMerchandiseDetails} from './models/meal-merchandise-details';
 
 @Injectable()
 export class EntryService {
@@ -230,6 +231,36 @@ export class EntryService {
         } else {
           console.error('Unable to find entry');
         }
+      });
+    });
+  }
+
+  setMealMerchandiseDetails(meetId: number, mealMerchandiseDetails: MealMerchandiseDetails) {
+    return new Observable((observer) => {
+      this.getIncompleteEntryFO(meetId).subscribe((entry: EntryFormObject) => {
+        if (entry !== null) {
+          entry.mealMerchandiseDetails = mealMerchandiseDetails;
+
+          // If logged in store to server
+          if (this.userService.getUsers() !== null) {
+            console.log('User is logged in, store to server');
+
+            this.storeIncompleteEntry(entry).subscribe((result: any) => {
+              console.log('Stored medical details to server');
+              console.log(result);
+              observer.next(result.entrydata);
+            });
+          } else {
+            this.storeEntries();
+            observer.next(entry);
+          }
+
+          console.log(entry);
+
+        } else {
+          console.error('Unable to find entry');
+        }
+
       });
     });
   }
@@ -552,7 +583,20 @@ export class EntryService {
 
       }
     }
+
+    console.log('entry fee: ' + entryFee);
+
     return entryFee;
+  }
+
+  getMealFees(entryFO: EntryFormObject) {
+    let mealFees = 0;
+    const meetDetails = this.meetService.getMeet(entryFO.meetId);
+    if (meetDetails !== undefined && meetDetails !== null) {
+      mealFees = entryFO.mealMerchandiseDetails.meals * meetDetails.mealfee;
+    }
+
+    return mealFees;
   }
 
   getEntryCost(entryFO: EntryFormObject) {

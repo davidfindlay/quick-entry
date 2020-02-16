@@ -3,6 +3,7 @@ import {Member} from './member';
 import {MeetEntryEvent} from './meet-entry-event';
 import {MeetEntryStatus} from './meet-entry-status';
 import {MeetEntryPayment} from './meet-entry-payment';
+import {MerchandiseDetails} from './merchandise';
 
 export class MeetEntry {
   id: number;
@@ -11,6 +12,7 @@ export class MeetEntry {
   member: Member;
   age_group_id: number;
   meals: number;
+  mealComments: string;
   medical: boolean;
   cost: number;
   notes: string;
@@ -28,6 +30,7 @@ export class MeetEntry {
   medical_safety: boolean;
   medical_details: string;
   events: MeetEntryEvent[];
+  merchandise: MerchandiseDetails[];
   status: MeetEntryStatus;
   payments: MeetEntryPayment[];
   code: string;
