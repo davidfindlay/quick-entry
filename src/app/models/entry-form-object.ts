@@ -3,6 +3,7 @@ import {EntrantDetails} from './entrant-details';
 import {MembershipDetails} from './membership-details';
 import {MedicalDetails} from './medical-details';
 import {PaymentOption} from './paymentoption';
+import {MealMerchandiseDetails} from './meal-merchandise-details';
 
 export class EntryFormObject {
 
@@ -13,6 +14,7 @@ export class EntryFormObject {
   membershipDetails: MembershipDetails;
   medicalDetails: MedicalDetails;
   paymentOptions: PaymentOption;
+  mealMerchandiseDetails: MealMerchandiseDetails;
 
   // Membership
   memberType: string;

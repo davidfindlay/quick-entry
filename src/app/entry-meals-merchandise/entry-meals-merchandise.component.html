@@ -1,11 +1,11 @@
 <h1>Enter {{meetName}}</h1>
-<h2>Meals and Merchandise</h2>
+<h2>{{this.mealName}}s and Merchandise</h2>
 
 <form [formGroup]="mealsMerchandiseForm">
 
   <fieldset class="qe-fieldset">
 
-    <h3>Meals</h3>
+    <h3>{{this.mealName}}</h3>
 
     <div class="card mb-3 bg-info text-white">
       <div class="card-body">
@@ -16,23 +16,53 @@
       </div>
     </div>
 
+    <div class="card mb-3 bg-info text-white" *ngIf="this.meet.mealsincluded > 0">
+      <div class="card-body">
+        <p>
+          {{this.meet.mealsincluded}} {{this.mealName}} {{(this.meet.mealsincluded > 1) ? ' tickets are ' : ' ticket is ' }}included in your
+          meet entry fee. Additional tickets can be added below for {{this.meet.mealfee | currency}} per extra ticket.
+        </p>
+      </div>
+    </div>
+
     <div class="form-group row">
-      <label class="col-form-legend col-md-6" for="meals">Quantity of Meal Tickets:</label>
+      <label class="col-form-legend col-md-6" for="meals">{{(this.meet.mealsincluded > 0) ? 'Extra' : 'Quantity of'}} {{this.mealName}} tickets:</label>
 
       <div class="col-md-6">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <button class="btn btn-outline-secondary" type="button" id="button-removemeal" aria-label="Remove Meal">-</button>
+            <button class="btn btn-outline-secondary" type="button" id="button-removemeal" aria-label="Remove Meal" (click)="removeMeal()">-</button>
           </div>
-          <input class="form-control col-sm-6" type="text" formControlName="meals" id="meals"/>
+          <input class="form-control quantity" width="2" type="text" formControlName="meals" id="meals"/>
           <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" id="button-addmeal" aria-label="Add Meal">+</button>
+            <button class="btn btn-outline-secondary" type="button" id="button-addmeal" aria-label="Add Meal" (click)="addMeal()">+</button>
           </div>
         </div>
       </div>
 
     </div>
 
+    <div class="form-group row">
+      <label class="col-form-legend col-md-6" for="mealComments">Dietary Requirements or Other Comments:</label>
+
+      <div class="col-md-6">
+        <textarea class="form-control" rows="4" id="mealComments" formControlName="mealComments"></textarea>
+      </div>
+
+    </div>
+
+    <div class="form-group row">
+      <p class="col-form-legend col-md-6">Subtotal:</p>
+
+      <div class="col-md-6">
+        {{mealSubtotal | currency}}
+      </div>
+    </div>
   </fieldset>
+
+
+
+  <app-workflow-nav next="/enter/{{meet_id}}/confirmation" previous="/enter/{{meet_id}}/step4"
+                    [nextActivated]="formValidSubject.asObservable()" (submitEvent)="onSubmit($event)"></app-workflow-nav>
 
 </form>

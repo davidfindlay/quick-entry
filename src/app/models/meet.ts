@@ -30,6 +30,7 @@ export class Meet {
   public minevents;
   public mealsincluded;
   public mealname;
+  public mealdescription;
   public massagefee;
   public programfee;
   public included_events;
