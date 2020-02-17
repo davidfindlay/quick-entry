@@ -30,7 +30,7 @@
           <td>{{meet.maxevents}} events</td>
         </tr>
         <tr *ngIf="meet.mealfee > 0">
-          <th class="tableLabel">{{(meet.mealname !== null) ? meet.mealname : 'Meal'}}:</th>
+          <th class="tableLabel">{{mealName}} Tickets:</th>
           <td>
             {{(meet.mealsincluded > 0) ? 'Entry Fee includes ' + meet.mealsincluded + ' tickets. Additional ticket fee: ' : ''}}
             {{meet.mealfee | currency}}

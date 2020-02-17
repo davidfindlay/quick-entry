@@ -568,14 +568,16 @@ export class EntryService {
 
         // Handle included events and extra event fee
         if (meetDetails.included_events !== null) {
+          console.log('included events is ' + meetDetails.included_events);
           for (const eventEntry of entryFO.entryEvents) {
             const eventDetails = meetDetails.events.find(x => x.id === eventEntry.event_id);
 
             // Only charge for individual events, and if there isn't a specific fee for this event
-            if (eventDetails.legs === 1 && eventDetails.eventfee === null) {
+            if (eventDetails.legs === 1 && (eventDetails.eventfee === null || eventDetails.eventfee === 0)) {
               individualEvents++;
               if (individualEvents > meetDetails.included_events) {
                 entryFee += meetDetails.extra_event_fee;
+                console.log('add ' + entryFee);
               }
             }
           }

@@ -33,6 +33,8 @@ export class MeetListItemComponent implements OnInit {
   submittedSubscription;
   submittedEntries: MeetEntry[] = [];
 
+  mealName = 'Meal';
+
   userDetails;
 
   loggedIn = false;
@@ -48,6 +50,10 @@ export class MeetListItemComponent implements OnInit {
   }
 
   ngOnInit() {
+
+    if (this.meet.mealname !== null && this.meet.mealname !== '') {
+      this.mealName = this.meet.mealname;
+    }
 
     this.incompleteSubscription = this.entryService.incompleteChanged.subscribe((incomplete: IncompleteEntry[]) => {
       console.log(incomplete);
