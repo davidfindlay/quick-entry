@@ -142,7 +142,12 @@ export class SubmittedEntryComponent implements OnInit {
 
   editSubmittedEntry(submittedEntry) {
     this.entryService.editSubmittedEntry(submittedEntry.code).subscribe((edit: any) => {
-      this.router.navigate(['/', 'enter', edit.meet_id, 'step1'])
+      // TODO: if logged in go to step 2
+      if (this.loggedIn) {
+        this.router.navigate(['/', 'enter', edit.meet_id, 'step2'])
+      } else {
+        this.router.navigate(['/', 'enter', edit.meet_id, 'step1'])
+      }
     });
   }
 

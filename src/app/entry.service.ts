@@ -595,7 +595,13 @@ export class EntryService {
     let mealFees = 0;
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
     if (meetDetails !== undefined && meetDetails !== null) {
-      mealFees = entryFO.mealMerchandiseDetails.meals * meetDetails.mealfee;
+      if (entryFO.mealMerchandiseDetails !== undefined && entryFO.mealMerchandiseDetails !== null) {
+        if (meetDetails.mealfee !== null) {
+          mealFees = entryFO.mealMerchandiseDetails.meals * meetDetails.mealfee;
+        } else {
+          mealFees = 0;
+        }
+      }
     }
 
     return mealFees;
@@ -786,8 +792,11 @@ export class EntryService {
   }
 
   getMeetEntryByCodeFO(meetEntryCode) {
+    console.log('getMeetEntryByCodeFO');
     return new Observable((observer) => {
       this.http.get(environment.api + 'meet_entry_by_code/' + meetEntryCode).subscribe((entry: any) => {
+
+          console.log(entry);
 
           const incompleteEntry = this.convertMeetEntryToEntryFO(entry);
           observer.next(incompleteEntry);
@@ -801,8 +810,11 @@ export class EntryService {
   }
 
   getMeetEntryFO(meetEntryId) {
+    console.log('getMeetEntryFO');
     return new Observable((observer) => {
       this.http.get(environment.api + 'meet_entry/' + meetEntryId).subscribe((entry: any) => {
+
+        console.log(entry);
 
           const incompleteEntry = this.convertMeetEntryToEntryFO(entry);
           observer.next(incompleteEntry);

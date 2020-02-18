@@ -223,7 +223,13 @@ export class EntryConfirmationComponent implements OnInit {
 
     this.meetFee = this.entryService.getMeetFee(this.entry);
     this.eventFee = this.entryService.getEventFees(this.entry);
-    this.mealFee = this.entryService.getMealFees(this.entry);
+
+    if (this.meet.mealfee !== null && this.meet.mealfee !== 0) {
+      this.mealFee = this.entryService.getMealFees(this.entry);
+    } else {
+      this.mealFee = 0;
+    }
+
     this.totalFee = this.meetFee + this.eventFee + this.mealFee;
 
     if (this.meet.mealname !== null && this.meet.mealname !== '') {
