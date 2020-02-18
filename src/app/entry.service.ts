@@ -846,6 +846,7 @@ export class EntryService {
     const entrantDetailsFO = new EntrantDetails();
     const membershipDetailsFO = new MembershipDetails();
     const medicalDetailsFO = new MedicalDetails();
+    const mealMerchandiseDetailsFO = new MealMerchandiseDetails();
 
     if (meetEntry.member === undefined || meetEntry.member === null) {
       console.log('convertMeetEntryToEntryFO: member is undefined or null');
@@ -915,8 +916,6 @@ export class EntryService {
       }
     }
 
-    console.log('got here');
-
     if (meetEntry.medical_condition) {
       medicalDetailsFO.dispensation = 'true';
     } else {
@@ -934,6 +933,10 @@ export class EntryService {
     } else {
       medicalDetailsFO.medicalCondition = 'false';
     }
+
+    mealMerchandiseDetailsFO.meals = meetEntry.meals;
+    mealMerchandiseDetailsFO.mealComments = meetEntry.mealComments;
+    entryFO.mealMerchandiseDetails = mealMerchandiseDetailsFO;
 
     medicalDetailsFO.medicalDetails = meetEntry.medical_details;
     entryFO.medicalDetails = medicalDetailsFO;
