@@ -78,7 +78,7 @@ export class PendingEntryListComponent implements OnInit {
 
       }
 
-      // this.filterMeets()
+      this.filterMeets();
 
     });
 
@@ -161,9 +161,13 @@ export class PendingEntryListComponent implements OnInit {
       }
 
       if (this.filteredMeets.length > 0) {
-        this.meetSelectorForm.patchValue({meet: this.filteredMeets[0].id});
-        this.meetId = this.filteredMeets[0].id;
-        this.router.navigate(['/', 'pending-entries', this.meetId]);
+        console.log('current meetId: ' + this.meetId);
+        if (this.meetId !== undefined && this.meetId !== null) {
+          this.meetSelectorForm.patchValue({meet: this.meetId});
+        } else {
+          this.meetId = this.filteredMeets[0].id;
+          this.router.navigate(['/', 'pending-entries', this.meetId]);
+        }
       }
     }
   }
@@ -225,7 +229,7 @@ export class PendingEntryListComponent implements OnInit {
 
       this.spinner.hide();
 
-      // console.log(this.tableRows);
+      console.log(this.tableRows);
 
     });
   }

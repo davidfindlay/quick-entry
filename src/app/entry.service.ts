@@ -331,7 +331,6 @@ export class EntryService {
 
     this.getIncompleteEntryFO(meetEvent.meet_id).subscribe((entry: EntryFormObject) => {
 
-
       if (entry !== null) {
         if (entry.entryEvents === undefined) {
           entry.entryEvents = [];
@@ -439,6 +438,12 @@ export class EntryService {
    *  Checks the meet entry complies with the rules
    */
   validateEntryEvents(entryFO: EntryFormObject): boolean {
+
+    if (entryFO === undefined || entryFO === null) {
+      console.log('validateEntryEvents: entryFO is undefined or null');
+
+      return false;
+    }
 
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
 

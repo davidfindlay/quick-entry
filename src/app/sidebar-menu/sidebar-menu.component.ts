@@ -11,7 +11,10 @@ import {User} from '../models/user';
 export class SidebarMenuComponent implements OnInit {
 
   userIsAdmin = false;
+  userIsMeetOrganiser = false;
   userLoggedIn;
+
+  meetName = 'Meet Organiser';
 
   constructor(private authService: AuthenticationService,
               private userService: UserService) { }
@@ -21,6 +24,7 @@ export class SidebarMenuComponent implements OnInit {
       const user = this.userService.getUsers();
       console.log(user);
       this.userIsAdmin = user.is_admin;
+      this.userService.isUserMeetOrganiser();
     }
 
     this.userService.userChanged.subscribe((user: User) => {
@@ -28,6 +32,7 @@ export class SidebarMenuComponent implements OnInit {
       if (user === null) {
         this.userIsAdmin = false;
         this.userLoggedIn = false;
+        this.userIsMeetOrganiser = false;
       } else {
         this.userLoggedIn = true;
         this.userIsAdmin = user.is_admin;

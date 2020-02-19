@@ -240,7 +240,9 @@ export class EntryConfirmationComponent implements OnInit {
       this.previousScreen = '/enter/' + this.meet_id + '/merchandise';
     }
 
-    this.mealsQuantity = this.entry.mealMerchandiseDetails.meals;
+    if (this.entry.mealMerchandiseDetails !== undefined && this.entry.mealMerchandiseDetails !== null) {
+      this.mealsQuantity = this.entry.mealMerchandiseDetails.meals;
+    }
 
     this.ngxSpinner.hide();
 

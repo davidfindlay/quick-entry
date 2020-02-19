@@ -191,4 +191,21 @@ export class UserService {
   linkMember(memberNumber) {
     return this.http.post(environment.api + 'users/link_member/' + memberNumber, {});
   }
+
+  isUserMeetOrganiser() {
+    if (this.member !== undefined && this.member !== null) {
+      if (this.member.meet_access !== undefined && this.member.meet_access !== null) {
+        if (this.member.meet_access.length > 0) {
+          console.log('User/member has meet access');
+          return true;
+        } else {
+          console.log('User/member dose not have meet access');
+          return false;
+        }
+      }
+    } else {
+      console.log('User/member has meet access');
+      return false;
+    }
+  }
 }
