@@ -1,0 +1,10 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>{{meetName}}</h1>
+    <h2>Merchandise</h2>
+  </div>
+</div>
+<button class="btn btn-primary" (click)="addMerchandise()">Add Merchandise Item</button>
+<div *ngFor="let merchandiseItem of this.merchandise; let i = index">
+<app-meet-merchandise-item [merchandise]="merchandiseItem" [index]="i"></app-meet-merchandise-item>
+</div>

@@ -20,4 +20,8 @@ export class MemberService {
   createMember(memberDetails) {
     return this.http.post(environment.api + 'members/create', memberDetails);
   }
+
+  isMeetOrganiser(meetId) {
+
+  }
 }

@@ -12,13 +12,14 @@ import * as moment from 'moment';
 import {BehaviorSubject} from 'rxjs';
 
 import {environment} from '../environments/environment';
+import {Member} from './models/member';
 
 @Injectable()
 export class UserService {
 
   authSub: Subscription;
   userChanged = new BehaviorSubject<User>(null);
-  memberChanged = new BehaviorSubject<User>(null);
+  memberChanged = new BehaviorSubject<Member>(null);
 
   user;
   member;
@@ -207,5 +208,21 @@ export class UserService {
       console.log('User/member has meet access');
       return false;
     }
+  }
+
+  // TODO: move meet access to primarily by user not member
+  getMeetsOrganised() {
+    console.log('getMeetsOrganised');
+    const meetsOrganised = [];
+    const member = this.getMember();
+    if (member !== undefined && member !== null) {
+      if (member.meet_access !== undefined && member.meet_access !== null) {
+        for (let x = 0; x < member.meet_access.length; x++) {
+          meetsOrganised.push(member.meet_access[x].meet_id);
+        }
+      }
+    }
+
+    return meetsOrganised;
   }
 }

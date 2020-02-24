@@ -1,0 +1,167 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>{{meetName}}</h1>
+    <h2>{{pageTitle}}</h2>
+  </div>
+</div>
+
+<div class="card mb-1">
+  <div class="card-header">
+    <h3>Merchandise Item Details</h3>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="merchandiseForm">
+    <div class="form-group">
+      <div class="row">
+        <label class="form-control-label col-sm-2" for="itemName">Item Name:</label>
+        <input class="form-control col-sm-8" type="text" formControlName="itemName" id="itemName"/>
+      </div>
+    </div>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="sku">SKU:</label>
+          <input class="form-control col-sm-8" type="text" formControlName="sku" id="sku"/>
+        </div>
+      </div>
+      <div class="row">
+        <p class="col-form-legend col-sm-2">Stock Control:</p>
+        <div class="col-sm-10">
+          <div class="form-check">
+            <label for="stock-control-yes">
+              <input class="form-check-label" type="radio" formControlName="stockControl" id="stock-control-yes"
+                     value="yes" />
+              Yes
+            </label>
+          </div>
+          <div class="form-check col-sm10">
+            <label for="stock-control-no">
+              <input class="form-check-label" type="radio" formControlName="stockControl" id="stock-control-no"
+                     value="no"
+              />
+              No
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" *ngIf="this.merchandiseForm.controls['stockControl'].value === 'yes'">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="stock">Stock Quantity:</label>
+          <input class="form-control col-sm-8" type="text" formControlName="stock" id="stock"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="itemDescription">Item Description:</label>
+          <textarea class="form-control col-sm-8" rows="4" formControlName="itemDescription" id="itemDescription"></textarea>
+
+        </div>
+      </div>
+
+      <div class="row">
+        <p class="col-form-legend col-sm-2">GST Applicable:</p>
+        <div class="col-sm-10">
+          <div class="form-check">
+            <label for="gst-applicable-yes">
+              <input class="form-check-label" type="radio" formControlName="gstApplicable" id="gst-applicable-yes"
+                     value="yes" />
+              Yes
+            </label>
+          </div>
+          <div class="form-check col-sm10">
+            <label for="gst-applicable-no">
+              <input class="form-check-label" type="radio" formControlName="gstApplicable" id="gst-applicable-no"
+                     value="no"
+              />
+              No
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" *ngIf="this.merchandiseForm.controls['gstApplicable'].value === 'yes'">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="exgst">Price ex GST:</label>
+          <input class="form-control col-sm-8" type="text" formControlName="exgst" id="exgst"/>
+        </div>
+      </div>
+      <div class="form-group" *ngIf="this.merchandiseForm.controls['gstApplicable'].value === 'yes'">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="gst">GST:</label>
+          <input class="form-control col-sm-8" type="text" formControlName="gst" id="gst"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="sku">Total Price:</label>
+          <input class="form-control col-sm-8" type="text" formControlName="totalPrice" id="totalPrice"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="maxQty">Maximum Order Qty:</label>
+          <input class="form-control col-sm-8" type="text" formControlName="maxQty" id="maxQty"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="deadline">Deadline:</label>
+          <input class="form-control col-sm-3" type="text" formControlName="deadline" id="deadline"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="status">Status:</label>
+          <select class="form-control col-sm-8" id="status" formControlName="status">
+            <option value="0">Draft</option>
+            <option value="1">Published</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+  <div class="card mb-1" *ngIf="merchandiseId !== undefined && merchandiseId !== null">
+    <div class="card-header">
+      <h3>Merchandise Images</h3>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="merchandiseImageForm">
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="addImage">Add Image:</label>
+          <input class="form-control col-sm-8 mr-1" type="file" formControlName="addImage" id="addImage" (change)="addFile($event.target.files)"/><br />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="caption">Caption:</label>
+          <input class="form-control col-sm-8 mr-1" type="text" formControlName="caption" id="caption" /><br />
+        </div>
+      </div>
+      </form>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-sm-12">
+            <button class="btn btn-primary" (click)="uploadImage()">Add Image</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+<div class="card mb-1">
+  <div class="card-body">
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-12">
+        <button class="btn btn-primary" (click)="save()">Save</button>
+        <button class="btn btn-primary" (click)="close()" *ngIf="showClose">Close</button>
+        <button class="btn btn-danger" (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>

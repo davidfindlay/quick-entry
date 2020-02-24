@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import {AuthenticationService} from '../authentication';
 import {UserService} from '../user.service';
 import {User} from '../models/user';
+import {Member} from '../models/member';
+import {MeetService} from '../meet.service';
+import {Meet} from '../models/meet';
 
 @Component({
   selector: 'app-sidebar-menu',
@@ -11,20 +14,21 @@ import {User} from '../models/user';
 export class SidebarMenuComponent implements OnInit {
 
   userIsAdmin = false;
-  userIsMeetOrganiser = false;
+  userIsMeetOrganiser = true;
   userLoggedIn;
 
   meetName = 'Meet Organiser';
+  meetsOrganising = [];
 
   constructor(private authService: AuthenticationService,
-              private userService: UserService) { }
+              private userService: UserService,
+              private meetService: MeetService) { }
 
   ngOnInit() {
     if (this.userService.getUsers()) {
       const user = this.userService.getUsers();
       console.log(user);
       this.userIsAdmin = user.is_admin;
-      this.userService.isUserMeetOrganiser();
     }
 
     this.userService.userChanged.subscribe((user: User) => {
@@ -32,12 +36,33 @@ export class SidebarMenuComponent implements OnInit {
       if (user === null) {
         this.userIsAdmin = false;
         this.userLoggedIn = false;
-        this.userIsMeetOrganiser = false;
       } else {
         this.userLoggedIn = true;
         this.userIsAdmin = user.is_admin;
       }
     });
+
+    this.userService.memberChanged.subscribe((member: Member) => {
+      this.getMeetOrganiserMenu();
+    });
+  }
+
+  getMeetOrganiserMenu() {
+    console.log('getMeetOrganiserMenu');
+    const meetsOrganised = this.userService.getMeetsOrganised();
+    this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
+      this.meetsOrganising = [];
+      for (let x = 0; x < meetsOrganised.length; x++) {
+        for (let y = 0; y < meets.length; y++) {
+          if (meets[y].id === meetsOrganised[x]) {
+            if (this.meetsOrganising.indexOf(meets[y]) === -1) {
+              this.meetsOrganising.push(meets[y]);
+            }
+          }
+        }
+      }
+    });
+
   }
 
 }

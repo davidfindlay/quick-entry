@@ -55,6 +55,10 @@ import * as Sentry from '@sentry/browser';
 import {environment} from '../environments/environment';
 import { MeetEntryContactListComponent } from './meet-entry-contact-list/meet-entry-contact-list.component';
 import { EntryMealsMerchandiseComponent } from './entry-meals-merchandise/entry-meals-merchandise.component';
+import {MeetDashboardComponent} from './meet-organiser/meet-dashboard/meet-dashboard.component';
+import {MeetMerchandiseComponent} from './meet-organiser/meet-merchandise/meet-merchandise.component';
+import {MeetOrganiserModule} from './meet-organiser/meet-organiser.module';
+import {MeetMerchandiseEditComponent} from './meet-organiser/meet-merchandise-edit/meet-merchandise-edit.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -79,6 +83,10 @@ const appRoutes: Routes = [
   { path: 'pending-entries', component: PendingEntryListComponent },
   { path: 'pending-entry/:pendingId', component: PendingEntryActionComponent },
   { path: 'entrant-contact-list', component: MeetEntryContactListComponent},
+  { path: 'meet-organiser/:meetId', component: MeetDashboardComponent},
+  { path: 'meet-organiser/:meetId/merchandise', component: MeetMerchandiseComponent},
+  { path: 'meet-organiser/:meetId/merchandise/add', component: MeetMerchandiseEditComponent},
+  { path: 'meet-organiser/:meetId/merchandise/:merchandiseId/edit', component: MeetMerchandiseEditComponent},
     { path: '**', component: MeetListComponent }
 ];
 
@@ -141,7 +149,8 @@ export class SentryErrorHandler implements ErrorHandler {
     AuthenticationModule,
     NgxDatatableModule,
     NgxSpinnerModule,
-    PaypalModule
+    PaypalModule,
+    MeetOrganiserModule
   ],
     providers: [
         MeetService,

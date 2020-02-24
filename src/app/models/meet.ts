@@ -4,6 +4,7 @@ import {Phone} from './phone';
 import {Email} from './email';
 import {MeetEventGroup} from './meet-event-group';
 import {MeetPaymentMethod} from './meet-payment-method';
+import {MeetMerchandise} from './meet-merchandise';
 
 /**
  * Created by david on 7/9/17.
@@ -40,4 +41,5 @@ export class Meet {
 
   public groups: MeetEventGroup[];
   public payment_types: MeetPaymentMethod[];
+  public merchandise: MeetMerchandise[];
 }
