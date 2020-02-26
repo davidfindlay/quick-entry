@@ -213,4 +213,9 @@ export class MeetService {
     formData.append('imageData', JSON.stringify(imageData))
     return this.http.post(environment.api + 'merchandise/' + imageData.meet_merchandise_id + '/addImage', formData);
   }
+
+  deleteMerchandiseImage(merchandiseImageId) {
+    console.log('deleteMerchandiseImage: ' + merchandiseImageId);
+    return this.http.delete(environment.api + 'merchandise/images/' + merchandiseImageId);
+  }
 }

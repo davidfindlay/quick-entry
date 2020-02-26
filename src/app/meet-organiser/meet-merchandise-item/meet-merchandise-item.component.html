@@ -17,10 +17,13 @@
     <p>Maximum Order: {{merchandiseItem.max_qty}}</p>
     <p>Status: {{statusText}}</p>
     <p>Images:</p>
-    <div *ngFor="let merchandiseImage of merchandiseItem">
-      <img src="{{merchandiseImage.filename}}" alt="{{merchandiseImage.caption}}">
-      {{merchandiseImage.caption}}
-
+    <div class="row">
+      <div class="card col-sm-4" *ngFor="let merchandiseImage of merchandiseItem.images">
+        <div class="card-body">
+          <img class="img-thumbnail" src="{{fileRoot + 'meets/' + merchandiseItem.meet_id + '/merchandise/' + merchandiseImage.filename}}" alt="{{merchandiseImage.caption}}">
+          <p class="figure-caption text-center">{{merchandiseImage.caption}}</p>
+        </div>
+      </div>
     </div>
 <div>
   <button class="btn btn-primary mr-1" (click)="publish()" *ngIf="this.merchandiseItem.status === 0">Publish</button>

@@ -15,6 +15,7 @@ import {MeetService} from '../../meet.service';
 import {Meet} from '../../models/meet';
 import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NgxSpinnerService} from 'ngx-spinner';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-meet-merchandise-item',
@@ -28,6 +29,7 @@ export class MeetMerchandiseItemComponent implements OnInit {
   @ViewChild('confirmation', {static: true}) confirmation: ElementRef;
   private merchandiseItem: MeetMerchandise;
   closeResult: string;
+  fileRoot = environment.fileRoot;
 
   statusText: string;
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ApplicationRef, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Meet} from '../../models/meet';
 import {MeetService} from '../../meet.service';
@@ -8,6 +8,8 @@ import {NgxSpinnerService} from 'ngx-spinner';
 import {MerchandiseDetails} from '../../models/merchandise';
 import {MeetMerchandise} from '../../models/meet-merchandise';
 import {MeetMerchandiseImage} from '../../models/meet-merchandise-image';
+
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-meet-merchandise-edit',
@@ -23,6 +25,7 @@ export class MeetMerchandiseEditComponent implements OnInit {
   merchandiseItem;
   merchandiseId;
 
+  fileRoot = environment.fileRoot;
   fileToUpload: File = null;
 
   showClose = false;
@@ -34,10 +37,11 @@ export class MeetMerchandiseEditComponent implements OnInit {
               private router: Router,
               private meetService: MeetService,
               private fb: FormBuilder,
-              private spinner: NgxSpinnerService) { }
+              private spinner: NgxSpinnerService,
+              private cdRef: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.spinner.show()
+    this.spinner.show();
     this.meetId = parseInt(this.activatedRoute.snapshot.params['meetId'], 10);
     console.log('Meet Merchandise meetId = ' + this.meetId);
     this.meetService.getMeetDetails(this.meetId).subscribe((meet: Meet) => {
@@ -182,8 +186,18 @@ export class MeetMerchandiseEditComponent implements OnInit {
     merchandiseImage.meet_merchandise_id = this.merchandiseId;
     this.meetService.addMerchandiseImage(this.fileToUpload, merchandiseImage).subscribe(res => {
       console.log('Added image');
+      this.merchandiseItem.images.push(res.merchandiseImage);
+      this.cdRef.detectChanges();
     }, err => {
       console.log(err);
+    });
+  }
+
+  deleteImage(merchandiseImageId) {
+    this.meetService.deleteMerchandiseImage(merchandiseImageId).subscribe(res => {
+      console.log('Deleted image ' + merchandiseImageId);
+      this.merchandiseItem.images = this.merchandiseItem.images.filter(x => x.id !== merchandiseImageId);
+      this.cdRef.detectChanges();
     });
   }
 
