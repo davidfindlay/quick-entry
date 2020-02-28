@@ -6,6 +6,7 @@
 export const environment = {
   production: true,
   api: 'https://msqtest.davsoft.com.au/api/',
+  fileRoot: 'https://msqtest.davsoft.com.au/static/',
   resultsPortal: 'https://b4wt31qb36.execute-api.ap-southeast-2.amazonaws.com/production/',
   payPalLegacyUrl: 'https://forum.mastersswimmingqld.org.au/swimman/api/paypalpayment.php',
   paypalApi: 'https://api.sandbox.paypal.com',

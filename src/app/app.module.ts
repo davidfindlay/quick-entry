@@ -59,6 +59,7 @@ import {MeetDashboardComponent} from './meet-organiser/meet-dashboard/meet-dashb
 import {MeetMerchandiseComponent} from './meet-organiser/meet-merchandise/meet-merchandise.component';
 import {MeetOrganiserModule} from './meet-organiser/meet-organiser.module';
 import {MeetMerchandiseEditComponent} from './meet-organiser/meet-merchandise-edit/meet-merchandise-edit.component';
+import { EntryMerchandiseItemComponent } from './entry-merchandise-item/entry-merchandise-item.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -135,7 +136,8 @@ export class SentryErrorHandler implements ErrorHandler {
         MeetEntryActionComponent,
         ClubMemberSelectorComponent,
         MeetEntryContactListComponent,
-        EntryMealsMerchandiseComponent
+        EntryMealsMerchandiseComponent,
+        EntryMerchandiseItemComponent
     ],
     entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
   imports: [

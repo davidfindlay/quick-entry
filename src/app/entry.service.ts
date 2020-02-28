@@ -20,6 +20,7 @@ import {map} from 'rxjs/operators';
 import {angularInnerClassDecoratorKeys} from 'codelyzer/util/utils';
 import {findReadVarNames} from '@angular/compiler/src/output/output_ast';
 import {MealMerchandiseDetails} from './models/meal-merchandise-details';
+import {MerchandiseDetails} from './models/merchandise';
 
 @Injectable()
 export class EntryService {
@@ -235,11 +236,17 @@ export class EntryService {
     });
   }
 
-  setMealMerchandiseDetails(meetId: number, mealMerchandiseDetails: MealMerchandiseDetails) {
+  setMealMerchandiseDetails(meetId: number, mealsQuantity: number, mealsComments: string) {
     return new Observable((observer) => {
       this.getIncompleteEntryFO(meetId).subscribe((entry: EntryFormObject) => {
         if (entry !== null) {
-          entry.mealMerchandiseDetails = mealMerchandiseDetails;
+
+          if (entry.mealMerchandiseDetails === undefined || entry.mealMerchandiseDetails === null) {
+            entry.mealMerchandiseDetails = new MealMerchandiseDetails();
+          }
+
+          entry.mealMerchandiseDetails.meals = mealsQuantity;
+          entry.mealMerchandiseDetails.mealComments = mealsComments;
 
           // If logged in store to server
           if (this.userService.getUsers() !== null) {
@@ -419,6 +426,44 @@ export class EntryService {
         // Check that entry is now valid with this seed time change
         entry.validEvents = this.validateEntryEvents(entry);
         this.incompleteChanged.next(this.incompleteEntries);
+
+        // If logged in store to server
+        if (this.userService.getUsers() !== null) {
+          console.log('User is logged in, store to server');
+
+          this.storeIncompleteEntry(entry).subscribe((result) => {
+            console.log(result);
+          });
+        } else {
+          this.storeEntries();
+        }
+      }
+    });
+  }
+
+  updateMerchandiseOrder(merchandise, qty) {
+    this.getIncompleteEntryFO(merchandise.meet_id).subscribe((entry: EntryFormObject) => {
+      if (entry) {
+        if (entry.mealMerchandiseDetails === undefined || entry.mealMerchandiseDetails === null) {
+          entry.mealMerchandiseDetails = new MealMerchandiseDetails();
+        }
+
+        if (entry.mealMerchandiseDetails.merchandiseItems === undefined || entry.mealMerchandiseDetails.merchandiseItems === null) {
+          entry.mealMerchandiseDetails.merchandiseItems = [];
+        }
+
+        // Check if this item is already listed
+        const existingItem = entry.mealMerchandiseDetails.merchandiseItems.filter(x => x.merchandiseId === merchandise.id);
+        console.log(existingItem);
+
+        if (existingItem.length === 0) {
+          const entryItem = new MerchandiseDetails();
+          entryItem.qty = qty;
+          entryItem.merchandiseId = merchandise.id;
+          entry.mealMerchandiseDetails.merchandiseItems.push(entryItem);
+        } else {
+          existingItem[0].qty = qty;
+        }
 
         // If logged in store to server
         if (this.userService.getUsers() !== null) {

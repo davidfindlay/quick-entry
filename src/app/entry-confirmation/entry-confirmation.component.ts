@@ -74,6 +74,8 @@ export class EntryConfirmationComponent implements OnInit {
   mealsQuantity = 0;
   mealSubtotal = 0;
 
+  merchandiseOrders = [];
+
   meetFee = 0;
   eventFee = 0;
   mealFee = 0;
@@ -230,7 +232,7 @@ export class EntryConfirmationComponent implements OnInit {
       this.mealFee = 0;
     }
 
-    this.totalFee = this.meetFee + this.eventFee + this.mealFee;
+
 
     if (this.meet.mealname !== null && this.meet.mealname !== '') {
       this.mealName = this.meet.mealname;
@@ -240,9 +242,31 @@ export class EntryConfirmationComponent implements OnInit {
       this.previousScreen = '/enter/' + this.meet_id + '/merchandise';
     }
 
+    let merchandiseTotal = 0;
+
     if (this.entry.mealMerchandiseDetails !== undefined && this.entry.mealMerchandiseDetails !== null) {
       this.mealsQuantity = this.entry.mealMerchandiseDetails.meals;
+
+      if (this.entry.mealMerchandiseDetails.merchandiseItems !== undefined && this.entry.mealMerchandiseDetails.merchandiseItems !== null) {
+        for (let x = 0; x < this.entry.mealMerchandiseDetails.merchandiseItems.length; x++) {
+          const merchandiseItem = this.meet.merchandise.filter(m => m.id === this.entry.mealMerchandiseDetails.merchandiseItems[x].merchandiseId);
+          if (merchandiseItem.length > 0) {
+            const total = parseInt(this.entry.mealMerchandiseDetails.merchandiseItems[x].qty, 10) * parseFloat(merchandiseItem[0].total_price);
+
+            this.merchandiseOrders.push({
+              qty: this.entry.mealMerchandiseDetails.merchandiseItems[x].qty,
+              item_name: merchandiseItem[0].item_name,
+              each: merchandiseItem[0].total_price,
+              subtotal: total
+            });
+
+            merchandiseTotal += total;
+          }
+        }
+      }
     }
+
+    this.totalFee = this.meetFee + this.eventFee + this.mealFee + merchandiseTotal;
 
     this.ngxSpinner.hide();
 

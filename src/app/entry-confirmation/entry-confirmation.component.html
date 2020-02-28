@@ -257,7 +257,7 @@
   </div>
 
   <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null && meet.mealfee > 0">
-    <h3>Meals and Merchandise</h3>
+    <h3>Meals</h3>
     <div class="row">
       <div class="fieldName col-sm-3">
         {{mealName}} Tickets:
@@ -302,8 +302,8 @@
       </thead>
       <tbody>
       <tr>
-        <td>
-
+        <td class="text-center">
+          1
         </td>
         <td>
           Meet Entry Fee
@@ -315,8 +315,8 @@
           {{meetFee | currency}}
         </td>
       </tr>
-      <tr>
-        <td>
+      <tr *ngIf="eventFee !== 0">
+        <td class="text-center">
         </td>
         <td>
           Event Fees
@@ -328,8 +328,8 @@
           {{eventFee | currency}}
         </td>
       </tr>
-      <tr>
-        <td>
+      <tr *ngIf="mealFee !== 0">
+        <td class="text-center">
           {{mealsQuantity}}
         </td>
         <td>
@@ -341,6 +341,12 @@
         <td class="moneycol">
           {{mealFee | currency}}
         </td>
+      </tr>
+      <tr *ngFor="let merchandiseItem of merchandiseOrders; let index = i">
+        <td class="text-center">{{merchandiseItem.qty}}</td>
+        <td>{{merchandiseItem.item_name}}</td>
+        <td class="moneycol">{{merchandiseItem.each | currency}}</td>
+        <td class="moneycol">{{merchandiseItem.subtotal | currency}}</td>
       </tr>
       <tr>
         <td colspan="3" class="moneycol">
