@@ -43,7 +43,7 @@ export class MeetEntryContactListComponent implements OnInit {
 
   createForm() {
     this.meetSelectorForm = this.fb.group({
-      meetYear: [2019, Validators.required],
+      meetYear: [2020, Validators.required],
       meet: [0, Validators.required]
     });
 
@@ -66,13 +66,29 @@ export class MeetEntryContactListComponent implements OnInit {
             const phones = member.phones;
             if (phones !== undefined && phones !== null) {
               phones.sort((a, b) => (a.id < b.id) ? 1 : -1)
-              phone = phones[0].phonenumber;
+              if (phones.length > 0) {
+                if (phones[0].phonenumber !== undefined && phones[0].phonenumber !== null) {
+                  phone = phones[0].phonenumber;
+                } else {
+                  phone = 'n/a';
+                }
+              } else {
+                phone = 'n/a';
+              }
             }
 
             const emails = member.emails;
             if (emails !== undefined && emails !== null) {
               emails.sort((a, b) => (a.id < b.id) ? 1 : -1)
-              email = emails[0].address;
+              if (emails.length > 0) {
+                if (emails[0].address !== undefined && emails[0].address !== null) {
+                  email = emails[0].address;
+                } else {
+                  email = 'n/a';
+                }
+              } else {
+                email = 'n/a';
+              }
             }
           }
 
