@@ -60,6 +60,7 @@ import {MeetMerchandiseComponent} from './meet-organiser/meet-merchandise/meet-m
 import {MeetOrganiserModule} from './meet-organiser/meet-organiser.module';
 import {MeetMerchandiseEditComponent} from './meet-organiser/meet-merchandise-edit/meet-merchandise-edit.component';
 import { EntryMerchandiseItemComponent } from './entry-merchandise-item/entry-merchandise-item.component';
+import {MerchandiseOrdersComponent} from './meet-organiser/merchandise-orders/merchandise-orders.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -85,9 +86,10 @@ const appRoutes: Routes = [
   { path: 'pending-entry/:pendingId', component: PendingEntryActionComponent },
   { path: 'entrant-contact-list', component: MeetEntryContactListComponent},
   { path: 'meet-organiser/:meetId', component: MeetDashboardComponent},
-  { path: 'meet-organiser/:meetId/merchandise', component: MeetMerchandiseComponent},
-  { path: 'meet-organiser/:meetId/merchandise/add', component: MeetMerchandiseEditComponent},
-  { path: 'meet-organiser/:meetId/merchandise/:merchandiseId/edit', component: MeetMerchandiseEditComponent},
+  { path: 'meet-organiser/:meetId/merchandise', component: MerchandiseOrdersComponent},
+  { path: 'meet-organiser/:meetId/merchandise/items', component: MeetMerchandiseComponent},
+  { path: 'meet-organiser/:meetId/merchandise/items/add', component: MeetMerchandiseEditComponent},
+  { path: 'meet-organiser/:meetId/merchandise/items/:merchandiseId/edit', component: MeetMerchandiseEditComponent},
     { path: '**', component: MeetListComponent }
 ];
 

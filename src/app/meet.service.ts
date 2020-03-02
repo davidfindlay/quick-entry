@@ -218,4 +218,8 @@ export class MeetService {
     console.log('deleteMerchandiseImage: ' + merchandiseImageId);
     return this.http.delete(environment.api + 'merchandise/images/' + merchandiseImageId);
   }
+
+  getMerchandiseOrders(meetId) {
+    return this.http.get(environment.api + 'meet_entry_orders/' + meetId);
+  }
 }

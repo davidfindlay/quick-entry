@@ -5,16 +5,20 @@ import { MeetMerchandiseComponent } from './meet-merchandise/meet-merchandise.co
 import { MeetMerchandiseItemComponent } from './meet-merchandise-item/meet-merchandise-item.component';
 import { MeetMerchandiseEditComponent } from './meet-merchandise-edit/meet-merchandise-edit.component';
 import {ReactiveFormsModule} from '@angular/forms';
+import { MerchandiseOrdersComponent } from './merchandise-orders/merchandise-orders.component';
+import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 
 @NgModule({
   declarations: [
     MeetDashboardComponent,
     MeetMerchandiseComponent,
     MeetMerchandiseItemComponent,
-    MeetMerchandiseEditComponent],
+    MeetMerchandiseEditComponent,
+    MerchandiseOrdersComponent],
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgxDatatableModule
   ]
 })
 export class MeetOrganiserModule { }
