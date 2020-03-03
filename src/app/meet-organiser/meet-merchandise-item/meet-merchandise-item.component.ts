@@ -27,7 +27,7 @@ export class MeetMerchandiseItemComponent implements OnInit {
   @Input() merchandise: MeetMerchandise;
   @Input() index;
   @ViewChild('confirmation', {static: true}) confirmation: ElementRef;
-  private merchandiseItem: MeetMerchandise;
+  merchandiseItem: MeetMerchandise;
   closeResult: string;
   fileRoot = environment.fileRoot;
 

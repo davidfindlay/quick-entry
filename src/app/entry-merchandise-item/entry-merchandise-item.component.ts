@@ -14,7 +14,7 @@ export class EntryMerchandiseItemComponent implements OnInit {
   @Input('merchandiseItem') merchandiseItem: MeetMerchandise;
   @Input('index') index;
 
-  private merchandiseItemForm: FormGroup;
+  merchandiseItemForm: FormGroup;
   private fileRoot = environment.fileRoot;
   private qty = 0;
   private gallery = [];

@@ -7,6 +7,11 @@ import { MeetMerchandiseEditComponent } from './meet-merchandise-edit/meet-merch
 import {ReactiveFormsModule} from '@angular/forms';
 import { MerchandiseOrdersComponent } from './merchandise-orders/merchandise-orders.component';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
+import { MealOrdersComponent } from './meal-orders/meal-orders.component';
+import { EmergencyContactsComponent } from './emergency-contacts/emergency-contacts.component';
+import { ContactsComponent } from './contacts/contacts.component';
+import { PendingEntriesComponent } from './pending-entries/pending-entries.component';
+import { EntryListComponent } from './entry-list/entry-list.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +19,12 @@ import {NgxDatatableModule} from '@swimlane/ngx-datatable';
     MeetMerchandiseComponent,
     MeetMerchandiseItemComponent,
     MeetMerchandiseEditComponent,
-    MerchandiseOrdersComponent],
+    MerchandiseOrdersComponent,
+    MealOrdersComponent,
+    EmergencyContactsComponent,
+    ContactsComponent,
+    PendingEntriesComponent,
+    EntryListComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
