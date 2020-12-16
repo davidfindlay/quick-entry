@@ -12,6 +12,8 @@ import { EmergencyContactsComponent } from './emergency-contacts/emergency-conta
 import { ContactsComponent } from './contacts/contacts.component';
 import { PendingEntriesComponent } from './pending-entries/pending-entries.component';
 import { EntryListComponent } from './entry-list/entry-list.component';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,9 @@ import { EntryListComponent } from './entry-list/entry-list.component';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    NgbModule,
+    RouterModule
   ]
 })
 export class MeetOrganiserModule { }

@@ -29,6 +29,9 @@ export class SidebarMenuComponent implements OnInit {
       const user = this.userService.getUsers();
       console.log(user);
       this.userIsAdmin = user.is_admin;
+      if (user !== undefined && user !== null) {
+        this.getMeetOrganiserMenu();
+      }
     }
 
     this.userService.userChanged.subscribe((user: User) => {

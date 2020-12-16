@@ -44,6 +44,7 @@ export class ContactsComponent implements OnInit {
 
     this.http.get(environment.api + 'meet_entries/' + this.meetId).subscribe((entries: any) => {
       this.entries = entries.meet_entries;
+      console.log(this.entries);
 
       for (let i = 0; i < this.entries.length; i++) {
 
@@ -58,13 +59,17 @@ export class ContactsComponent implements OnInit {
         let entrant_email = 'n/a';
 
         if (this.entries[i].member.phones !== undefined && this.entries[i].member.phones !== null) {
-          const latest_phone = this.entries[i].member.phones.length - 1;
-          entrant_phone = this.entries[i].member.phones[latest_phone].phonenumber;
+          if (this.entries[i].member.phones.length > 0) {
+            const latest_phone = this.entries[i].member.phones.length - 1;
+            entrant_phone = this.entries[i].member.phones[latest_phone].phonenumber;
+          }
         }
 
         if (this.entries[i].member.emails !== undefined && this.entries[i].member.emails !== null) {
-          const latest_email = this.entries[i].member.emails.length - 1;
-          entrant_email = this.entries[i].member.emails[latest_email].address;
+          if (this.entries[i].member.emails.length > 0) {
+            const latest_email = this.entries[i].member.emails.length - 1;
+            entrant_email = this.entries[i].member.emails[latest_email].address;
+          }
         }
 
         let club_details = 'n/a';

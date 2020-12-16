@@ -66,6 +66,11 @@ import {EmergencyContactsComponent} from './meet-organiser/emergency-contacts/em
 import {ContactsComponent} from './meet-organiser/contacts/contacts.component';
 import {PendingEntriesComponent} from './meet-organiser/pending-entries/pending-entries.component';
 import {EntryListComponent} from './meet-organiser/entry-list/entry-list.component';
+import { MeetSelectorComponent } from './meet-selector/meet-selector.component';
+import { PostalTimeEntryComponent } from './postal-time-entry/postal-time-entry.component';
+import { UserListComponent } from './user-list/user-list.component';
+import {NgbdSortableHeader} from './sortable.directive';
+import { UserEditComponent } from './user-edit/user-edit.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -101,6 +106,8 @@ const appRoutes: Routes = [
   { path: 'meet-organiser/:meetId/pending-entries', component: PendingEntriesComponent },
   { path: 'meet-organiser/:meetId/entry-list', component: EntryListComponent },
   { path: 'meet-organiser/:meetId/dashboard', component: MeetDashboardComponent },
+  { path: 'user-list', component: UserListComponent },
+  { path: 'user-list/:userId', component: UserEditComponent },
     { path: '**', component: MeetListComponent }
 ];
 
@@ -150,9 +157,14 @@ export class SentryErrorHandler implements ErrorHandler {
         ClubMemberSelectorComponent,
         MeetEntryContactListComponent,
         EntryMealsMerchandiseComponent,
-        EntryMerchandiseItemComponent
+        EntryMerchandiseItemComponent,
+        MeetSelectorComponent,
+        PostalTimeEntryComponent,
+        UserListComponent,
+        NgbdSortableHeader,
+        UserEditComponent
     ],
-    entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
+    entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent, PostalTimeEntryComponent ],
   imports: [
     BrowserModule,
     FormsModule,

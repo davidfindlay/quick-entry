@@ -1,0 +1,195 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>View User</h1>
+  </div>
+</div>
+
+<div *ngIf="user">
+  <form [formGroup]="userForm">
+    <div class="row">
+      <div class="col-xs-12">
+        <button class="btn btn-primary">Save Changes</button>
+        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+
+    <fieldset class="qe-fieldset">
+      <h2>Username and Password</h2>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2">User ID:</label>
+          {{user.id}}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="username">Username:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="username" id="username"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2">Password:</label>
+          <button class="btn btn-warning" (click)="passwordGenerate()">Generate New Password</button>&nbsp;
+          <button class="btn btn-warning" (click)="passwordReset()">Send Password Reset</button>
+        </div>
+      </div>
+
+    </fieldset>
+
+    <fieldset class="qe-fieldset">
+      <h2>User Details</h2>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="firstName">First name:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="firstName" id="firstName"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="surname">Surname:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="surname" id="surname"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="email">Email:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="email" id="email"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2">Linked Member:</label>
+          <span *ngIf="!user.member">No member linked</span>
+        </div>
+      </div>
+
+    </fieldset>
+
+    <fieldset class="qe-fieldset">
+      <h2>Contact Details</h2>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="phone">Phone:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="phone" id="phone"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="gender">Gender:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="gender" id="gender"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="dob">Date of Birth:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="dob" id="dob"/>
+        </div>
+      </div>
+
+    </fieldset>
+
+    <fieldset class="qe-fieldset">
+      <h2>Emergency Contact Details</h2>
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="emergencyFirstName">First Name:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="emergencyFirstName"
+                 id="emergencyFirstName"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="emergencySurname">Surname:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="emergencySurname" id="emergencySurname"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="emergencyPhone">Phone:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="emergencyPhone" id="emergencyPhone"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <label class="form-control-label col-sm-2" for="emergencyEmail">Email:</label>
+          <input class="form-control col-sm-6" type="text" formControlName="emergencyEmail" id="emergencyEmail"/>
+        </div>
+      </div>
+
+    </fieldset>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <button class="btn btn-primary">Save Changes</button>
+        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<ng-template #confirmPasswordReset let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="send-password-title">Send Password Reset</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="card bg-info text-white">
+      <p>Sending a password reset email will not immediately change the user's password, but will send a token to the
+        user's email address that they can use change their own password.</p>
+      <p>If the user remembers their password before
+        resetting their password, they can still log in and continue to use their old password.</p>
+    </div>
+    <p>Are you sure you want to send a password reset email to {{user.firstname}} {{user.surname}}
+      &lt;{{user.email}}&gt;?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-warning">Yes</button>
+    <button class="btn-primary">No</button>
+    <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
+  </div>
+</ng-template>
+
+<ng-template #generateNewPassword let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="generate-new-password">Generate New Password</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="card bg-info text-white">
+      <p>Clicking Save will automatically send an email to {{user.firstname}} {{user.surname}} with the new
+      password details. </p>
+    </div>
+    <form>
+      <div class="form-group">
+        <div class="row">
+        <label class="form-control-label col-sm-2" for="newPassword">New Password: </label>
+          <input class="form-control col-sm-6" type="text" formControlName="newPassword" id="newPassword"
+                 disabled="disabled"/>
+          <button class="btn btn-primary">Generate Password</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-danger">Save Changes</button>
+    <button class="btn-primary">Cancel</button>
+    <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
+  </div>
+</ng-template>
+

@@ -74,10 +74,12 @@ export class UserService {
     }
   }
 
-  getUsers()
-    :
-    User {
+  getUsers(): User {
     return this.user;
+  }
+
+  getUser(userId) {
+    return this.http.get(environment.api + 'users/' + userId);
   }
 
 // Returns the member if the user has one
@@ -121,7 +123,6 @@ export class UserService {
       });
     }
 
-    console.log(currentMemberships);
     return currentMemberships;
   }
 
@@ -224,5 +225,9 @@ export class UserService {
     }
 
     return meetsOrganised;
+  }
+
+  getUserList() {
+    return this.http.get(environment.api + 'users');
   }
 }

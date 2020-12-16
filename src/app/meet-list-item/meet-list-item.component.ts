@@ -37,6 +37,8 @@ export class MeetListItemComponent implements OnInit {
 
   userDetails;
 
+  allowEntry;
+
   loggedIn = false;
   hasEntry = false;
 
