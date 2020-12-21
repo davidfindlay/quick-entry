@@ -1,18 +1,22 @@
 <div class="row">
   <div class="col-xs-12">
-    <h1>View User</h1>
+    <h1>Edit User</h1>
   </div>
 </div>
 
-<div *ngIf="user">
-  <form [formGroup]="userForm">
-    <div class="row">
-      <div class="col-xs-12">
-        <button class="btn btn-primary">Save Changes</button>
-        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-      </div>
-    </div>
+<p *ngFor="let alert of alerts">
+  <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+</p>
 
+<div *ngIf="user">
+
+  <div class="row">
+    <div class="col-xs-12">
+      <button class="btn btn-primary" (click)="save()">Save Changes</button>
+      <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+  <form [formGroup]="userForm">
     <fieldset class="qe-fieldset">
       <h2>Username and Password</h2>
       <div class="form-group">
@@ -128,15 +132,15 @@
       </div>
 
     </fieldset>
-
-    <div class="row">
-      <div class="col-xs-12">
-        <button class="btn btn-primary">Save Changes</button>
-        <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-      </div>
-    </div>
-
   </form>
+  <div class="row">
+    <div class="col-xs-12">
+      <button class="btn btn-primary" (click)="save()">Save Changes</button>
+      <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+
+
 </div>
 
 <ng-template #confirmPasswordReset let-modal>
@@ -157,8 +161,8 @@
       &lt;{{user.email}}&gt;?</p>
   </div>
   <div class="modal-footer">
-    <button class="btn-warning">Yes</button>
-    <button class="btn-primary">No</button>
+    <button class="btn-warning" (click)="modal.close('send')">Yes</button>
+    <button class="btn-primary" (click)="modal.close('cancel')">No</button>
     <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
   </div>
 </ng-template>
@@ -173,12 +177,12 @@
   <div class="modal-body">
     <div class="card bg-info text-white">
       <p>Clicking Save will automatically send an email to {{user.firstname}} {{user.surname}} with the new
-      password details. </p>
+        password details. </p>
     </div>
     <form>
       <div class="form-group">
         <div class="row">
-        <label class="form-control-label col-sm-2" for="newPassword">New Password: </label>
+          <label class="form-control-label col-sm-2" for="newPassword">New Password: </label>
           <input class="form-control col-sm-6" type="text" formControlName="newPassword" id="newPassword"
                  disabled="disabled"/>
           <button class="btn btn-primary">Generate Password</button>

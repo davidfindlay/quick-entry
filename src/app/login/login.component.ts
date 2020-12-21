@@ -4,6 +4,12 @@ import {AuthenticationService} from '../authentication/authentication.service';
 import 'rxjs/add/operator/catch';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UserService} from '../user.service';
+
+interface Alert {
+  type: string;
+  message: string;
+}
 
 @Component({
   selector: 'app-login',
@@ -15,11 +21,15 @@ export class LoginComponent implements OnInit {
   @ViewChild('confirmPasswordReset', {static: false}) confirmPasswordReset;
 
   model: any = {};
+  modelReset: any = {};
   loading = false;
   error = '';
 
+  alerts: Alert[];
+
   constructor(private router: Router,
               private authenticationService: AuthenticationService,
+              private userService: UserService,
               private spinner: NgxSpinnerService,
               private modalService: NgbModal) {
   }
@@ -28,6 +38,7 @@ export class LoginComponent implements OnInit {
     // reset login status
     this.authenticationService.logout();
     this.spinner.hide();
+    this.resetAlerts();
   }
 
   login() {
@@ -49,11 +60,38 @@ export class LoginComponent implements OnInit {
   }
 
   clickPasswordReset() {
+    if (this.model.username) {
+      this.modelReset.resetEmail = this.model.username;
+    }
     this.modalService.open(this.confirmPasswordReset, { size: 'lg' }).result.then((result) => {
-      const closeResult = `Closed with: ${result}`;
+      if (result === 'send') {
+        this.sendPasswordReset(this.modelReset.resetEmail);
+      }
     }, (reason) => {
       console.log(this.getDismissReason(reason));
     });
+  }
+
+  sendPasswordReset(email) {
+
+    this.spinner.show();
+
+    this.userService.sendPasswordResetRequest(email).subscribe((resetRequest: any) => {
+      console.log(resetRequest);
+      if (resetRequest.success) {
+        this.alerts.push({
+          type: 'success',
+          message: 'Password reset email has been sent to ' + email + '.'
+        });
+      } else {
+        this.alerts.push({
+          type: 'danger',
+          message: resetRequest.message
+        });
+      }
+      this.spinner.hide();
+    });
+
   }
 
   private getDismissReason(reason: any): string {
@@ -64,6 +102,14 @@ export class LoginComponent implements OnInit {
     } else {
       return `with: ${reason}`;
     }
+  }
+
+  resetAlerts() {
+    this.alerts = [];
+  }
+
+  closeAlert(alert: Alert) {
+    this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
 
 }

@@ -4,6 +4,12 @@ import {ActivatedRoute, Route, Router} from '@angular/router';
 import {User} from '../models/user';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgxSpinnerService} from 'ngx-spinner';
+
+interface Alert {
+  type: string;
+  message: string;
+}
 
 @Component({
   selector: 'app-user-edit',
@@ -17,12 +23,16 @@ export class UserEditComponent implements OnInit {
 
   userForm: FormGroup;
   user: User;
+  updatedUser: User;
+
+  alerts: Alert[];
 
   constructor(private userService: UserService,
               private route: ActivatedRoute,
               private router: Router,
               private fb: FormBuilder,
-              private modalService: NgbModal) { }
+              private modalService: NgbModal,
+              private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
 
@@ -38,15 +48,55 @@ export class UserEditComponent implements OnInit {
     }, error => {
       console.log(error);
     });
+    this.resetAlerts();
+
+    this.userForm.valueChanges.subscribe((user: any) => {
+      this.updateModel(user);
+    });
+
+    this.updatedUser = new User();
+    this.updatedUser.id = this.user.id;
   }
 
   cancel() {
     this.router.navigate(['..'], {relativeTo: this.route});
   }
 
+  updateModel(user) {
+    this.updatedUser.id = this.user.id;
+    this.updatedUser.username = user.username;
+    this.updatedUser.firstname = user.firstName;
+    this.updatedUser.surname = user.surname;
+    this.updatedUser.email = user.email;
+    this.updatedUser.phone = user.phone;
+    this.updatedUser.gender = user.gender;
+    this.updatedUser.dob = user.dob;
+    this.updatedUser.emergency_firstname = user.emergencyFirstName;
+    this.updatedUser.emergency_surname = user.emergencySurname;
+    this.updatedUser.emergency_phone = user.emergencyPhone;
+    this.updatedUser.emergency_email = user.emergencyEmail;
+  }
+
+  save() {
+    console.log('save');
+
+    this.userService.update(this.updatedUser).subscribe((result: any) => {
+      console.log(result);
+
+      if (result.success) {
+        this.alerts.push({
+          type: 'success',
+          message: 'Changes saved.'
+        });
+      }
+    }, (error) => {
+      console.error(error);
+    });
+  }
+
   passwordGenerate() {
     this.modalService.open(this.generateNewPassword, { size: 'lg' }).result.then((result) => {
-      const closeResult = `Closed with: ${result}`;
+
     }, (reason) => {
       // const closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
@@ -54,11 +104,36 @@ export class UserEditComponent implements OnInit {
 
   passwordReset() {
     this.modalService.open(this.confirmPasswordReset, { size: 'lg' }).result.then((result) => {
-      const closeResult = `Closed with: ${result}`;
+      if (result === 'send') {
+        const currentAdminUser = this.userService.getUsers();
+        this.sendPasswordReset(this.user.email, currentAdminUser.id);
+      }
     }, (reason) => {
       // const closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
   };
+
+  sendPasswordReset(email, userId) {
+
+    this.spinner.show();
+
+    this.userService.sendPasswordResetRequest(email, userId).subscribe((resetRequest: any) => {
+      console.log(resetRequest);
+      if (resetRequest.success) {
+        this.alerts.push({
+          type: 'success',
+          message: 'Password reset email has been sent to ' + email + '.'
+        });
+      } else {
+        this.alerts.push({
+          type: 'danger',
+          message: resetRequest.message
+        });
+      }
+      this.spinner.hide();
+    });
+
+  }
 
   createForm() {
     this.userForm = this.fb.group( {
@@ -90,6 +165,14 @@ export class UserEditComponent implements OnInit {
       emergencyPhone: user.emergency_phone,
       emergencyEmail: user.emergency_email
     });
+  }
+
+  resetAlerts() {
+    this.alerts = [];
+  }
+
+  closeAlert(alert: Alert) {
+    this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
 
 }

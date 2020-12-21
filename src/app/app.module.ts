@@ -71,10 +71,12 @@ import { PostalTimeEntryComponent } from './postal-time-entry/postal-time-entry.
 import { UserListComponent } from './user-list/user-list.component';
 import {NgbdSortableHeader} from './sortable.directive';
 import { UserEditComponent } from './user-edit/user-edit.component';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
     { path: 'login', component: LoginComponent },
+  { path: 'reset-password/:token', component: PasswordResetComponent },
   { path: 'enter/:meet', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step1', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step2', component: MembershipClubDetailsComponent},
@@ -162,7 +164,8 @@ export class SentryErrorHandler implements ErrorHandler {
         PostalTimeEntryComponent,
         UserListComponent,
         NgbdSortableHeader,
-        UserEditComponent
+        UserEditComponent,
+        PasswordResetComponent
     ],
     entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent, PostalTimeEntryComponent ],
   imports: [

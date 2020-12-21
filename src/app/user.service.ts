@@ -190,6 +190,12 @@ export class UserService {
     });
   }
 
+  update(userDetails) {
+    console.log('Update user: ' + userDetails.id);
+    console.log(userDetails);
+    return this.http.put(environment.api + 'users/' + userDetails.id, userDetails);
+  }
+
   linkMember(memberNumber) {
     return this.http.post(environment.api + 'users/link_member/' + memberNumber, {});
   }
@@ -229,5 +235,17 @@ export class UserService {
 
   getUserList() {
     return this.http.get(environment.api + 'users');
+  }
+
+  public sendPasswordResetRequest(email, user_id = null) {
+    return this.http.post(environment.api + 'reset/' + email, { user_id: user_id });
+  }
+
+  public verifyPasswordResetToken(token) {
+    return this.http.post(environment.api + 'resetToken/' + token, {});
+  }
+
+  public usePasswordResetToken(token, newPassword) {
+    return this.http.post(environment.api + 'resetPassword/' + token, {newPassword: newPassword});
   }
 }
