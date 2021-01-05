@@ -248,4 +248,16 @@ export class UserService {
   public usePasswordResetToken(token, newPassword) {
     return this.http.post(environment.api + 'resetPassword/' + token, {newPassword: newPassword});
   }
+
+  public getRandomPassword() {
+    return this.http.get(environment.api + 'generateRandomPassword');
+  }
+
+  public changePassword(userId, newPassword, adminUserId) {
+    return this.http.post(environment.api + 'changePassword/' + userId, {
+      userId: userId,
+      newPassword: newPassword,
+      adminUserId: adminUserId
+    });
+  }
 }

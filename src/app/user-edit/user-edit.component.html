@@ -176,23 +176,30 @@
   </div>
   <div class="modal-body">
     <div class="card bg-info text-white">
-      <p>Clicking Save will automatically send an email to {{user.firstname}} {{user.surname}} with the new
-        password details. </p>
+      <div class="card-body">
+        <p>Clicking Generate Password will automatically create a random password. Please check that the new
+        password is appropriate before giving it to the user. </p>
+      <p>Clicking Save Changes will automatically change the password and send an email to {{user.firstname}}
+        {{user.surname}} with the new password details. </p>
+      </div>
     </div>
-    <form>
+    <form [formGroup]="generatePasswordForm">
       <div class="form-group">
         <div class="row">
           <label class="form-control-label col-sm-2" for="newPassword">New Password: </label>
-          <input class="form-control col-sm-6" type="text" formControlName="newPassword" id="newPassword"
-                 disabled="disabled"/>
-          <button class="btn btn-primary">Generate Password</button>
+          <input class="form-control col-sm-6" type="text" formControlName="newPassword" id="newPassword" />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+      <button class="btn btn-primary" (click)="generateRandomPassword()">Generate Password</button>
         </div>
       </div>
     </form>
   </div>
   <div class="modal-footer">
-    <button class="btn-danger">Save Changes</button>
-    <button class="btn-primary">Cancel</button>
+    <button class="btn-danger" (click)="modal.close('save')">Save Changes</button>
+    <button class="btn-primary" (click)="modal.close('cancel')">Cancel</button>
     <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
   </div>
 </ng-template>

@@ -22,8 +22,10 @@ export class UserEditComponent implements OnInit {
   @ViewChild('generateNewPassword', {static: false}) generateNewPassword;
 
   userForm: FormGroup;
+  generatePasswordForm: FormGroup;
   user: User;
   updatedUser: User;
+  generatedPassword: string;
 
   alerts: Alert[];
 
@@ -37,6 +39,7 @@ export class UserEditComponent implements OnInit {
   ngOnInit() {
 
     this.createForm();
+    this.createGenerateForm();
 
     const userId = this.route.snapshot.paramMap.get('userId');
 
@@ -52,6 +55,10 @@ export class UserEditComponent implements OnInit {
 
     this.userForm.valueChanges.subscribe((user: any) => {
       this.updateModel(user);
+    });
+
+    this.generatePasswordForm.valueChanges.subscribe((pass: any) => {
+      this.generatedPassword = pass.newPassword;
     });
 
     this.updatedUser = new User();
@@ -96,9 +103,21 @@ export class UserEditComponent implements OnInit {
 
   passwordGenerate() {
     this.modalService.open(this.generateNewPassword, { size: 'lg' }).result.then((result) => {
-
+      if (result === 'save') {
+        const currentAdminUser = this.userService.getUsers();
+        this.changePassword(this.user, this.generatedPassword, currentAdminUser.id);
+      }
     }, (reason) => {
       // const closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  generateRandomPassword() {
+    this.userService.getRandomPassword().subscribe((randPass: any)  => {
+      console.log(randPass.password);
+      this.generatePasswordForm.patchValue({
+        newPassword: randPass.password
+      });
     });
   }
 
@@ -112,6 +131,28 @@ export class UserEditComponent implements OnInit {
       // const closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
   };
+
+  changePassword(user, newPassword, adminUserId) {
+    console.log('Change password to ' + newPassword);
+
+    this.spinner.show();
+
+    this.userService.changePassword(user.id, newPassword, adminUserId).subscribe((resetRequest: any) => {
+      console.log(resetRequest);
+      if (resetRequest.success) {
+        this.alerts.push({
+          type: 'success',
+          message: 'Password has been changed and has been sent to ' + user.email + '.'
+        });
+      } else {
+        this.alerts.push({
+          type: 'danger',
+          message: resetRequest.message
+        });
+      }
+      this.spinner.hide();
+    });
+  }
 
   sendPasswordReset(email, userId) {
 
@@ -148,6 +189,12 @@ export class UserEditComponent implements OnInit {
       emergencySurname: '',
       emergencyPhone: '',
       emergencyEmail: '',
+    });
+  }
+
+  createGenerateForm() {
+    this.generatePasswordForm = this.fb.group({
+      newPassword: {value: '', disabled: true}
     });
   }
 

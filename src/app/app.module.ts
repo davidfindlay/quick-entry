@@ -72,10 +72,12 @@ import { UserListComponent } from './user-list/user-list.component';
 import {NgbdSortableHeader} from './sortable.directive';
 import { UserEditComponent } from './user-edit/user-edit.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
+import { RegisterComponent } from './register/register.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
     { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
   { path: 'reset-password/:token', component: PasswordResetComponent },
   { path: 'enter/:meet', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step1', component: EntrantDetailsComponent },
@@ -165,7 +167,8 @@ export class SentryErrorHandler implements ErrorHandler {
         UserListComponent,
         NgbdSortableHeader,
         UserEditComponent,
-        PasswordResetComponent
+        PasswordResetComponent,
+        RegisterComponent
     ],
     entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent, PostalTimeEntryComponent ],
   imports: [
