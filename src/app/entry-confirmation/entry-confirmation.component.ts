@@ -120,54 +120,62 @@ export class EntryConfirmationComponent implements OnInit {
       this.meetName = this.meet.meetname;
       this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((entry: EntryFormObject) => {
         this.entry = entry;
-        console.log(this.entry);
         if (this.entry !== undefined && this.entry !== null) {
           this.paidAmount = parseFloat(this.entry.edit_paid);
           this.loadEntry();
+        } else {
+          console.error('Unable to get entry via getIncompleteEntryFO');
         }
       });
 
     } else if (this.pending_entry_code !== undefined && this.pending_entry_code !== null && this.pending_entry_code !== 0) {
       this.entryService.getPendingEntry(this.pending_entry_code).subscribe((entry: IncompleteEntry) => {
-        console.log(entry);
-        this.meet = this.meetService.getMeet(entry.meet_id);
-        this.meetName = this.meet.meetname;
-        this.entry = entry.entrydata;
-        this.statusLabel = entry.status_label;
-        this.statusText = entry.status_description;
-        if (this.entry.paymentDetails !== undefined && this.entry.paymentDetails !== null) {
-          this.paidAmount = parseFloat(this.entry.paymentDetails.amount);
+
+        if (entry !== undefined && entry !== null) {
+
+          this.meet = this.meetService.getMeet(entry.meet_id);
+          this.meetName = this.meet.meetname;
+          this.statusLabel = entry.status_label;
+          this.statusText = entry.status_description;
+          if (this.entry.paymentDetails !== undefined && this.entry.paymentDetails !== null) {
+            this.paidAmount = parseFloat(this.entry.paymentDetails.amount);
+          } else {
+            this.paidAmount = parseFloat(this.entry.edit_paid);
+          }
+          console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
+          if (this.paidAmount >= this.meet.meetfee) {
+            this.showPaymentChoice = false;
+            this.workflowNav.enableFinishButton();
+          } else {
+            this.workflowNav.disableBack();
+            this.workflowNav.disableCancel();
+          }
+          this.loadEntry();
         } else {
-          this.paidAmount = parseFloat(this.entry.edit_paid);
+          console.error('Unable to get entry via getPendingEntry');
         }
-        console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
-        if (this.paidAmount >= this.meet.meetfee) {
-          this.showPaymentChoice = false;
-          this.workflowNav.enableFinishButton();
-        } else {
-          this.workflowNav.disableBack();
-          this.workflowNav.disableCancel();
-        }
-        this.loadEntry();
       });
     } else if (this.meet_entry_code !== undefined && this.meet_entry_code !== null && this.meet_entry_code !== 0) {
       this.entryService.getMeetEntryByCodeFO(this.meet_entry_code).subscribe((entry: IncompleteEntry) => {
-        console.log(entry);
-        this.meet = this.meetService.getMeet(entry.meet_id);
-        this.meetName = this.meet.meetname;
-        this.entry = entry.entrydata;
-        this.statusLabel = entry.status_label;
-        this.statusText = entry.status_description;
-        this.paidAmount = entry.paid_amount;
-        console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
-        if (this.paidAmount === this.meet.meetfee) {
-          this.showPaymentChoice = false;
-          this.workflowNav.enableFinishButton();
+        if (entry !== undefined && entry !== null) {
+          this.meet = this.meetService.getMeet(entry.meet_id);
+          this.meetName = this.meet.meetname;
+          this.entry = entry.entrydata;
+          this.statusLabel = entry.status_label;
+          this.statusText = entry.status_description;
+          this.paidAmount = entry.paid_amount;
+          console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
+          if (this.paidAmount === this.meet.meetfee) {
+            this.showPaymentChoice = false;
+            this.workflowNav.enableFinishButton();
+          } else {
+            this.workflowNav.disableBack();
+            this.workflowNav.disableCancel();
+          }
+          this.loadEntry();
         } else {
-          this.workflowNav.disableBack();
-          this.workflowNav.disableCancel();
+          console.error('Unable to get entry via getMeetEntryByCodeFO');
         }
-        this.loadEntry();
       });
     }
 

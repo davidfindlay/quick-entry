@@ -14,9 +14,9 @@ export class Meet {
 
   public id;
   public meetname;
-  public startdate;
-  public enddate;
-  public deadline;
+  public startdate: Date;
+  public enddate: Date;
+  public deadline: Date;
   public contactname;
   public phone: Phone;
   public contactemail;

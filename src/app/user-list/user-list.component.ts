@@ -34,7 +34,7 @@ export class UserListComponent implements OnInit {
   pageSize = 10;
 
   constructor(private userService: UserService,
-              private userSearchService: UserSearch,
+              public userSearchService: UserSearch,
               private router: Router,
               private route: ActivatedRoute) {
   }

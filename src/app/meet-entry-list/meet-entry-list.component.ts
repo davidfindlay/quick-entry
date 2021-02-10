@@ -42,15 +42,22 @@ export class MeetEntryListComponent implements OnInit {
               private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
-    this.meets = this.meetService.getMeets();
+    this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
+      this.meets = meets;
 
-    this.meets.forEach((meet: Meet) => {
-      const year = meet.startdate.getFullYear();
-      console.log(year);
-      if (!this.years.includes(year)) {
-        this.years.push(meet.startdate.getFullYear());
+      for (const meet of this.meets) {
+        if (meet.startdate) {
+          const year = new Date(meet.startdate).getFullYear();
+          if (!this.years.includes(year)) {
+            this.years.push(year);
+          }
+        }
       }
     });
+
+
+
+    console.log(this.years);
 
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.createForm();

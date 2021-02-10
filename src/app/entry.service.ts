@@ -658,7 +658,11 @@ export class EntryService {
   }
 
   getEntryCost(entryFO: EntryFormObject) {
-    return this.getMeetFee(entryFO) + this.getEventFees(entryFO);
+    if (entryFO !== undefined && entryFO !== null) {
+      return this.getMeetFee(entryFO) + this.getEventFees(entryFO);
+    } else {
+      console.error('entryFO is undefined or null');
+    }
   }
 
   deleteEntry(meetId: number) {

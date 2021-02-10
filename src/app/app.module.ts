@@ -73,12 +73,16 @@ import {NgbdSortableHeader} from './sortable.directive';
 import { UserEditComponent } from './user-edit/user-edit.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { RegisterComponent } from './register/register.component';
+import {MeetAdministrationModule} from './meet-administration/meet-administration.module';
+import {SharedModule} from './shared/shared.module';
+import { MeetCalendarComponent } from './meet-calendar/meet-calendar.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
     { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'reset-password/:token', component: PasswordResetComponent },
+  { path: 'meets/:meetId', component: MeetListItemComponent },
   { path: 'enter/:meet', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step1', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step2', component: MembershipClubDetailsComponent},
@@ -112,6 +116,7 @@ const appRoutes: Routes = [
   { path: 'meet-organiser/:meetId/dashboard', component: MeetDashboardComponent },
   { path: 'user-list', component: UserListComponent },
   { path: 'user-list/:userId', component: UserEditComponent },
+  { path: 'calendar', component: MeetCalendarComponent },
     { path: '**', component: MeetListComponent }
 ];
 
@@ -130,71 +135,74 @@ export class SentryErrorHandler implements ErrorHandler {
 
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        HeaderComponent,
-        MeetListComponent,
-        MeetListItemComponent,
-        EntrantDetailsComponent,
-        EntryDetailsComponent,
-        EntryConfirmComponent,
-        LoginComponent,
-        ConfirmCancelComponent,
-        WorkflowNavComponent,
-        MembershipClubDetailsComponent,
-        ClassificationMedicalDetailsComponent,
-        EntryPaymentComponent,
-        EntryConfirmationComponent,
-        EntryDetailsEventComponent,
-        EventSelectCheckboxComponent,
-        TimePipe,
-        SeedtimeHelperComponent,
-        EntryDetailsTotalsComponent,
-        SubmittedEntryComponent,
-        PendingEntryComponent,
-        SidebarMenuComponent,
-        MyProfileComponent,
-        MeetEntryListComponent,
-        PendingEntryListComponent,
-        PendingEntryActionComponent,
-        MeetEntryActionComponent,
-        ClubMemberSelectorComponent,
-        MeetEntryContactListComponent,
-        EntryMealsMerchandiseComponent,
-        EntryMerchandiseItemComponent,
-        MeetSelectorComponent,
-        PostalTimeEntryComponent,
-        UserListComponent,
-        NgbdSortableHeader,
-        UserEditComponent,
-        PasswordResetComponent,
-        RegisterComponent
-    ],
-    entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent, PostalTimeEntryComponent ],
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    MeetListComponent,
+    MeetListItemComponent,
+    EntrantDetailsComponent,
+    EntryDetailsComponent,
+    EntryConfirmComponent,
+    LoginComponent,
+    ConfirmCancelComponent,
+    WorkflowNavComponent,
+    MembershipClubDetailsComponent,
+    ClassificationMedicalDetailsComponent,
+    EntryPaymentComponent,
+    EntryConfirmationComponent,
+    EntryDetailsEventComponent,
+    EventSelectCheckboxComponent,
+    TimePipe,
+    SeedtimeHelperComponent,
+    EntryDetailsTotalsComponent,
+    SubmittedEntryComponent,
+    PendingEntryComponent,
+    SidebarMenuComponent,
+    MyProfileComponent,
+    MeetEntryListComponent,
+    PendingEntryListComponent,
+    PendingEntryActionComponent,
+    MeetEntryActionComponent,
+    ClubMemberSelectorComponent,
+    MeetEntryContactListComponent,
+    EntryMealsMerchandiseComponent,
+    EntryMerchandiseItemComponent,
+    MeetSelectorComponent,
+    PostalTimeEntryComponent,
+    UserListComponent,
+    NgbdSortableHeader,
+    UserEditComponent,
+    PasswordResetComponent,
+    RegisterComponent,
+    MeetCalendarComponent
+  ],
+  entryComponents: [ConfirmCancelComponent, SeedtimeHelperComponent, PostalTimeEntryComponent],
   imports: [
     BrowserModule,
     FormsModule,
     FontAwesomeModule,
     ReactiveFormsModule,
-    NgbModule.forRoot(),
+    NgbModule,
     RouterModule.forRoot(appRoutes, {scrollPositionRestoration: 'enabled'}),
     HttpClientModule,
     AuthenticationModule,
     NgxDatatableModule,
     NgxSpinnerModule,
     PaypalModule,
-    MeetOrganiserModule
+    MeetOrganiserModule,
+    MeetAdministrationModule,
+    SharedModule
   ],
-    providers: [
-        MeetService,
-        UserService,
-        EntryService,
-      TimePipe,
-      MeetEntryStatusService,
-      MemberService,
-      { provide: ErrorHandler, useClass: SentryErrorHandler }
-    ],
-    bootstrap: [AppComponent]
+  providers: [
+    MeetService,
+    UserService,
+    EntryService,
+    TimePipe,
+    MeetEntryStatusService,
+    MemberService,
+    {provide: ErrorHandler, useClass: SentryErrorHandler}
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule {
 }

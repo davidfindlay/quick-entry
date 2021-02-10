@@ -180,11 +180,14 @@ export class UserService {
 
           this.authenticationService.login(registeredUser.user.username, userDetails.password).subscribe((loggedIn) => {
             observer.next(registeredUser);
+            observer.complete();
           });
 
         }
       }, (error: any) => {
-        observer.next(error);
+        console.log(error.error);
+        observer.error(error.error);
+        observer.complete();
       });
 
     });

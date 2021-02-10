@@ -12,10 +12,32 @@
   <fieldset class="qe-fieldset">
     <h2>User Details</h2>
 
+    <div class="card bg-info text-white">
+      <div class="card-body">
+        <p>
+        How to create an account:
+        </p>
+        <ul>
+          <li>You will log in using your email address. If you share an email address, create an account under one name,
+          then select "Enter for someone else" feature when entering meets.</li>
+          <li>Your password must meet the following standards:
+          <ul>
+            <li>Must be at least 5 characters long</li>
+            <li>Must include at least one number</li>
+          </ul>
+          </li>
+          <li>We recommend saving your username and password in your browser or a password manager</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="form-group">
       <div class="row">
-        <label class="form-control-label col-sm-2" for="email">Email Address:</label>
+        <label class="form-control-label col-sm-2" for="email">Email Address (required):</label>
         <input class="form-control col-sm-6" type="text" formControlName="email" id="email"/>
+      </div>
+      <div class="card bg-warning" *ngIf="email.touched && email.errors !== null && email.errors.required">
+        Email address is required.
       </div>
     </div>
 
@@ -24,6 +46,12 @@
         <label class="form-control-label col-sm-2" for="password1">Password:</label>
         <input class="form-control col-sm-6" type="password" formControlName="password1" id="password1"/>
       </div>
+      <div class="card bg-warning" *ngIf="password1.touched && password1.errors !== null && password1.errors.required">
+        Password is required.
+      </div>
+      <div class="card bg-warning" *ngIf="password1.touched && password1.errors !== null && password1.errors.pattern">
+        Your password does not meet the minimum standards!
+      </div>
     </div>
 
     <div class="form-group">
@@ -31,34 +59,44 @@
         <label class="form-control-label col-sm-2" for="password2">Confirm Password:</label>
         <input class="form-control col-sm-6" type="password" formControlName="password2" id="password2"/>
       </div>
+      <div class="card bg-warning" *ngIf="password2.touched && userForm.errors !== null && userForm.errors.notSame">
+        Password and Confirm Password must match! Please try again.
+      </div>
+
     </div>
 
     <div class="form-group">
       <div class="row">
-        <label class="form-control-label col-sm-2" for="firstName">First name:</label>
+        <label class="form-control-label col-sm-2" for="firstName">First name (required):</label>
         <input class="form-control col-sm-6" type="text" formControlName="firstName" id="firstName"/>
+      </div>
+      <div class="card bg-warning" *ngIf="firstName.touched && firstName.errors !== null && firstName.errors.required">
+        First name is required.
       </div>
     </div>
 
     <div class="form-group">
       <div class="row">
-        <label class="form-control-label col-sm-2" for="surname">Surname:</label>
+        <label class="form-control-label col-sm-2" for="surname">Surname (required):</label>
         <input class="form-control col-sm-6" type="text" formControlName="surname" id="surname"/>
+      </div>
+      <div class="card bg-warning" *ngIf="surname.touched && surname.errors !== null && surname.errors.required">
+        Surname is required.
       </div>
     </div>
 
     <div class="form-group row">
-      <label class="form-control-label col-sm-2" for="dob">Date of Birth (dd/mm/yyyy) (required):</label>
+      <label class="form-control-label col-sm-2" for="dob">Date of Birth (dd/mm/yyyy):</label>
       <input class="form-control col-sm-4" type="date" formControlName="dob" id="dob"/>
     </div>
 
     <div class="form-group row">
-      <p class="col-form-legend col-sm-2">Sex (required):</p>
+      <p class="col-form-legend col-sm-2">Gender:</p>
       <div class="col-sm-10">
         <div class="form-check">
           <label for="entrant-male">
             <input class="form-check-label" type="radio" formControlName="gender" id="entrant-male"
-                   value="male"
+                   value="M"
                    />
             Male
           </label>
@@ -66,7 +104,7 @@
         <div class="form-check col-sm10">
           <label for="entrant-female">
             <input class="form-check-label" type="radio" formControlName="gender" id="entrant-female"
-                   value="female"
+                   value="F"
             />
             Female
           </label>
@@ -76,8 +114,11 @@
 
     <div class="form-group">
       <div class="row">
-        <label class="form-control-label col-sm-2" for="phone">Phone:</label>
+        <label class="form-control-label col-sm-2" for="phone">Phone (required):</label>
         <input class="form-control col-sm-6" type="text" formControlName="phone" id="phone"/>
+      </div>
+      <div class="card bg-warning" *ngIf="phone.touched && phone.errors !== null && phone.errors.required">
+        Phone number is required.
       </div>
     </div>
 
@@ -122,6 +163,10 @@
       </div>
     </div>
 
+    <div class="card bg-warning" *ngIf="memberType.touched && memberType.errors !== null && memberType.errors.required">
+      Membership type is required. If you are not a member, select Non-Member.
+    </div>
+
     <div class="form-group" *ngIf="showMemberNumberField">
       <div class="row">
         <label for="member-number" class="form-control-label col-sm-2">
@@ -139,6 +184,7 @@
         </div>
       </div>
     </div>
+
   </fieldset>
 
   <fieldset class="qe-fieldset" *ngIf="showEmergencyContactDetails">
@@ -179,11 +225,15 @@
     </div>
 
   </fieldset>
-</form>
+
+  <p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
+
 <div class="row">
   <div class="col-xs-12">
-    <button class="btn btn-primary" (click)="save()">Register</button>
+    <button class="btn btn-primary" (click)="save()" [disabled]="userForm.invalid">Register</button>
     <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   </div>
 </div>
-
+</form>

@@ -1,7 +1,7 @@
 import {Component, OnInit, Input, ChangeDetectorRef} from '@angular/core';
 import * as moment from 'moment';
 import {EntryService} from '../entry.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {IncompleteEntry} from '../models/incomplete_entry';
 import {MeetEntryStatusService} from '../meet-entry-status.service';
 import {MeetEntry} from '../models/meet-entry';
@@ -12,6 +12,8 @@ import {ConfirmCancelComponent} from '../confirm-cancel/confirm-cancel.component
 import {UnauthenticatedEntryService} from '../unauthenticated-entry.service';
 import {Observable} from 'rxjs';
 import {EntryFormObject} from '../models/entry-form-object';
+import {MeetService} from '../meet.service';
+import {Meet} from '../models/meet';
 
 @Component({
   selector: 'app-meet-list-item',
@@ -45,13 +47,28 @@ export class MeetListItemComponent implements OnInit {
   constructor(private entryService: EntryService,
               private unauthenticatedEntryService: UnauthenticatedEntryService,
               private router: Router,
+              private route: ActivatedRoute,
               private statuses: MeetEntryStatusService,
               private userService: UserService,
+              private meetService: MeetService,
               private authService: AuthenticationService,
               private modalService: NgbModal) {
   }
 
   ngOnInit() {
+
+    if (this.route.snapshot.paramMap.get('meetId')) {
+      console.log('meet id = ' + this.route.snapshot.paramMap.get('meetId'));
+      this.meetService.getMeetDetails(parseInt(this.route.snapshot.paramMap.get('meetId'), 10)).subscribe((meet: any) => {
+        console.log(meet);
+        this.meet = meet;
+        if (this.meet.mealname !== null && this.meet.mealname !== '') {
+          this.mealName = this.meet.mealname;
+        }
+
+      });
+
+    }
 
     if (this.meet.mealname !== null && this.meet.mealname !== '') {
       this.mealName = this.meet.mealname;

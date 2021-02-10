@@ -3,7 +3,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Meet} from '../models/meet';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {MeetService} from '../meet.service';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 
 @Component({
   selector: 'app-meet-selector',
@@ -30,6 +30,14 @@ export class MeetSelectorComponent implements OnInit {
   ngOnInit() {
 
     this.spinner.show();
+
+    this.route.queryParamMap.subscribe((queryParams: ParamMap) => {
+      this.yearSelected = queryParams.get('meetYear');
+      this.meetSelectorForm.patchValue({
+        meetYear: this.yearSelected
+      });
+    });
+
     this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
       this.meets = meets;
 
@@ -65,13 +73,15 @@ export class MeetSelectorComponent implements OnInit {
     this.meetSelectorForm.valueChanges.subscribe((val) => {
       console.log(val);
       if (parseInt(val.meetYear, 10) !== this.yearSelected) {
-        this.yearSelected = parseInt(val.meetYear, 10);
-        this.filterMeets();
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { year: val.meetYear},
+          queryParamsHandling: 'merge'
+        });
       }
 
       if (parseInt(val.meet, 10) !== this.meetId) {
-        this.meetId = parseInt(val.meet, 10);
-        this.filterMeets();
+        this.router.navigate(['..', val.meet]);
       }
     });
 
