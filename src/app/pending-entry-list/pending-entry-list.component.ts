@@ -153,7 +153,7 @@ export class PendingEntryListComponent implements OnInit {
   }
 
   loadMeet() {
-    this.http.get(environment.api + 'pending_entries/' + this.meetId).subscribe((entries: any) => {
+    this.http.get(environment.api + 'pending_entries/' + 195).subscribe((entries: any) => {
       this.entries = entries.pending_entries;
 
       this.tableRows = [];

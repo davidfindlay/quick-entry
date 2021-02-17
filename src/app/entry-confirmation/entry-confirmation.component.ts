@@ -298,7 +298,6 @@ export class EntryConfirmationComponent implements OnInit {
         this.entryService.deleteEntry(this.meet_id);
         break;
       case 'saveAndExit':
-        this.saveEntry();
         break;
       case 'submit':
         this.saveEntry().subscribe((saved: any) => {
@@ -438,7 +437,7 @@ export class EntryConfirmationComponent implements OnInit {
     }
 
     const meetPaymentTypes = this.meet.payment_types;
-    if (meetPaymentTypes === undefined && meetPaymentTypes === null) {
+    if (meetPaymentTypes === undefined || meetPaymentTypes === null) {
       return false;
     }
 
@@ -449,6 +448,13 @@ export class EntryConfirmationComponent implements OnInit {
     }
 
     return false;
+  }
+
+  enablePayLater() {
+    const meetPaymentTypes = this.meet.payment_types;
+    if (meetPaymentTypes === undefined || meetPaymentTypes === null) {
+      return true;
+    }
   }
 
   getLegs(event_id) {

@@ -104,7 +104,10 @@
       <div class="form-group">
         <div class="row">
           <label class="form-control-label col-sm-2" for="deadline">Deadline:</label>
-          <input class="form-control col-sm-3" type="text" formControlName="deadline" id="deadline"/>
+          <input class="form-control col-sm-6" placeholder="YYYY-mm-dd"
+                 name="deadline" id="deadline" formControlName="deadline" ngbDatepicker #e="ngbDatepicker">
+          <div class="input-group-append">
+            <button class="
         </div>
       </div>
       <div class="form-group">

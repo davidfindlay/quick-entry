@@ -5,8 +5,8 @@
 
 export const environment = {
   production: false,
-  // api: 'https://api.quickentry.mastersswimmingqld.org.au/api/',
-  api: 'http://localhost:8088/api/',
+  api: 'https://api.quickentry.mastersswimmingqld.org.au/api/',
+  // api: 'http://localhost:8088/api/',
   fileRoot: 'https://api.quickentry.mastersswimmingqld.org.au/static/',
   // api: 'https://msqprod.davsoft.com.au/api/',
   resultsPortal: 'https://b4wt31qb36.execute-api.ap-southeast-2.amazonaws.com/production/',

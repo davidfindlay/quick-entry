@@ -4,7 +4,7 @@ import {Meet} from '../models/meet';
 import {MeetEntryStatusService} from '../meet-entry-status.service';
 
 @Component({
-  selector: 'app-pending-entry',
+  selector: ' app-pending-entry',
   templateUrl: './pending-entry.component.html',
   styleUrls: ['./pending-entry.component.css']
 })

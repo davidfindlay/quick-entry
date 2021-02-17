@@ -3,7 +3,7 @@
 
 <form [formGroup]="mealsMerchandiseForm">
 
-  <fieldset class="qe-fieldset">
+  <fieldset class="qe-fieldset" *ngIf="this.mealName">
 
     <h3>{{this.mealName}}</h3>
 
@@ -60,7 +60,7 @@
     </div>
   </fieldset>
 
-  <fieldset class="qe-fieldset">
+  <fieldset class="qe-fieldset" *ngIf="this.meet.merchandise.length > 0">
 
     <h3>Merchandise</h3>
 
