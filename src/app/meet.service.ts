@@ -35,7 +35,6 @@ export class MeetService {
 
     this.http.get<Meet[]>(environment.api + 'meets?year=' + year)
       .subscribe(data => {
-          console.log('got meets');
           this.meets = data;
           this.meetsChanged.next(this.meets.slice());
           // Store meet data

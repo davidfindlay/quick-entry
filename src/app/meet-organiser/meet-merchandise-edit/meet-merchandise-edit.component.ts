@@ -108,6 +108,7 @@ export class MeetMerchandiseEditComponent implements OnInit {
     });
 
     this.merchandiseImageForm = this.fb.group({
+      addImage: '',
       caption: ''
     });
 

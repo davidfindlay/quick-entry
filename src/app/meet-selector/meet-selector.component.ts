@@ -31,12 +31,51 @@ export class MeetSelectorComponent implements OnInit {
 
     this.spinner.show();
 
-    this.route.queryParamMap.subscribe((queryParams: ParamMap) => {
-      this.yearSelected = queryParams.get('meetYear');
-      this.meetSelectorForm.patchValue({
-        meetYear: this.yearSelected
-      });
+    this.meetId = this.meetPreset;
+    this.filterMeets();
+
+    this.meetSelectorForm = this.fb.group({
+      meetYear: [this.yearSelected, Validators.required],
+      meet: []
     });
+
+    this.meetSelectorForm.controls.meetYear.valueChanges.subscribe((val) => {
+      // console.log('meet selector year changes: ' + parseInt(val, 10));
+
+      this.yearSelected = parseInt(val, 10);
+      this.filterMeets();
+    });
+
+    this.meetSelectorForm.controls.meet.valueChanges.subscribe((val) => {
+      // console.log('meet selector meet changes: ' + parseInt(val, 10));
+
+      let routeDelta = [];
+      if (this.route.snapshot.paramMap.get('meetId')) {
+        routeDelta = ['..', parseInt(val, 10)];
+      } else {
+        routeDelta = [parseInt(val, 10)];
+      }
+
+      this.router.navigate(routeDelta, {
+        relativeTo: this.route
+      });
+
+    });
+  }
+
+  getMeetYear(meetId: number) {
+    const meet = this.meets.filter(x => x.id === meetId);
+    if (meet !== null) {
+      return new Date(meet[0].startdate).getFullYear();
+    } else {
+      return null;
+    }
+  }
+
+  filterMeets() {
+    // console.log('filterMeets');
+
+    this.filteredMeets = [];
 
     this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
       this.meets = meets;
@@ -53,75 +92,44 @@ export class MeetSelectorComponent implements OnInit {
 
       }
 
-      const meetYear = this.getMeetYear(this.meetId);
-
-      if (this.years.includes(meetYear)) {
+      if (!this.yearSelected) {
+        this.yearSelected = new Date().getFullYear();
         this.meetSelectorForm.patchValue({
-          meetYear: meetYear
-        });
+          meetYear: this.yearSelected
+        }, { emitEvent: false });
       }
 
-    });
+      for (let i = 0, len = this.meets.length; i < len; i++) {
+        const meet = this.meets[i];
+        const startDate = new Date(meet.startdate);
+        const year = startDate.getFullYear();
 
-    this.meetId = this.meetPreset;
+        if (year === this.yearSelected) {
+          this.filteredMeets.push(meet);
+          // console.log('Add Meet ' + meet.meetname);
+        }
 
-    this.meetSelectorForm = this.fb.group({
-      meetYear: [this.yearSelected, Validators.required],
-      meet: []
-    });
-
-    this.meetSelectorForm.valueChanges.subscribe((val) => {
-      console.log(val);
-      if (parseInt(val.meetYear, 10) !== this.yearSelected) {
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: { year: val.meetYear},
-          queryParamsHandling: 'merge'
-        });
-      }
-
-      if (parseInt(val.meet, 10) !== this.meetId) {
-        this.router.navigate(['..', val.meet]);
-      }
-    });
-
-  }
-
-  getMeetYear(meetId: number) {
-    const meet = this.meets.filter(x => x.id === meetId);
-    if (meet !== null) {
-      return new Date(meet[0].startdate).getFullYear();
-    } else {
-      return null;
-    }
-  }
-
-  filterMeets() {
-    console.log('filterMeets');
-    this.filteredMeets = [];
-    for (let i = 0, len = this.meets.length; i < len; i++) {
-      const meet = this.meets[i];
-      const startDate = new Date(meet.startdate);
-      const year = startDate.getFullYear();
-
-      if (year === this.yearSelected) {
-        this.filteredMeets.push(meet);
-        // console.log('Add Meet ' + meet.meetname);
-      }
-
-      if (this.filteredMeets.length > 0) {
-        console.log('current meetId: ' + this.meetId);
-        if (this.meetId !== undefined && this.meetId !== null) {
-          this.meetSelectorForm.patchValue(
-            {meet: this.meetId},
-            {emitEvent: false}
+        if (this.filteredMeets.length > 0) {
+          // console.log('current meetId: ' + this.meetId);
+          if (this.meetId !== undefined && this.meetId !== null) {
+            this.meetSelectorForm.patchValue(
+              {meet: this.meetId},
+              {emitEvent: false}
             );
-        } else {
-          this.meetId = this.filteredMeets[0].id;
-          this.router.navigate(['/', 'pending-entries', this.meetId]);
+          } else {
+            this.meetId = this.filteredMeets[0].id;
+            this.meetSelectorForm.patchValue(
+              {meet: this.meetId},
+              {emitEvent: true}
+            );
+            // this.router.navigate(['/', 'pending-entries', this.meetId]);
+          }
         }
       }
-    }
+
+    });
+
+
   }
 
 }

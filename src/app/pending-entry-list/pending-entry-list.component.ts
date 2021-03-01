@@ -56,38 +56,13 @@ export class PendingEntryListComponent implements OnInit {
 
   ngOnInit() {
     this.spinner.show();
-    this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
-      this.meets = meets;
-
-      for (let i = 0, len = this.meets.length; i < len; i++) {
-        const meet = this.meets[i];
-        const startDate = new Date(meet.startdate);
-        // console.log(startDate);
-
-        const year = startDate.getFullYear();
-        // console.log('meet=' + meet.id + ' year=' + year);
-        if (!this.years.includes(year)) {
-          this.years.push(year);
-        }
-
-      }
-
-      const dt = new Date();
-      if (this.years.includes(dt.getFullYear())) {
-        this.meetSelectorForm.patchValue({
-          meetYear: dt.getFullYear()
-        });
-      } else {
-
-      }
-
-    });
 
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.loadMeet();
 
     this.route.params.subscribe(
       params => {
+        console.log('load new meet');
         this.meetId = params['meetId'];
         this.loadMeet();
       });
@@ -105,22 +80,8 @@ export class PendingEntryListComponent implements OnInit {
       showCancelled: false
     });
 
-    this.meetSelectorFormSub = this.meetSelectorForm.valueChanges.subscribe((change) => {
+    this.meetSelectorFormSub = this.listControl.valueChanges.subscribe((change) => {
       this.spinner.show();
-
-      if (change.meetYear !== this.yearSelected) {
-        this.yearSelected = parseInt(change.meetYear, 10);
-        console.log('Change selected year to ' + change.meetYear)
-      }
-
-      console.log('Current meet: ' + this.meetId);
-      console.log(change);
-      if (change.meet !== this.meetId) {
-        this.router.navigate(['/', 'pending-entries', change.meet]);
-        console.log('Selected meet ' + this.meetId);
-      }
-
-      // console.log(change);
 
       if (change.showPending) {
         this.showPending = true;
@@ -153,7 +114,7 @@ export class PendingEntryListComponent implements OnInit {
   }
 
   loadMeet() {
-    this.http.get(environment.api + 'pending_entries/' + 195).subscribe((entries: any) => {
+    this.http.get(environment.api + 'pending_entries/' + this.meetId).subscribe((entries: any) => {
       this.entries = entries.pending_entries;
 
       this.tableRows = [];
@@ -215,7 +176,7 @@ export class PendingEntryListComponent implements OnInit {
 
       this.spinner.hide();
 
-      console.log(this.tableRows);
+      // console.log(this.tableRows);
 
     });
   }

@@ -452,7 +452,10 @@ export class EntryConfirmationComponent implements OnInit {
 
   enablePayLater() {
     const meetPaymentTypes = this.meet.payment_types;
-    if (meetPaymentTypes === undefined || meetPaymentTypes === null) {
+    if (meetPaymentTypes === undefined || meetPaymentTypes === null || meetPaymentTypes.length === 0) {
+      this.paymentOptionForm.patchValue({
+        paymentOption: 'later'
+      });
       return true;
     }
   }

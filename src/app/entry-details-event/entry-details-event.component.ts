@@ -161,7 +161,7 @@ export class EntryDetailsEventComponent implements OnInit {
 
     if (this.meetEvent.times_required) {
       this.seedTimeMandatory = true;
-      // console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
+      console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
     }
 
   }
