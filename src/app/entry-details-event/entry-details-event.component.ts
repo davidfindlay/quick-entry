@@ -11,8 +11,6 @@ import {SeedtimeHelperComponent} from '../seedtime-helper/seedtime-helper.compon
 import {of} from 'rxjs/internal/observable/of';
 import {EntryService} from '../entry.service';
 import {EntryFormObject} from '../models/entry-form-object';
-import {PostalTimeEntryComponent} from '../postal-time-entry/postal-time-entry.component';
-import {ConfirmCancelComponent} from '../confirm-cancel/confirm-cancel.component';
 
 @Component({
   selector: 'app-entry-details-event',
@@ -107,23 +105,25 @@ export class EntryDetailsEventComponent implements OnInit {
       }
 
       // Download member history if it's not already available
-      if (!isNaN(this.memberNo)) {
-        if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
-          this.memberHistoryService.downloadHistory(this.memberNo);
-          this.memberHistoryService.resultsAvailable.subscribe((resultsAvailable) => {
-            // Once results are available, check if there's a previous result for this event
-            if (resultsAvailable) {
-              this.isMemberHistoryAvailable();
+      if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
+        this.memberHistoryService.downloadHistory(this.memberNo);
+        this.memberHistoryService.resultsAvailable.subscribe((resultsAvailable) => {
+          // Once results are available, check if there's a previous result for this event
+          if (resultsAvailable) {
+            this.isMemberHistoryAvailable();
 
-              // Freetime not available
-              if (this.historyAvailable && this.meetEvent.freetime) {
-                // console.log('Disable free time entry on event ' + this.meetEvent.prognumber);
-                this.eventEntryForm.controls.seedTime.disable();
-              }
+            // Freetime not available
+            if (this.historyAvailable && this.meetEvent.freetime) {
+              // console.log('Disable free time entry on event ' + this.meetEvent.prognumber);
+              this.eventEntryForm.controls.seedTime.disable();
             }
-          });
-        }
+          }
+        }, (error: any) => {
+          console.error('No entry form object found');
+          console.log(error);
+        });
       }
+
 
     });
 
@@ -161,31 +161,25 @@ export class EntryDetailsEventComponent implements OnInit {
 
     if (this.meetEvent.times_required) {
       this.seedTimeMandatory = true;
-      console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
+      // console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
     }
 
   }
 
   isMemberHistoryAvailable() {
-    console.log(this.memberNo);
-    if (!isNaN(this.memberNo)) {
-      if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
-        // console.log('Look for member history for ' + this.meetEvent.event_discipline.discipline);
-        this.historyAvailable = this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.event_distance.metres,
-          this.meetEvent.event_discipline.discipline, this.meetEvent.event_distance.course);
-        if (this.historyAvailable) {
-          // console.log('History available for event ' + this.meetEvent.prognumber);
-        } else {
-          // console.log('No member history for event ' + this.meetEvent.prognumber);
-        }
+    if (this.memberNo !== undefined && this.memberNo !== null && this.memberNo !== 0) {
+      // console.log('Look for member history for ' + this.meetEvent.event_discipline.discipline);
+      this.historyAvailable = this.memberHistoryService.isHistoryAvailable(this.memberNo, this.meetEvent.event_distance.metres,
+        this.meetEvent.event_discipline.discipline, this.meetEvent.event_distance.course);
+      if (this.historyAvailable) {
+        // console.log('History available for event ' + this.meetEvent.prognumber);
       } else {
         // console.log('No member history for event ' + this.meetEvent.prognumber);
-        this.historyAvailable = false;
       }
     } else {
+      // console.log('No member history for event ' + this.meetEvent.prognumber);
       this.historyAvailable = false;
     }
-
   }
 
   eventSelected() {
@@ -202,7 +196,6 @@ export class EntryDetailsEventComponent implements OnInit {
     modalRef.componentInstance.inDiscipline = of(this.meetEvent.event_discipline.discipline);
     modalRef.componentInstance.inCourse = of(this.meetEvent.event_distance.course);
     modalRef.componentInstance.inFreetime = of(this.meetEvent.freetime);
-    modalRef.componentInstance.inHideHistory = of(this.meetEvent.disable_seedtime_suggestions);
 
     if (this.eventEntryForm.controls['seedTime'].value !== '') {
       modalRef.componentInstance.timeIn = TimeService.timeStringToSeconds(this.eventEntryForm.controls['seedTime'].value);
@@ -390,7 +383,7 @@ export class EntryDetailsEventComponent implements OnInit {
       }
       // console.log('Seed time not 0');
     } else {
-      console.log('seed time NT');
+      console.log('seed time NT')
       this.seedTimeNT = true;
       this.seedTimeTooLong = false;
       this.seedTimeTooShort = false;
@@ -401,22 +394,6 @@ export class EntryDetailsEventComponent implements OnInit {
   enterPressed($event) {
     const target = $event.target;
     target.blur();
-  }
-
-  clickPostalTimeEntry() {
-    console.log('test');
-
-    const modalRef = this.modalService.open(PostalTimeEntryComponent, {size: 'lg'});
-
-    console.log(this.meetEvent);
-
-    modalRef.componentInstance.memberNo = this.memberNo;
-    modalRef.componentInstance.inDistance = of(this.meetEvent.event_distance.metres);
-    modalRef.componentInstance.inDiscipline = of(this.meetEvent.event_discipline.discipline);
-    modalRef.componentInstance.inCourse = of(this.meetEvent.event_distance.course);
-    modalRef.componentInstance.inFreetime = of(this.meetEvent.freetime);
-
-    console.log('clickPostalTimeEntry');
   }
 
 }

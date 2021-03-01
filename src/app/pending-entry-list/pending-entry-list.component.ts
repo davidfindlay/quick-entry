@@ -182,6 +182,7 @@ export class PendingEntryListComponent implements OnInit {
   }
 
   actionEntry(pendingId) {
+    console.log('actionEntry: ' + pendingId);
     this.router.navigate(['/', 'pending-entry', pendingId]);
   }
 
