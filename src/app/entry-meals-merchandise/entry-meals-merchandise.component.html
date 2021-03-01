@@ -3,7 +3,7 @@
 
 <form [formGroup]="mealsMerchandiseForm">
 
-  <fieldset class="qe-fieldset">
+  <fieldset class="qe-fieldset" *ngIf="this.mealName">
 
     <h3>{{this.mealName}}</h3>
 
@@ -60,6 +60,26 @@
     </div>
   </fieldset>
 
+  <fieldset class="qe-fieldset" *ngIf="this.meet.merchandise.length > 0">
+
+    <h3>Merchandise</h3>
+
+    <div class="card mb-3 bg-info text-white">
+      <div class="card-body">
+        <p>
+          The following merchandise items are available for order along with your meet entries. Unless otherwise stated
+          merchandise items are delivered when you attend the meet. If you cancel your meet entry, your order will also
+          be cancelled.
+        </p>
+      </div>
+    </div>
+
+    <div *ngFor="let merchandiseItem of this.meet.merchandise; let i = index">
+      <app-entry-merchandise-item [merchandiseItem]="merchandiseItem" [index]="i">
+      </app-entry-merchandise-item>
+    </div>
+
+  </fieldset>
 
 
   <app-workflow-nav next="/enter/{{meet_id}}/confirmation" previous="/enter/{{meet_id}}/step4"

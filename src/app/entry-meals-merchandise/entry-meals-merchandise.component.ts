@@ -95,9 +95,11 @@ export class EntryMealsMerchandiseComponent implements OnInit {
   }
 
   saveEntry(advance) {
-    const mealMerchandiseDetails: MealMerchandiseDetails = Object.assign({}, this.mealsMerchandiseForm.value);
+    // TODO: don't overwrite existing
+    // const mealMerchandiseDetails: MealMerchandiseDetails = Object.assign({}, this.mealsMerchandiseForm.value);
 
-    this.entryService.setMealMerchandiseDetails(this.meet_id, mealMerchandiseDetails).subscribe((updated) => {
+    this.entryService.setMealMerchandiseDetails(this.meet_id, this.mealsMerchandiseForm.controls['meals'].value,
+      this.mealsMerchandiseForm.controls['mealComments'].value).subscribe((updated) => {
       console.log(updated);
       if (advance) {
         this.workflow.navigateNext();

@@ -42,15 +42,6 @@ export class MeetEntryListComponent implements OnInit {
               private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
-    this.meets = this.meetService.getMeets();
-
-    this.meets.forEach((meet: Meet) => {
-      const year = meet.startdate.getFullYear();
-      console.log(year);
-      if (!this.years.includes(year)) {
-        this.years.push(meet.startdate.getFullYear());
-      }
-    });
 
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.createForm();

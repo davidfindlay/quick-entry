@@ -39,9 +39,12 @@ export class PendingEntryListComponent implements OnInit {
   showFinalised = false;
   showPending = true;
   showIncomplete = false;
+  showCancelled =  false;
+
+  listControl: FormGroup;
+  meetSelectorFormSub;
 
   meetSelectorForm: FormGroup;
-  meetSelectorFormSub;
 
   constructor(private fb: FormBuilder,
               private meetService: MeetService,
@@ -53,40 +56,13 @@ export class PendingEntryListComponent implements OnInit {
 
   ngOnInit() {
     this.spinner.show();
-    this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
-      this.meets = meets;
-
-      for (let i = 0, len = this.meets.length; i < len; i++) {
-        const meet = this.meets[i];
-        const startDate = new Date(meet.startdate);
-        // console.log(startDate);
-
-        const year = startDate.getFullYear();
-        // console.log('meet=' + meet.id + ' year=' + year);
-        if (!this.years.includes(year)) {
-          this.years.push(year);
-        }
-
-      }
-
-      const dt = new Date();
-      if (this.years.includes(dt.getFullYear())) {
-        this.meetSelectorForm.patchValue({
-          meetYear: dt.getFullYear()
-        });
-      } else {
-
-      }
-
-      // this.filterMeets()
-
-    });
 
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.loadMeet();
 
     this.route.params.subscribe(
       params => {
+        console.log('load new meet');
         this.meetId = params['meetId'];
         this.loadMeet();
       });
@@ -97,32 +73,15 @@ export class PendingEntryListComponent implements OnInit {
 
   createForm() {
     const dt = new Date();
-    this.meetSelectorForm = this.fb.group({
-      meetYear: [dt.getFullYear(), Validators.required],
-      meet: [this.meetId, Validators.required],
+    this.listControl = this.fb.group({
       showPending: true,
       showFinalised: false,
       showIncomplete: false,
       showCancelled: false
     });
 
-    this.meetSelectorFormSub = this.meetSelectorForm.valueChanges.subscribe((change) => {
+    this.meetSelectorFormSub = this.listControl.valueChanges.subscribe((change) => {
       this.spinner.show();
-
-      if (change.meetYear !== this.yearSelected) {
-        this.yearSelected = parseInt(change.meetYear, 10);
-        console.log('Change selected year to ' + change.meetYear)
-        this.filterMeets();
-      }
-
-      console.log('Current meet: ' + this.meetId);
-      console.log(change);
-      if (change.meet !== this.meetId) {
-        this.router.navigate(['/', 'pending-entries', change.meet]);
-        console.log('Selected meet ' + this.meetId);
-      }
-
-      // console.log(change);
 
       if (change.showPending) {
         this.showPending = true;
@@ -142,30 +101,16 @@ export class PendingEntryListComponent implements OnInit {
         this.showIncomplete = false;
       }
 
+      if (change.showCancelled) {
+        this.showCancelled = true;
+      } else {
+        this.showCancelled = false;
+      }
+
       this.loadMeet();
 
     });
 
-  }
-
-  filterMeets() {
-    this.filteredMeets = [];
-    for (let i = 0, len = this.meets.length; i < len; i++) {
-      const meet = this.meets[i];
-      const startDate = new Date(meet.startdate);
-      const year = startDate.getFullYear();
-
-      if (year === this.yearSelected) {
-        this.filteredMeets.push(meet);
-        console.log('Add Meet ' + meet.meetname);
-      }
-
-      if (this.filteredMeets.length > 0) {
-        this.meetSelectorForm.patchValue({meet: this.filteredMeets[0].id});
-        this.meetId = this.filteredMeets[0].id;
-        this.router.navigate(['/', 'pending-entries', this.meetId]);
-      }
-    }
   }
 
   loadMeet() {
@@ -213,6 +158,12 @@ export class PendingEntryListComponent implements OnInit {
 
         if (!this.showFinalised) {
           if (entry.finalised_at !== null) {
+            continue;
+          }
+        }
+
+        if (!this.showCancelled) {
+          if (entry.status_id === 11) {
             continue;
           }
         }

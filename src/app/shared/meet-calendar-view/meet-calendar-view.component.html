@@ -1,0 +1,82 @@
+<ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
+  <li [ngbNavItem]="1">
+    <a ngbNavLink>Current</a>
+    <ng-template ngbNavContent>
+      <div *ngFor="let year of futureYears">
+        <h2>{{year}}</h2>
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>Date</th>
+            <th>Meet Name</th>
+            <th>Location</th>
+            <th *ngIf="!admin">More Information</th>
+            <th *ngIf="admin">Controls</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr *ngFor="let meet of getMeetsByYear(year)">
+            <td>
+              {{meet.startdate | date: 'd/M'}}
+            </td>
+            <td>
+              {{meet.meetname}}
+            </td>
+            <td>
+              {{meet.location}}
+            </td>
+            <td *ngIf="!admin">
+              <a [routerLink]="['/', 'meets', meet.id]">Details</a>
+            </td>
+            <td *ngIf="admin">
+              <button class="btn btn-primary" [routerLink]="['/', 'meet-admin', meet.id]">Manage</button>
+            </td>
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="2">
+    <a ngbNavLink>Past</a>
+    <ng-template ngbNavContent>
+      <div *ngFor="let year of pastYears">
+        <h2>{{year}}</h2>
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>Date</th>
+            <th>Meet Name</th>
+            <th>Location</th>
+            <th *ngIf="!admin">More Information</th>
+            <th *ngIf="admin">Controls</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let meet of getMeetsByYear(year)">
+            <td>
+              {{meet.startdate | date: 'd/M'}}
+            </td>
+            <td>
+              {{meet.meetname}}
+            </td>
+            <td>
+              {{meet.location}}
+            </td>
+            <td *ngIf="!admin">
+              <a [routerLink]="['/', 'meets', meet.id]">Details</a>
+            </td>
+            <td *ngIf="admin">
+              <button class="btn btn-primary" [routerLink]="['/', 'meet-admin', meet.id]">Manage</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-template>
+  </li>
+</ul>
+
+<div [ngbNavOutlet]="nav" class="mt-2"></div>

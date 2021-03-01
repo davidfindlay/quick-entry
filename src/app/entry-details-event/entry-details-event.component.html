@@ -22,11 +22,12 @@
         <div class="card mb-3 bg-info text-white" *ngIf="isPostal() && eventSelected()">
           <div class="card-body">
             <p class="card-text">
-              No seed time is required for this event. Please ensure you lodge a postal form
-              for this event with your Club Captain.
+              After you have completed your postal swim, click the button below to enter your times. Your Club Captain
+              will be asked to approve your postal results.
             </p>
           </div>
         </div>
+        <button class="btn btn-primary" *ngIf="isPostal() && eventSelected()" (click)="clickPostalTimeEntry()">Enter Postal Times</button>
         <div class="card mb-3 bg-info text-white" *ngIf="isRelay() && eventSelected()">
           <div class="card-body">
             <p class="card-text">
@@ -90,10 +91,10 @@
                    (blur)="fixSeedTime()" (keyup.enter)="enterPressed($event)">
             <div class="input-group-append">
               <button type="button" class="btn btn-outline-info" placement="bottom" ngbTooltip="Personal Best"
-                      (click)="clickPersonalBest()" *ngIf="historyAvailable">PB
+                      (click)="clickPersonalBest()" *ngIf="historyAvailable && ! meetEvent.disable_seedtime_suggestions">PB
               </button>
               <button type="button" class="btn btn-outline-info" placement="bottom" ngbTooltip="Last Result Time"
-                      (click)="clickLastTime()" *ngIf="historyAvailable">LT
+                      (click)="clickLastTime()" *ngIf="historyAvailable && ! meetEvent.disable_seedtime_suggestions">LT
               </button>
               <button type="button" class="btn btn-outline-info" placement="bottom" ngbTooltip="More Options"
                       (click)="clickMore()">More

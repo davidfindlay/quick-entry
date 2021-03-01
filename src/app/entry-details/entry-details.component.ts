@@ -58,7 +58,7 @@ export class EntryDetailsComponent implements OnInit {
           });
         }
 
-        if (this.meet.mealfee !== null) {
+        if ((this.meet.mealname !== null && this.meet.mealname !== '') || (this.meet.merchandise && this.meet.merchandise.length > 0)) {
           this.nextScreen = '/enter/' + this.meet_id + '/merchandise';
         } else {
           this.nextScreen = '/enter/' + this.meet_id + '/confirmation';

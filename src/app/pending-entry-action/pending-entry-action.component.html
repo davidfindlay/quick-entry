@@ -435,6 +435,26 @@
       </div>
     </div>
 
+    <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null && meet.mealfee > 0">
+      <h3>Meals and Merchandise</h3>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          {{mealName}} Tickets:
+        </div>
+        <div class="fieldValue">
+          {{entry.mealMerchandiseDetails.meals}}
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          Dietary Requirements or Other Comments:
+        </div>
+        <div class="fieldValue">
+          {{entry.mealMerchandiseDetails.mealComments}}
+        </div>
+      </div>
+    </div>
+
   </form>
 
   <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">

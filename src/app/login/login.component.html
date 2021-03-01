@@ -9,11 +9,14 @@
     having problems logging in, please contact <a href="mailto:recorder@mastersswimmingqld.org.au">
     the Branch Recorder</a>.
   </div>
-  <form name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
+  <p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
+  <form name="form" #f="ngForm" novalidate>
     <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !username.valid }">
-      <label for="username">Username</label>
+      <label for="username">Username or Email Address:</label>
       <input type="text" class="form-control" id="username" name="username" [(ngModel)]="model.username" #username="ngModel" required />
-      <div *ngIf="f.submitted && !username.valid" class="help-block">Username is required</div>
+      <div *ngIf="f.submitted && !username.valid" class="help-block">Username or email address is required</div>
     </div>
     <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !password.valid }">
       <label for="password">Password</label>
@@ -21,8 +24,41 @@
       <div *ngIf="f.submitted && !password.valid" class="help-block">Password is required</div>
     </div>
     <div class="form-group">
-      <button [disabled]="loading" class="btn btn-primary">Login</button>
+      <button [disabled]="loading" class="btn btn-primary" (click)="login()">Login</button>
+      &nbsp;
+      <button [disabled]="loading" class="btn btn-warning" (click)="clickPasswordReset()">Forgot Password</button>
       <img *ngIf="loading" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
     </div>
   </form>
 </div>
+
+<ng-template #confirmPasswordReset let-modal>
+  <form name="passwordForm" #resetForm="ngForm" novalidate>
+  <div class="modal-header">
+    <h4 class="modal-title" id="send-password-title">Send Password Reset</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="card bg-info text-white">
+      <div class="card-body">
+      <p>Please provide your email address below. If an account exists registered with that email address, you
+      will be sent an email with a link to reset your password.</p>
+      </div>
+    </div>
+    <div class="form-group mt-2">
+      <div class="row">
+        <label class="form-control-label col-sm-2" for="resetEmail">Email Address: </label>
+        <input class="form-control col-sm-6" type="text" id="resetEmail" name="resetEmail"
+               [(ngModel)]="modelReset.resetEmail" #resetEmail="ngModel" required/>
+      </div>
+    </div>
+  </div>
+  </form>
+  <div class="modal-footer">
+    <button class="btn-warning" (click)="modal.close('send')">Send Password Reset Email</button>
+    <button class="btn-primary" (click)="modal.close('cancel')">Cancel</button>
+  </div>
+
+</ng-template>

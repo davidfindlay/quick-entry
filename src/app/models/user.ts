@@ -15,4 +15,6 @@ export class User {
   emergency_phone: string;
   emergency_email: string;
   is_admin: boolean;
+  created_at: Date;
+  updated_at: Date;
 }

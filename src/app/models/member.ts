@@ -1,3 +1,5 @@
+import {MemberMeetAccess} from './member-meet-access';
+
 export class Member {
   id: number;
   number: string;
@@ -8,4 +10,5 @@ export class Member {
   gender: number;
   address: number;
   postal: number;
+  meet_access: MemberMeetAccess[];
 }

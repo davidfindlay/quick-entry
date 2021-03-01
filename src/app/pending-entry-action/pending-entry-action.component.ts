@@ -56,6 +56,8 @@ export class PendingEntryActionComponent implements OnInit {
   clubName = '';
   clubCode = '';
 
+  mealName = '';
+
   editing = false;
   pendingActionForm;
 
@@ -112,6 +114,10 @@ export class PendingEntryActionComponent implements OnInit {
     this.created_at = entry.created_at;
     this.updated_at = entry.updated_at;
     this.finalised_at = entry.finalised_at;
+
+    if (this.meet.mealname !== null && this.meet.mealname !== '') {
+      this.mealName = this.meet.mealname;
+    }
 
     if (this.entry.membershipDetails.club_selector !== '') {
       const club = this.clubService.getClubById(parseInt(this.entry.membershipDetails.club_selector, 10));

@@ -11,6 +11,8 @@ import {SeedtimeHelperComponent} from '../seedtime-helper/seedtime-helper.compon
 import {of} from 'rxjs/internal/observable/of';
 import {EntryService} from '../entry.service';
 import {EntryFormObject} from '../models/entry-form-object';
+import {PostalTimeEntryComponent} from '../postal-time-entry/postal-time-entry.component';
+import {ConfirmCancelComponent} from '../confirm-cancel/confirm-cancel.component';
 
 @Component({
   selector: 'app-entry-details-event',
@@ -159,7 +161,7 @@ export class EntryDetailsEventComponent implements OnInit {
 
     if (this.meetEvent.times_required) {
       this.seedTimeMandatory = true;
-      // console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
+      console.log('Seedtime mandatory for event ' + this.meetEvent.prognumber);
     }
 
   }
@@ -200,6 +202,7 @@ export class EntryDetailsEventComponent implements OnInit {
     modalRef.componentInstance.inDiscipline = of(this.meetEvent.event_discipline.discipline);
     modalRef.componentInstance.inCourse = of(this.meetEvent.event_distance.course);
     modalRef.componentInstance.inFreetime = of(this.meetEvent.freetime);
+    modalRef.componentInstance.inHideHistory = of(this.meetEvent.disable_seedtime_suggestions);
 
     if (this.eventEntryForm.controls['seedTime'].value !== '') {
       modalRef.componentInstance.timeIn = TimeService.timeStringToSeconds(this.eventEntryForm.controls['seedTime'].value);
@@ -387,7 +390,7 @@ export class EntryDetailsEventComponent implements OnInit {
       }
       // console.log('Seed time not 0');
     } else {
-      console.log('seed time NT')
+      console.log('seed time NT');
       this.seedTimeNT = true;
       this.seedTimeTooLong = false;
       this.seedTimeTooShort = false;
@@ -398,6 +401,22 @@ export class EntryDetailsEventComponent implements OnInit {
   enterPressed($event) {
     const target = $event.target;
     target.blur();
+  }
+
+  clickPostalTimeEntry() {
+    console.log('test');
+
+    const modalRef = this.modalService.open(PostalTimeEntryComponent, {size: 'lg'});
+
+    console.log(this.meetEvent);
+
+    modalRef.componentInstance.memberNo = this.memberNo;
+    modalRef.componentInstance.inDistance = of(this.meetEvent.event_distance.metres);
+    modalRef.componentInstance.inDiscipline = of(this.meetEvent.event_discipline.discipline);
+    modalRef.componentInstance.inCourse = of(this.meetEvent.event_distance.course);
+    modalRef.componentInstance.inFreetime = of(this.meetEvent.freetime);
+
+    console.log('clickPostalTimeEntry');
   }
 
 }

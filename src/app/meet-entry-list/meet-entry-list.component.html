@@ -4,22 +4,7 @@
   </div>
 </div>
 
-<form [formGroup]="meetSelectorForm">
-  <fieldset class="qe-fieldset">
-    <div class="form-group row">
-      <label for="meet-year" class="form-control-label col-sm-6">Year: </label>
-      <select id="meet-year" class="form-control col-sm-6" formControlName="meetYear">
-        <option value="{{year}}" *ngFor="let year of years">{{year}}</option>
-      </select>
-    </div>
-    <div class="form-group row">
-      <label for="meet" class="form-control-label col-sm-6">Meet: </label>
-      <select id="meet" class="form-control col-sm-6" formControlName="meet">
-        <option value="{{meet.id}}" *ngFor="let meet of meets">{{meet.meetname}}</option>
-      </select>
-    </div>
-  </fieldset>
-</form>
+<app-meet-selector [meetPreset]="this.meetId"></app-meet-selector>
 
 <ngx-datatable
   #entryTable

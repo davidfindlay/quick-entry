@@ -1,7 +1,7 @@
 import {Component, OnInit, Input, ChangeDetectorRef} from '@angular/core';
 import * as moment from 'moment';
 import {EntryService} from '../entry.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {IncompleteEntry} from '../models/incomplete_entry';
 import {MeetEntryStatusService} from '../meet-entry-status.service';
 import {MeetEntry} from '../models/meet-entry';
@@ -12,6 +12,8 @@ import {ConfirmCancelComponent} from '../confirm-cancel/confirm-cancel.component
 import {UnauthenticatedEntryService} from '../unauthenticated-entry.service';
 import {Observable} from 'rxjs';
 import {EntryFormObject} from '../models/entry-form-object';
+import {MeetService} from '../meet.service';
+import {Meet} from '../models/meet';
 
 @Component({
   selector: 'app-meet-list-item',
@@ -37,33 +39,47 @@ export class MeetListItemComponent implements OnInit {
 
   userDetails;
 
+  allowEntry;
+
   loggedIn = false;
   hasEntry = false;
 
   constructor(private entryService: EntryService,
               private unauthenticatedEntryService: UnauthenticatedEntryService,
               private router: Router,
+              private route: ActivatedRoute,
               private statuses: MeetEntryStatusService,
               private userService: UserService,
+              private meetService: MeetService,
               private authService: AuthenticationService,
               private modalService: NgbModal) {
   }
 
   ngOnInit() {
 
+    if (this.route.snapshot.paramMap.get('meetId')) {
+      console.log('meet id = ' + this.route.snapshot.paramMap.get('meetId'));
+      this.meetService.getMeetDetails(parseInt(this.route.snapshot.paramMap.get('meetId'), 10)).subscribe((meet: any) => {
+        console.log(meet);
+        this.meet = meet;
+        if (this.meet.mealname !== null && this.meet.mealname !== '') {
+          this.mealName = this.meet.mealname;
+        }
+
+      });
+
+    }
+
     if (this.meet.mealname !== null && this.meet.mealname !== '') {
       this.mealName = this.meet.mealname;
     }
 
     this.incompleteSubscription = this.entryService.incompleteChanged.subscribe((incomplete: IncompleteEntry[]) => {
-      console.log(incomplete);
 
       if (incomplete !== undefined && incomplete !== null) {
 
         this.incompleteEntries = incomplete.filter(x => x.meet_id === this.meet.id
           && (x.status_id === undefined || x.status_id === 1 || x.status_id === 14));
-
-        console.log(this.incompleteEntries);
 
         if (this.incompleteEntries.length > 0) {
           this.hasEntry = true;
@@ -109,8 +125,6 @@ export class MeetListItemComponent implements OnInit {
 
       this.submittedEntries = this.unauthenticatedEntryService.getEntriesByMeet(this.meet.id);
       this.pendingEntries = this.unauthenticatedEntryService.getPendingByMeet(this.meet.id);
-      console.log(this.submittedEntries);
-      console.log(this.pendingEntries);
     }
   }
 

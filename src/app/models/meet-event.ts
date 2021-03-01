@@ -24,6 +24,8 @@ export class MeetEvent {
     exhibition: boolean;
     freetime: boolean;
     times_required: boolean;
+    splits_required: boolean;
+    disable_seedtime_suggestions: boolean;
 
     event_type: EventType;
     event_distance: EventDistance;
