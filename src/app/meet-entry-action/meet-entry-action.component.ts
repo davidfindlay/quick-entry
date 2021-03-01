@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {ApplicationRef, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Meet} from '../models/meet';
 import {EntryEvent} from '../models/entryevent';
 import {ActivatedRoute} from '@angular/router';
@@ -6,6 +6,7 @@ import {EntryService} from '../entry.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {MeetService} from '../meet.service';
 import {NgxSpinnerService} from 'ngx-spinner';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-meet-entry-action',
@@ -15,6 +16,8 @@ import {NgxSpinnerService} from 'ngx-spinner';
 export class MeetEntryActionComponent implements OnInit {
 
   @ViewChild('deleteConfirm', {static: true}) deleteConfirm: ElementRef;
+  @ViewChild('applyPayment', {static: true}) applyPayment: ElementRef;
+  @ViewChild('transferPayment', {static: true}) transferPayment: ElementRef;
 
   meet_id;
   meet: Meet;
@@ -35,6 +38,8 @@ export class MeetEntryActionComponent implements OnInit {
   medicalCondition = 'No';
 
   paidAmount = 0;
+  totalPayments = 0;
+  owedAmount = 0;
   meetEntryId;
 
   memberSearchResult;
@@ -52,6 +57,9 @@ export class MeetEntryActionComponent implements OnInit {
               private entryService: EntryService,
               private meetService: MeetService,
               private fb: FormBuilder,
+              private cdref: ChangeDetectorRef,
+              private appref: ApplicationRef,
+              private modal: NgbModal,
               private spinner: NgxSpinnerService) { }
 
   ngOnInit() {
@@ -86,6 +94,15 @@ export class MeetEntryActionComponent implements OnInit {
     this.eventEntries = entry.entrydata.entryEvents;
     this.paidAmount = entry.paidAmount;
     this.spinner.hide();
+    this.entry = entry.entrydata;
+
+    for (const payment of this.entry.payments) {
+      this.totalPayments += payment.amount;
+    }
+
+    this.owedAmount = this.entry.cost - this.totalPayments;
+
+    this.cdref.detectChanges();
   }
 
   getLegs(event_id) {
@@ -110,6 +127,27 @@ export class MeetEntryActionComponent implements OnInit {
     }
 
     return '';
+  }
+
+  clickApplyPayment() {
+    console.log('Open apply payment');
+    this.modal.open(this.applyPayment).result.then((details: any) => {
+      console.log(details);
+
+    }, (error: any) => {
+      console.log(error);
+    });
+    this.appref.tick();
+  }
+
+  clickTransferPayment() {
+    this.modal.open(this.transferPayment).result.then((approved: any) => {
+      console.log(approved);
+
+    }, (error: any) => {
+      console.log(error);
+    });
+    this.appref.tick();
   }
 
 }
