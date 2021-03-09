@@ -55,6 +55,7 @@ export class EntryDetailsEventComponent implements OnInit {
   seedTimeTooShort = false;
   seedTimeTooLong = false;
   seedTimeNT = false;
+  seedTime;
 
   constructor(private fb: FormBuilder,
               private memberHistoryService: MemberHistoryService,
@@ -90,7 +91,6 @@ export class EntryDetailsEventComponent implements OnInit {
               if (currentEventEntry.seedtime === 0) {
                 this.seedTimeNT = true;
               }
-
             }
           }
         }
@@ -130,6 +130,7 @@ export class EntryDetailsEventComponent implements OnInit {
     this.eventEntryForm.valueChanges.subscribe((entryDetails) => {
       const rawValues = this.eventEntryForm.getRawValue();
       const newSeedTime = TimeService.timeStringToSeconds(rawValues.seedTime);
+      this.seedTime = newSeedTime;
       this.isTimeReasonable(newSeedTime);
       this.entryService.updateEventEntry(this.meetEvent, newSeedTime);
     });
@@ -216,6 +217,13 @@ export class EntryDetailsEventComponent implements OnInit {
       if (this.meetEvent.freetime && this.historyAvailable) {
         this.clickPersonalBest();
       }
+
+      if (this.seedTimeMandatory) {
+        if (!this.seedTime || this.seedTime === 0) {
+
+        }
+      }
+
     } else if (this.entered === true) {
       this.entered = false;
       this.enterClass = 'btn btn-outline-primary';

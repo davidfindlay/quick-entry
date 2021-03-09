@@ -538,18 +538,16 @@ export class EntryService {
   checkForNT(entryFO: EntryFormObject) {
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
 
-    for (const event of meetDetails.events) {
-      if (event.times_required) {
-        for (const eventEntry of entryFO.entryEvents) {
-          if (event.id === eventEntry.event_id) {
-            if (eventEntry.seedtime === 0) {
-              console.log('Event ' + event.prognumber + ' has disallowed 0 seedtime!');
-              return true;
-            }
-          }
+    for (const eventEntry of entryFO.entryEvents) {
+      const meetEvent = meetDetails.events.find(x => x.id === eventEntry.event_id);
+      if (meetEvent.times_required) {
+        if (eventEntry.seedtime === null || eventEntry.seedtime === 0) {
+          console.log('Event ' + meetEvent.prognumber + ' has disallowed 0 seedtime!');
+          return true;
         }
       }
     }
+
     return false;
   }
 

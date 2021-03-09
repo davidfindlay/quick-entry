@@ -55,7 +55,7 @@
           </div>
         </div>
 
-        <div class="card mb-3 bg-danger text-white" *ngIf="seedTimeMandatory && seedTimeNT && eventSelected()">
+        <div class="card mb-3 bg-danger text-white" *ngIf="seedTimeMandatory && seedTimeNT && entered">
           <div class="card-body">
             <p class="card-text">
               This event does not allow No Time entries. An entry seed time must supplied.
@@ -85,7 +85,8 @@
 
           <label for="seedTime" class="col-sm-3 col-form-label">Seed Time:</label>
 
-          <div class="input-group col-sm-9">
+          <div class="col-sm-9">
+          <div class="input-group">
             <input type="text" class="form-control" id="seedTime" formControlName="seedTime"
                    ngbTooltip triggers="manual" #seedTimeTip="ngbTooltip" placement="bottom"
                    (blur)="fixSeedTime()" (keyup.enter)="enterPressed($event)">
@@ -100,6 +101,10 @@
                       (click)="clickMore()">More
               </button>
             </div>
+          </div>
+          <div *ngIf="seedTimeMandatory">
+            A seed time is required for this event.
+          </div>
           </div>
         </div>
 
