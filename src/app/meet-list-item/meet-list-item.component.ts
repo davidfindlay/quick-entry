@@ -75,6 +75,7 @@ export class MeetListItemComponent implements OnInit {
     }
 
     this.incompleteSubscription = this.entryService.incompleteChanged.subscribe((incomplete: IncompleteEntry[]) => {
+      console.log(incomplete);
 
       if (incomplete !== undefined && incomplete !== null) {
 
@@ -85,6 +86,11 @@ export class MeetListItemComponent implements OnInit {
           this.hasEntry = true;
         } else {
           this.hasEntry = false;
+        }
+
+        const toResume = incomplete.filter(x => x.meet_id === this.meet.id && x.status_id === 12);
+        if (toResume.length > 0) {
+          this.hasEntry = true;
         }
       }
     });
@@ -101,6 +107,8 @@ export class MeetListItemComponent implements OnInit {
           // console.log(this.submittedEntries);
         }
       });
+
+
 
       this.userDetails = this.userService.getUsers();
       // console.log(this.userDetails);
