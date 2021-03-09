@@ -75,11 +75,14 @@ export class EntryDetailsEventComponent implements OnInit {
 
       if (this.entry !== undefined && this.entry !== null) {
         if (this.entry.entryEvents !== undefined && this.entry.entryEvents !== null) {
-          const currentEvents = this.entry.entryEvents.filter(x => x.event_id === this.meetEvent.id)
+          const currentEvents = this.entry.entryEvents.filter(x => x.event_id === this.meetEvent.id);
           if (currentEvents !== undefined && currentEvents !== null) {
             if (currentEvents.length > 0) {
               const currentEventEntry = currentEvents[0];
+              console.log(currentEventEntry);
               this.showEntered();
+
+
 
               const seedtime = TimeService.formatTime(currentEventEntry.seedtime);
 
