@@ -127,6 +127,8 @@ export class MeetSelectorComponent implements OnInit {
         }
       }
 
+      this.spinner.hide();
+
     });
 
 

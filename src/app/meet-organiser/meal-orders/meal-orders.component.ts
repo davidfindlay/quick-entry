@@ -82,11 +82,13 @@ export class MealOrdersComponent implements OnInit {
   loadMeet() {
     this.entries = [];
     this.orderTable = [];
+
     this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
       const meet = meets.filter(x => x.id === this.meetId)[0];
       if (meet !== undefined && meet !== null) {
         this.meet = meet;
         this.meetName = meet.meetname;
+        console.log('got meet details');
       } else {
         console.error('Unable to load meet details for meetId: ' + this.meetId);
       }
@@ -96,6 +98,7 @@ export class MealOrdersComponent implements OnInit {
 
     this.http.get(environment.api + 'meet_entries/' + this.meetId).subscribe((entries: any) => {
       this.orderTable = [];
+
       if (entries.success !== undefined && entries.success !== null && entries.success !== false) {
         this.entries = entries.meet_entries;
 
@@ -119,7 +122,8 @@ export class MealOrdersComponent implements OnInit {
           let club_details = 'n/a';
 
           if (this.entries[i].club !== undefined && this.entries[i].club !== null) {
-            club_details = '<abbr title="' + this.entries[i].club.clubname + '">' + this.entries[i].club.code + '</abbr>';
+            // club_details = '<abbr title="' + this.entries[i].club.clubname + '">' + this.entries[i].club.code + '</abbr>';
+            club_details = this.entries[i].club.code;
           }
 
           let status = 'n/a';
@@ -150,9 +154,14 @@ export class MealOrdersComponent implements OnInit {
         }
 
         this.orderTableUnfiltered = [...this.orderTable];
+
         this.orderTable = this.orderTableUnfiltered;
-        this.table.recalculate();
+        console.log('total meals ordered: ' + this.totalMealsOrdered);
+        // this.table.recalculate();
+
       }
+      console.log('hello');
+      console.log(this.orderTable);
       this.spinner.hide();
     }, (err) => {
       console.error(err);
