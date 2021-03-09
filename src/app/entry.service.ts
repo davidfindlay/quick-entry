@@ -97,6 +97,7 @@ export class EntryService {
 
             if (incompleteEntries !== null) {
               this.incompleteEntries = incompleteEntries;
+              console.log(this.incompleteEntries);
               observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
             } else {
               console.error('Unable to retrieve incomplete entries from server');
