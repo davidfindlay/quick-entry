@@ -31,6 +31,8 @@ export class EntryDetailsComponent implements OnInit {
 
     isAnonymousEntry = true;
 
+    nextScreen;
+
     constructor(private fb: FormBuilder,
                 private route: ActivatedRoute,
                 private router: Router,
@@ -54,6 +56,12 @@ export class EntryDetailsComponent implements OnInit {
             console.log(updated);
             this.meet = updated;
           });
+        }
+
+        if ((this.meet.mealname !== null && this.meet.mealname !== '') || (this.meet.merchandise && this.meet.merchandise.length > 0)) {
+          this.nextScreen = '/enter/' + this.meet_id + '/merchandise';
+        } else {
+          this.nextScreen = '/enter/' + this.meet_id + '/confirmation';
         }
 
         this.createForm();

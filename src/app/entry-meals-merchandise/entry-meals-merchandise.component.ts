@@ -8,6 +8,7 @@ import {ActivatedRoute, ActivatedRouteSnapshot} from '@angular/router';
 import {MedicalDetails} from '../models/medical-details';
 import {EntryService} from '../entry.service';
 import {MealMerchandiseDetails} from '../models/meal-merchandise-details';
+import {EntryFormObject} from '../models/entry-form-object';
 
 @Component({
   selector: 'app-entry-meals-merchandise',
@@ -46,6 +47,9 @@ export class EntryMealsMerchandiseComponent implements OnInit {
       this.mealName = this.meet.mealname;
     }
     this.createForm();
+
+    // Prefill existing details
+    this.getExistingEntry();
   }
 
   createForm() {
@@ -59,6 +63,21 @@ export class EntryMealsMerchandiseComponent implements OnInit {
     });
 
     this.formValidSubject.next(true);
+  }
+
+  getExistingEntry() {
+    this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((entry: EntryFormObject) => {
+      console.log(entry);
+      if (entry !== undefined && entry !== null) {
+        const mealMerchandiseDetails = entry.mealMerchandiseDetails;
+        if (mealMerchandiseDetails !== undefined && mealMerchandiseDetails != null) {
+
+          // Patch the value of the meal form
+          this.mealsMerchandiseForm.patchValue(mealMerchandiseDetails);
+
+        }
+      }
+    });
   }
 
   addMeal() {

@@ -133,6 +133,8 @@ export class EntryConfirmationComponent implements OnInit {
 
         if (entry !== undefined && entry !== null) {
 
+          this.entry = entry.entrydata;
+
           this.meet = this.meetService.getMeet(entry.meet_id);
           this.meetName = this.meet.meetname;
           this.statusLabel = entry.status_label;

@@ -65,6 +65,17 @@ export class ClassificationMedicalDetailsComponent implements OnInit {
     });
 
     this.medicalDetailsForm.valueChanges.subscribe(val => {
+
+      if (val.classification !== 'no') {
+        this.medicalDetailsForm.get('classFreestyle').setValidators(Validators.required);
+        this.medicalDetailsForm.get('classBreaststroke').setValidators(Validators.required);
+        this.medicalDetailsForm.get('classMedley').setValidators(Validators.required);
+      } else {
+        this.medicalDetailsForm.get('classFreestyle').clearValidators();
+        this.medicalDetailsForm.get('classBreaststroke').clearValidators();
+        this.medicalDetailsForm.get('classMedley').clearValidators();
+      }
+
       if (this.medicalDetailsForm.valid) {
         this.formValidSubject.next(true);
       } else {

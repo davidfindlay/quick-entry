@@ -112,6 +112,5 @@
     "no-access-missing-member": true,
     "templates-use-public": true,
     "invoke-injectable": true
-  },
-  "extends": ["tslint:recommended", "tslint-sonarts"]
+  }
 }
