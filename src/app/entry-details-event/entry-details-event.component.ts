@@ -193,13 +193,15 @@ export class EntryDetailsEventComponent implements OnInit {
   clickMore() {
     const modalRef = this.modalService.open(SeedtimeHelperComponent, {size: 'lg'});
 
-    // console.log(this.meetEvent);
+    console.log(this.meetEvent);
+    console.log(this.memberNo);
 
     modalRef.componentInstance.memberNo = this.memberNo;
     modalRef.componentInstance.inDistance = of(this.meetEvent.event_distance.metres);
     modalRef.componentInstance.inDiscipline = of(this.meetEvent.event_discipline.discipline);
     modalRef.componentInstance.inCourse = of(this.meetEvent.event_distance.course);
     modalRef.componentInstance.inFreetime = of(this.meetEvent.freetime);
+    // modalRef.componentInstance.inHideHistory = of(false);
 
     if (this.eventEntryForm.controls['seedTime'].value !== '') {
       modalRef.componentInstance.timeIn = TimeService.timeStringToSeconds(this.eventEntryForm.controls['seedTime'].value);
