@@ -107,7 +107,6 @@ export class EntryConfirmationComponent implements OnInit {
     this.pending_entry_code = this.route.snapshot.paramMap.get('pendingId');
     this.meet_entry_code = this.route.snapshot.paramMap.get('entryId');
 
-    console.log(this.meet_id);
     console.log(this.pending_entry_code);
     console.log(this.meet_entry_code);
 
@@ -167,7 +166,7 @@ export class EntryConfirmationComponent implements OnInit {
           this.statusText = entry.status_description;
           this.paidAmount = entry.paid_amount;
           console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
-          if (this.paidAmount === this.meet.meetfee) {
+          if (this.paidAmount >= this.meet.meetfee) {
             this.showPaymentChoice = false;
             this.workflowNav.enableFinishButton();
           } else {

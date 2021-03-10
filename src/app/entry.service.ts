@@ -892,6 +892,7 @@ export class EntryService {
     }
 
     const meetEntry = entry.meet_entry;
+    console.log(entry);
 
     // Convert meet entry to entry form object
     const entryFO = new EntryFormObject();
@@ -989,6 +990,8 @@ export class EntryService {
     mealMerchandiseDetailsFO.meals = meetEntry.meals;
     mealMerchandiseDetailsFO.mealComments = meetEntry.mealComments;
     entryFO.mealMerchandiseDetails = mealMerchandiseDetailsFO;
+
+    // Find merchandise
 
     medicalDetailsFO.medicalDetails = meetEntry.medical_details;
     entryFO.medicalDetails = medicalDetailsFO;
