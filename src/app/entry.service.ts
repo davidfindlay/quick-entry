@@ -892,7 +892,6 @@ export class EntryService {
     }
 
     const meetEntry = entry.meet_entry;
-    console.log(entry);
 
     // Convert meet entry to entry form object
     const entryFO = new EntryFormObject();
@@ -992,6 +991,19 @@ export class EntryService {
     entryFO.mealMerchandiseDetails = mealMerchandiseDetailsFO;
 
     // Find merchandise
+    if (entry.merchandise !== undefined && entry.merchandise !== null && entry.merchandise.length > 0) {
+      mealMerchandiseDetailsFO.merchandiseItems = [];
+      for (const order of entry.merchandise) {
+        console.log(order);
+
+        for (const item of order.items) {
+          const merchandiseItem = new MerchandiseDetails();
+          merchandiseItem.qty = item.qty;
+          merchandiseItem.merchandiseId = item.meet_merchandise_id;
+          mealMerchandiseDetailsFO.merchandiseItems.push(merchandiseItem);
+        }
+      }
+    }
 
     medicalDetailsFO.medicalDetails = meetEntry.medical_details;
     entryFO.medicalDetails = medicalDetailsFO;
