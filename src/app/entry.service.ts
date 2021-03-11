@@ -1124,4 +1124,8 @@ export class EntryService {
     return this.http.put(environment.api + 'entry_incomplete/' + pendingCode, pendingEntry);
   }
 
+  sendEmailConfirmation(entryId) {
+    return this.http.post(environment.api + 'meet_entry/' + entryId + '/resendConfirmation', {});
+  }
+
 }

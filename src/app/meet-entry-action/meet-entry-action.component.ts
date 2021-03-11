@@ -6,7 +6,10 @@ import {EntryService} from '../entry.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {MeetService} from '../meet.service';
 import {NgxSpinnerService} from 'ngx-spinner';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbAlert, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Subject} from 'rxjs';
+import {debounceTime} from 'rxjs/operators';
+import {Alert} from '../models/alert';
 
 @Component({
   selector: 'app-meet-entry-action',
@@ -18,6 +21,7 @@ export class MeetEntryActionComponent implements OnInit {
   @ViewChild('deleteConfirm', {static: true}) deleteConfirm: ElementRef;
   @ViewChild('applyPayment', {static: true}) applyPayment: ElementRef;
   @ViewChild('transferPayment', {static: true}) transferPayment: ElementRef;
+  @ViewChild('emailConfirm', {static: true}) emailConfirm: ElementRef;
 
   meet_id;
   meet: Meet;
@@ -53,6 +57,8 @@ export class MeetEntryActionComponent implements OnInit {
 
   meetActionForm: FormGroup;
 
+  alerts: Alert[];
+
   constructor(private route: ActivatedRoute,
               private entryService: EntryService,
               private meetService: MeetService,
@@ -80,6 +86,8 @@ export class MeetEntryActionComponent implements OnInit {
     this.meetActionForm = this.fb.group({
       clubSelector: ''
     });
+
+    this.resetAlerts();
   }
 
   loadEntry(entry) {
@@ -148,6 +156,42 @@ export class MeetEntryActionComponent implements OnInit {
       console.log(error);
     });
     this.appref.tick();
+  }
+
+  resendEmail() {
+    this.modal.open(this.emailConfirm).result.then((approved: any) => {
+      if (approved === 'Yes') {
+        this.spinner.show();
+        console.log('resendEmail: Yes');
+        this.entryService.sendEmailConfirmation(this.meetEntryId).subscribe((response: any) => {
+          if (response.success) {
+            this.alerts.push({
+              type: 'success',
+              message: response.message
+            });
+          } else {
+            this.alerts.push({
+              type: 'danger',
+              message: response.message
+            });
+          }
+          this.spinner.hide();
+
+        });
+      }
+
+    }, (error: any) => {
+      console.log(error);
+    });
+    this.appref.tick();
+  }
+
+  resetAlerts() {
+    this.alerts = [];
+  }
+
+  closeAlert(alert: Alert) {
+    this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
 
 }
