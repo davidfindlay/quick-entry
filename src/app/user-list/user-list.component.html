@@ -55,7 +55,7 @@
   </table>
 
   <div class="d-flex justify-content-between p-2">
-    <ngb-pagination [collectionSize]="total$ | async" [(page)]="userSearchService.page"
+    <ngb-pagination [collectionSize]="total$ | async" [(page)]="userSearchService.page" [maxSize]="10"
                     [pageSize]="userSearchService.pageSize">
     </ngb-pagination>
 

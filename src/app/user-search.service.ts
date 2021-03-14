@@ -33,10 +33,13 @@ function sort(users: User[], column: string, direction: string): User[] {
 }
 
 function matches(user: User, term: string) {
-  console.log('matches: ' + term);
-  return user.username.toLowerCase().includes(term)
-    || user.surname.includes(term)
-    || user.firstname.includes(term);
+  if (user.firstname && user.surname) {
+    return user.username.toLowerCase().includes(term)
+      || user.surname.includes(term)
+      || user.firstname.includes(term);
+  } else {
+    return user.username.toLowerCase().includes(term);
+  }
 }
 
 @Injectable({providedIn: 'root'})
@@ -91,7 +94,6 @@ export class UserSearch {
   }
 
   set searchTerm(searchTerm: string) {
-    console.log('searchTerm: ' + searchTerm);
     this._set({searchTerm});
   }
 
@@ -100,7 +102,6 @@ export class UserSearch {
 
   private _set(patch: Partial<State>) {
     Object.assign(this._state, patch);
-    console.log(this._state);
     this._search$.next();
   }
 
@@ -113,6 +114,7 @@ export class UserSearch {
     // 2. filter
     users = users.filter(user => matches(user, searchTerm));
     const total = users.length;
+
 
     // 3. paginate
     users = users.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize);
