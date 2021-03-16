@@ -1128,4 +1128,7 @@ export class EntryService {
     return this.http.post(environment.api + 'meet_entry/' + entryId + '/resendConfirmation', {});
   }
 
+  sendPendingEmailConfirmation(entryId) {
+    return this.http.post(environment.api + 'pending_entry/' + entryId + '/resendConfirmation', {});
+  }
 }

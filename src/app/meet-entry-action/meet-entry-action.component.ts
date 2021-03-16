@@ -177,6 +177,12 @@ export class MeetEntryActionComponent implements OnInit {
           }
           this.spinner.hide();
 
+        }, (error) => {
+          this.alerts.push({
+            type: 'danger',
+            message: 'Unable to send confirmation email for unknown reason. Please contact the system administrator. '
+          });
+          this.spinner.hide();
         });
       }
 

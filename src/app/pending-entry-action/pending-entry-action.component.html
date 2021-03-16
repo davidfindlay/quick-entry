@@ -41,8 +41,13 @@
       <button class="btn btn-success" (click)="update()" *ngIf="editing">Update</button>
       <button class="btn btn-danger" (click)="cancel()" *ngIf="editing">Cancel</button>
       <button class="btn btn-warning" (click)="markProcessed()" *ngIf="!editing">Mark Processed</button>
+      <button class="btn btn-primary" (click)="resendEmail()">Resend Confirmation Email</button>
     </div>
   </div>
+
+  <p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
 
   <form [formGroup]="pendingActionForm">
 
@@ -599,3 +604,17 @@
     <button type="button" class="btn btn-success" (click)="modal.close('No')">No</button>
   </div>
 </ng-template>
+
+<ng-template #emailConfirm let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal2-basic-title">Confirm Resending Email Confirmation</h4>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to resend the email confirmation?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Yes')">Yes</button>
+    <button type="button" class="btn btn-success" (click)="modal.close('No')">No</button>
+  </div>
+</ng-template>
+
