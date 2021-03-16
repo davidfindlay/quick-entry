@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {ApplicationRef, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {Meet} from '../models/meet';
 import {EntryEvent} from '../models/entryevent';
 import {EntryService} from '../entry.service';
@@ -10,6 +10,8 @@ import {FormBuilder} from '@angular/forms';
 import {ClubsService} from '../clubs.service';
 import {Observable} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
+import {Alert} from '../models/alert';
+import {NgxSpinnerService} from 'ngx-spinner';
 
 @Component({
   selector: 'app-pending-entry-action',
@@ -19,6 +21,7 @@ import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
 export class PendingEntryActionComponent implements OnInit {
 
   @ViewChild('deleteConfirm', {static: true}) deleteConfirm: ElementRef;
+  @ViewChild('emailConfirm', {static: true}) emailConfirm: ElementRef;
 
   meet_id;
   meet: Meet;
@@ -61,6 +64,8 @@ export class PendingEntryActionComponent implements OnInit {
   editing = false;
   pendingActionForm;
 
+  alerts: Alert[];
+
   clubSearch = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(200),
@@ -75,7 +80,11 @@ export class PendingEntryActionComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private modalService: NgbModal,
-              private fb: FormBuilder) { }
+              private fb: FormBuilder,
+              private cdref: ChangeDetectorRef,
+              private appref: ApplicationRef,
+              private spinner: NgxSpinnerService) {
+  }
 
   ngOnInit() {
 
@@ -93,6 +102,8 @@ export class PendingEntryActionComponent implements OnInit {
     this.entryService.getPendingEntry(this.pendingEntryCode).subscribe((entry: any) => {
       this.loadEntry(entry);
     });
+
+    this.resetAlerts();
   }
 
   loadEntry(entry) {
@@ -173,7 +184,7 @@ export class PendingEntryActionComponent implements OnInit {
   toTitleCase(str: string) {
     return str.replace(
       /\w\S*/g,
-      function(txt) {
+      function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
@@ -337,5 +348,47 @@ export class PendingEntryActionComponent implements OnInit {
         this.loadEntry(entry);
       });
     })
+  }
+
+  resendEmail() {
+    this.modalService.open(this.emailConfirm).result.then((approved: any) => {
+      if (approved === 'Yes') {
+        this.spinner.show();
+        console.log('resendEmail: Yes');
+        this.entryService.sendPendingEmailConfirmation(this.pendingEntryId).subscribe((response: any) => {
+          if (response.success) {
+            this.alerts.push({
+              type: 'success',
+              message: response.message
+            });
+          } else {
+            this.alerts.push({
+              type: 'danger',
+              message: response.message
+            });
+          }
+          this.spinner.hide();
+
+        }, (error) => {
+          this.alerts.push({
+            type: 'danger',
+            message: 'Unable to send confirmation email for unknown reason. Please contact the system administrator. '
+          });
+          this.spinner.hide();
+        });
+      }
+
+    }, (error: any) => {
+      console.log(error);
+    });
+    this.appref.tick();
+  }
+
+  resetAlerts() {
+    this.alerts = [];
+  }
+
+  closeAlert(alert: Alert) {
+    this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
 }
