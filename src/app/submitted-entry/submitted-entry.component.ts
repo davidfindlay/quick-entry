@@ -9,6 +9,7 @@ import {MeetService} from '../meet.service';
 import {PaypalService} from '../paypal/paypal.service';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {UserService} from '../user.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-submitted-entry',
@@ -19,6 +20,7 @@ export class SubmittedEntryComponent implements OnInit {
 
   @Input() meet: Meet;
   @Input() submittedEntry: MeetEntry;
+  @Input() meetTitle: boolean;
 
   paymentOwed = false;
   paymentAmountOwed = 0;
@@ -41,9 +43,14 @@ export class SubmittedEntryComponent implements OnInit {
       this.loggedIn = true;
     }
 
+    if (this.submittedEntry.meet !== undefined && this.submittedEntry.meet !== null) {
+      this.meet = this.submittedEntry.meet;
+    }
+
     if (this.submittedEntry.events !== undefined && this.submittedEntry.events !== null) {
       if (this.submittedEntry.events.length > 0) {
         for (const eventEntry of this.submittedEntry.events) {
+          // console.log(eventEntry);
           this.eventRows.push({
             progNumber: this.getEventProgramNo(eventEntry.event_id),
             progSuffix: this.getEventProgramNoSuffix(eventEntry.event_id),
@@ -173,6 +180,26 @@ export class SubmittedEntryComponent implements OnInit {
 
       this.spinner.hide();
     });
+  }
+
+  // Returns pretty formatted date of meet
+  getMeetDates(): string {
+
+    let formattedDate = '';
+    const startdate = '';
+    const enddate = '';
+
+    if (startdate === enddate) {
+      formattedDate = moment(this.meet.startdate).format('dddd') + ' ' + moment(this.meet.startdate).format('LL');
+    } else {
+      formattedDate = moment(this.meet.startdate).format('dddd') + ' '
+        + moment(this.meet.startdate).format('LL') + ' to '
+        + moment(this.meet.enddate).format('dddd') + ' '
+        + moment(this.meet.enddate).format('LL');
+    }
+
+    return (formattedDate);
+
   }
 
 }

@@ -1,33 +1,33 @@
-<div class="card">
+<div class="card mb-2" *ngIf="submittedEntry && meet">
   <div class="card-header">
-    <h2 class="card-title">
+    <h2 class="card-title" *ngIf="!meetTitle">
       {{submittedEntry.member.firstname}} {{submittedEntry.member.surname}}
     </h2>
+    <h2 class="card-title" *ngIf="meetTitle">
+      {{meet.meetname}}
+    </h2>
+    <span *ngIf="meetTitle">{{getMeetDates()}}<br /></span>
     {{submittedEntry.club.clubname}} ({{submittedEntry.club.code}})
   </div>
   <div class="card-body">
     <strong>Entry Number: </strong> {{submittedEntry.id}}<br/>
+    <strong>Entrant: </strong> {{submittedEntry.member.firstname}} {{submittedEntry.member.surname}}<br />
     <strong>Status: </strong> {{submittedEntry.status.status.label}}
-    <table class="mb-2" *ngIf="eventRows.length > 0">
+    <table class="mt-2 mb-2 col-sm-12" *ngIf="eventRows.length > 0">
       <tr>
-        <th>
-          No:
-        </th>
         <th>
           Event Details:
         </th>
-        <th>
+        <th class="text-right">
           Seed Time:
         </th>
       </tr>
       <tr *ngFor="let event of eventRows">
         <td>
-          {{ event.progNumber }}{{ event.progSuffix }}
-        </td>
-        <td>
+          #{{ event.progNumber }}{{ event.progSuffix }} -
           {{ event.eventDetails }}
         </td>
-        <td>
+        <td class="text-right">
           {{event.seedtime | time }}
         </td>
       </tr>
@@ -58,7 +58,7 @@
 <!--      </button>-->
     </div>
   </div>
-  <div class="card-footer">
+  <div class="card-footer" *ngIf="submittedEntry.created_at">
     <strong>Lodged: </strong> {{submittedEntry.created_at | date: 'medium'}}<br/>
 
   </div>

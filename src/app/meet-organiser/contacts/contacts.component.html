@@ -32,6 +32,34 @@
 </nav>
 <div class="row">
   <div class="col-sm-12">
-    <ngx-datatable [rows]="contactTable" [columns]="contactColumns" rowHeight="auto"></ngx-datatable>
+<!--    <ngx-datatable [rows]="contactTable" [columns]="contactColumns" rowHeight="auto"></ngx-datatable>-->
+    <table>
+      <thead>
+      <tr>
+        <th>Entry ID</th>
+        <th>Entrant</th>
+        <th>Club</th>
+        <th>Phone</th>
+        <th>Email</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let contact of contactTable">
+        <td>
+          {{contact.meet_entries_id}}
+        </td>
+        <td>
+          {{contact.entrant_details}}
+        </td>
+        <td>
+          {{contact.club}}
+        </td>
+        <td [innerHTML]="contact.phone">
+        </td>
+        <td [innerHTML]="contact.email">
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </div>

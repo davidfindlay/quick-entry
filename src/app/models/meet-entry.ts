@@ -4,10 +4,12 @@ import {MeetEntryEvent} from './meet-entry-event';
 import {MeetEntryStatus} from './meet-entry-status';
 import {MeetEntryPayment} from './meet-entry-payment';
 import {MerchandiseDetails} from './merchandise';
+import {Meet} from './meet';
 
 export class MeetEntry {
   id: number;
   meet_id: number;
+  meet: Meet;
   member_id: number;
   member: Member;
   age_group_id: number;

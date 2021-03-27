@@ -76,12 +76,14 @@ import { RegisterComponent } from './register/register.component';
 import {MeetAdministrationModule} from './meet-administration/meet-administration.module';
 import {SharedModule} from './shared/shared.module';
 import { MeetCalendarComponent } from './meet-calendar/meet-calendar.component';
+import { MyEntriesComponent } from './my-entries/my-entries.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
     { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'reset-password/:token', component: PasswordResetComponent },
+  { path: 'my-entries', component: MyEntriesComponent },
   { path: 'meets/:meetId', component: MeetListItemComponent },
   { path: 'enter/:meet', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step1', component: EntrantDetailsComponent },
@@ -174,7 +176,8 @@ export class SentryErrorHandler implements ErrorHandler {
     UserEditComponent,
     PasswordResetComponent,
     RegisterComponent,
-    MeetCalendarComponent
+    MeetCalendarComponent,
+    MyEntriesComponent
   ],
   entryComponents: [ConfirmCancelComponent, SeedtimeHelperComponent, PostalTimeEntryComponent],
   imports: [

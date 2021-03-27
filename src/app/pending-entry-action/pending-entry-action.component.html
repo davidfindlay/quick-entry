@@ -8,7 +8,8 @@
       entry may be Approved.
     </p>
     <p class="card-text">
-      If the pending entry is duplicate or no longer required, please Delete.
+      If the pending entry is duplicate or no longer required, please click <strong>Mark Processed</strong>. This will hide the entry. It can
+      be viewed again by selecting "Show Finalised" in Display Options on the Pending Entry List.
     </p>
   </div>
 </div>
@@ -40,7 +41,7 @@
       <button class="btn btn-primary" (click)="edit()" *ngIf="!editing">Edit</button>
       <button class="btn btn-success" (click)="update()" *ngIf="editing">Update</button>
       <button class="btn btn-danger" (click)="cancel()" *ngIf="editing">Cancel</button>
-      <button class="btn btn-warning" (click)="markProcessed()" *ngIf="!editing">Mark Processed</button>
+      <button class="btn btn-warning" (click)="markProcessed()" *ngIf="!editing && entry.finalised_at !== null">Mark Processed</button>
       <button class="btn btn-primary" (click)="resendEmail()">Resend Confirmation Email</button>
     </div>
   </div>

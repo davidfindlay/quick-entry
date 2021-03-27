@@ -2,13 +2,21 @@
   <ul class="nav navbar-nav flex-column h-100 bg-dark">
     <li class="nav-item"><a class="nav-link active" routerLink="/">Current Meets</a></li>
     <li class="nav-item"><a class="nav-link" routerLink="calendar">Meet Calendar</a></li>
+    <li class="nav-item" *ngIf="userLoggedIn"><a class="nav-link" routerLink="my-entries">My Entries</a></li>
+    <li class="nav-item" *ngIf="userLoggedIn"><a class="nav-link" routerLink="my-profile">My Profile</a></li>
+  </ul>
+
+    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-white" *ngIf="userIsAdmin">
+      Administration
+    </h6>
+  <ul class="nav navbar-nav flex-column h-100 bg-dark" *ngIf="userIsAdmin">
     <li class="nav-item" *ngIf="userIsAdmin"><a class="nav-link" routerLink="meet-entries">Meet Entries</a></li>
     <li class="nav-item" *ngIf="userIsAdmin"><a class="nav-link" routerLink="entrant-contact-list">Meet Entrant Contacts</a></li>
     <li class="nav-item" *ngIf="userIsAdmin"><a class="nav-link" routerLink="pending-entries">Pending Entries</a></li>
     <li class="nav-item" *ngIf="userIsAdmin"><a class="nav-link" routerLink="meet-admin">Meet Administration</a></li>
     <li class="nav-item" *ngIf="userIsAdmin"><a class="nav-link" routerLink="user-list">User Management</a></li>
 <!--    <li class="nav-item"><a class="nav-link" routerLink="club-entries">Club Entries</a></li>-->
-    <li class="nav-item" *ngIf="userLoggedIn"><a class="nav-link" routerLink="my-profile">My Profile</a></li>
+
   </ul>
   <div *ngIf="userLoggedIn">
   <div *ngFor="let meet of meetsOrganising">
