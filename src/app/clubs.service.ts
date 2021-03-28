@@ -62,4 +62,12 @@ export class ClubsService {
     }
     return null;
   }
+
+  getEntries(clubId, meetId) {
+    if (meetId) {
+      return this.http.get(environment.api + 'club/' + clubId + '/entries?meetId=' + meetId);
+    } else {
+      return this.http.get(environment.api + 'club/' + clubId + '/entries');
+    }
+  }
 }

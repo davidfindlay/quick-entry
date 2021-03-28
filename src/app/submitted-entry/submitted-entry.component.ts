@@ -120,10 +120,21 @@ export class SubmittedEntryComponent implements OnInit {
     if (this.meet.events !== undefined && this.meet.events !== null) {
       const event = this.meet.events.filter(x => x.id === eventId);
       if (event.length === 1) {
-        let eventDetails = event[0].event_distance.distance + ' ' + event[0].event_discipline.discipline;
+
+        let relayText = '';
+        if (event[0].legs > 1) {
+          relayText = event[0].legs + 'x';
+        }
+
+        let eventDetails = relayText + event[0].event_distance.distance + ' ' + event[0].event_discipline.discipline;
         if (event[0].eventname !== null && event[0].eventname !== '') {
           eventDetails = event[0].eventname + ': ' + eventDetails;
         }
+
+        if (relayText !== '') {
+          eventDetails = eventDetails + ' (Requested nomination)';
+        }
+
         return eventDetails;
       } else {
         console.log('Event ' + eventId + ' not found.');

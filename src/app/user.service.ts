@@ -26,6 +26,7 @@ export class UserService {
 
   currentMemberships;
   previousMemberships;
+  clubRoles;
 
   constructor(private http: HttpClient,
               private authenticationService: AuthenticationService) {
@@ -64,9 +65,10 @@ export class UserService {
 
           if (member.success) {
             this.member = member.member;
-            // console.log(this.member);
+            console.log(this.member);
             this.currentMemberships = this.loadCurrentMemberships();
             this.previousMemberships = this.loadPreviousMemberships();
+            this.clubRoles = this.member.club_roles;
             this.memberChanged.next(this.member);
           }
 
@@ -234,6 +236,10 @@ export class UserService {
     }
 
     return meetsOrganised;
+  }
+
+  getCurrentClubAdmins() {
+    return this.clubRoles;
   }
 
   getUserList() {

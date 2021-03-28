@@ -5,6 +5,7 @@ import {User} from '../models/user';
 import {Member} from '../models/member';
 import {MeetService} from '../meet.service';
 import {Meet} from '../models/meet';
+import {Club} from '../models/club';
 
 @Component({
   selector: 'app-sidebar-menu',
@@ -19,6 +20,8 @@ export class SidebarMenuComponent implements OnInit {
 
   meetName = 'Meet Organiser';
   meetsOrganising = [];
+
+  clubAdmin = [];
 
   constructor(private authService: AuthenticationService,
               private userService: UserService,
@@ -42,11 +45,13 @@ export class SidebarMenuComponent implements OnInit {
       } else {
         this.userLoggedIn = true;
         this.userIsAdmin = user.is_admin;
+        this.getClubsAdmin();
       }
     });
 
     this.userService.memberChanged.subscribe((member: Member) => {
       this.getMeetOrganiserMenu();
+      this.getClubsAdmin();
     });
   }
 
@@ -66,6 +71,12 @@ export class SidebarMenuComponent implements OnInit {
       }
     });
 
+  }
+
+  getClubsAdmin() {
+    console.log('getClubsAdmin');
+
+    this.clubAdmin = this.userService.getCurrentClubAdmins();
   }
 
 }
