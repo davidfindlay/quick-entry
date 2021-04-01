@@ -41,7 +41,8 @@ export class ClubRelayTeamEditComponent implements OnInit {
               private router: Router,
               private route: ActivatedRoute,
               private fb: FormBuilder,
-              private spinner: NgxSpinnerService) { }
+              private spinner: NgxSpinnerService) {
+  }
 
   ngOnInit() {
     this.spinner.show();
@@ -89,10 +90,61 @@ export class ClubRelayTeamEditComponent implements OnInit {
     });
 
     this.relayForm.valueChanges.subscribe((change) => {
-
-      this.calculateAge();
-
+      console.log(change);
     });
+
+    this.relayForm.controls.swimmer1.valueChanges.subscribe((change) => {
+      if (this.relayForm.controls.swimmer2.value === change) {
+        this.relayForm.controls.swimmer2.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer3.value === change) {
+        this.relayForm.controls.swimmer3.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer4.value === change) {
+        this.relayForm.controls.swimmer4.patchValue('', {emitEvent: false});
+      }
+      this.calculateAge();
+    });
+
+    this.relayForm.controls.swimmer2.valueChanges.subscribe((change) => {
+      if (this.relayForm.controls.swimmer1.value === change) {
+        this.relayForm.controls.swimmer1.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer3.value === change) {
+        this.relayForm.controls.swimmer3.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer4.value === change) {
+        this.relayForm.controls.swimmer4.patchValue('', {emitEvent: false});
+      }
+      this.calculateAge();
+    });
+
+    this.relayForm.controls.swimmer3.valueChanges.subscribe((change) => {
+      if (this.relayForm.controls.swimmer1.value === change) {
+        this.relayForm.controls.swimmer1.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer2.value === change) {
+        this.relayForm.controls.swimmer2.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer4.value === change) {
+        this.relayForm.controls.swimmer4.patchValue('', {emitEvent: false});
+      }
+      this.calculateAge();
+    });
+
+    this.relayForm.controls.swimmer4.valueChanges.subscribe((change) => {
+      if (this.relayForm.controls.swimmer1.value === change) {
+        this.relayForm.controls.swimmer1.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer2.value === change) {
+        this.relayForm.controls.swimmer2.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer3.value === change) {
+        this.relayForm.controls.swimmer3.patchValue('', {emitEvent: false});
+      }
+      this.calculateAge();
+    });
+
   }
 
   calculateAge() {
