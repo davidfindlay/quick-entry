@@ -75,9 +75,14 @@
 
   <div class="card mb-3 bg-info text-white">
     <div class="card-body">
-      <p class="card-text">
+      <div class="card-text">
+        <p>
+        If you have selected an age group, you can create your relay team without having to select team members yet.
+      </p>
+      <p>
         Only swimmers with at least one individual event entry for this meet will be shown.
       </p>
+      </div>
     </div>
   </div>
 
@@ -219,9 +224,11 @@
   </div>
 
   <div class="form-group row">
-    <input type="button" class="btn btn-primary" id="editTeamSubmit" value="Save Changes" *ngIf="edit" />
-    <input type="button" class="btn btn-primary" id="newTeamCreate" value="Create Team" *ngIf="!edit" />
-    <input type="button" class="btn btn-danger" id="cancel" value="Cancel"/>
+    <input type="button" class="btn btn-primary" id="editTeamSubmit" value="Save Changes" *ngIf="edit"
+           [disabled]="!this.relayForm.valid" />
+    <input type="button" class="btn btn-primary" id="newTeamCreate" value="Create Team" *ngIf="!edit"
+           (click)="createTeam()" [disabled]="!this.relayForm.valid" />
+    <input type="button" class="btn btn-danger" id="cancel" value="Cancel" (click)="cancel()" />
   </div>
 
 </form>

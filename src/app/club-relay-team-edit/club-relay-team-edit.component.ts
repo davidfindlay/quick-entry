@@ -4,8 +4,9 @@ import {ClubsService} from '../clubs.service';
 import {RelayService} from '../relay.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NgxSpinnerService} from 'ngx-spinner';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {TimeService} from '../time.service';
+import {RelayTeam} from '../models/relay-team';
 
 @Component({
   selector: 'app-club-relay-team-edit',
@@ -79,16 +80,34 @@ export class ClubRelayTeamEditComponent implements OnInit {
       ageGroup: '',
       letter: '',
       teamName: '',
-      swimmer1: '',
-      swimmer2: '',
-      swimmer3: '',
-      swimmer4: '',
+      swimmer1: ['', Validators.required],
+      swimmer2: ['', Validators.required],
+      swimmer3: ['', Validators.required],
+      swimmer4: ['', Validators.required],
       seedTime: ''
     });
 
-    // this.relayForm.valueChanges.subscribe((change) => {
-    //   console.log(change);
-    // });
+    this.relayForm.controls.ageGroup.valueChanges.subscribe((ageGroup) => {
+      if (ageGroup !== '') {
+        console.log('clear validators');
+        this.relayForm.controls.swimmer1.setValidators(null);
+        this.relayForm.controls.swimmer2.setValidators(null);
+        this.relayForm.controls.swimmer3.setValidators(null);
+        this.relayForm.controls.swimmer4.setValidators(null);
+
+      } else {
+        console.log('require validators');
+        this.relayForm.controls.swimmer1.setValidators([Validators.required]);
+        this.relayForm.controls.swimmer2.setValidators([Validators.required]);
+        this.relayForm.controls.swimmer3.setValidators([Validators.required]);
+        this.relayForm.controls.swimmer4.setValidators([Validators.required]);
+      }
+      this.relayForm.controls.swimmer1.updateValueAndValidity();
+      this.relayForm.controls.swimmer2.updateValueAndValidity();
+      this.relayForm.controls.swimmer3.updateValueAndValidity();
+      this.relayForm.controls.swimmer4.updateValueAndValidity();
+
+    });
 
     this.relayForm.controls.swimmer1.valueChanges.subscribe((change) => {
       if (this.relayForm.controls.swimmer2.value === change) {
@@ -227,6 +246,15 @@ export class ClubRelayTeamEditComponent implements OnInit {
     if (relayEvent) {
       this.eventGender = relayEvent.event_type.gender;
     }
+  }
+
+  createTeam() {
+    const relayTeam = new RelayTeam();
+    console.log(this.relayForm.value);
+  }
+
+  cancel() {
+    this.router.navigate(['/', 'club-relays', this.clubId, this.meetId]);
   }
 
 }
