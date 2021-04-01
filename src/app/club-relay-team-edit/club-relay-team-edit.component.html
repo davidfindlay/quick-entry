@@ -213,7 +213,8 @@
   <div class="form-group row">
     <label for="newTeamSeedTime" class="col-sm-2 col-form-label text-right">Seed time:</label>
     <div class="col-sm-10">
-      <input type="text" name="newTeamSeedTime" id="newTeamSeedTime" size="40" class="form-control" formControlName="seedTime" /> optional
+      <input type="text" name="newTeamSeedTime" id="newTeamSeedTime" size="40" class="form-control"
+             formControlName="seedTime" (blur)="fixSeedTime()" /> optional
     </div>
   </div>
 

@@ -5,6 +5,7 @@ import {RelayService} from '../relay.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {FormBuilder, FormGroup} from '@angular/forms';
+import {TimeService} from '../time.service';
 
 @Component({
   selector: 'app-club-relay-team-edit',
@@ -64,12 +65,8 @@ export class ClubRelayTeamEditComponent implements OnInit {
           this.entries = entries.entries;
 
           this.getEventGender();
-          console.log('event Gender: ' + this.eventGender);
           this.getAllMembers();
           this.getAvailableMembers();
-
-          console.log(this.swimmers);
-          console.log(this.availableSwimmers);
 
           this.spinner.hide();
         });
@@ -89,9 +86,9 @@ export class ClubRelayTeamEditComponent implements OnInit {
       seedTime: ''
     });
 
-    this.relayForm.valueChanges.subscribe((change) => {
-      console.log(change);
-    });
+    // this.relayForm.valueChanges.subscribe((change) => {
+    //   console.log(change);
+    // });
 
     this.relayForm.controls.swimmer1.valueChanges.subscribe((change) => {
       if (this.relayForm.controls.swimmer2.value === change) {
@@ -145,6 +142,11 @@ export class ClubRelayTeamEditComponent implements OnInit {
       this.calculateAge();
     });
 
+  }
+
+  fixSeedTime() {
+    const formattedSeedTime = TimeService.rewriteTimeEM(this.relayForm.controls.seedTime.value);
+    this.relayForm.controls.seedTime.patchValue(formattedSeedTime, {emitEvent: false});
   }
 
   calculateAge() {
