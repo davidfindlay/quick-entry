@@ -87,6 +87,35 @@ export class ClubRelayTeamEditComponent implements OnInit {
       swimmer4: '',
       seedTime: ''
     });
+
+    this.relayForm.valueChanges.subscribe((change) => {
+
+      this.calculateAge();
+
+    });
+  }
+
+  calculateAge() {
+    let age = 0;
+    if (this.relayForm.controls.swimmer1.value) {
+      const member = this.swimmers.find(x => x.id === parseInt(this.relayForm.controls.swimmer1.value, 10));
+      age += this.getAge(member);
+    }
+    if (this.relayForm.controls.swimmer2.value) {
+      const member = this.swimmers.find(x => x.id === parseInt(this.relayForm.controls.swimmer2.value, 10));
+      age += this.getAge(member);
+    }
+    if (this.relayForm.controls.swimmer3.value) {
+      const member = this.swimmers.find(x => x.id === parseInt(this.relayForm.controls.swimmer3.value, 10));
+      age += this.getAge(member);
+    }
+    if (this.relayForm.controls.swimmer4.value) {
+      const member = this.swimmers.find(x => x.id === parseInt(this.relayForm.controls.swimmer4.value, 10));
+      age += this.getAge(member);
+    }
+
+    this.totalAge = age;
+    return age;
   }
 
   getAllMembers() {

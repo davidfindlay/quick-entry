@@ -87,7 +87,7 @@
     <div class="col-sm-10">
       <select name="newTeamSwimmer1" id="newTeamSwimmer1" class="newTeamSwimmer form-control" formControlName="swimmer1">
         <option value=""></option>
-        <option value="member.id" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+        <option value="{{member.id}}" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
       </select>
     </div>
   </div>
@@ -98,7 +98,7 @@
     <div class="col-sm-10">
       <select name="newTeamSwimmer2" id="newTeamSwimmer2" class="newTeamSwimmer form-control" formControlName="swimmer2">
         <option value=""></option>
-        <option value="member.id" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+        <option value="{{member.id}}" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
       </select>
     </div>
   </div>
@@ -109,7 +109,7 @@
     <div class="col-sm-10">
       <select name="newTeamSwimmer3" id="newTeamSwimmer3" class="newTeamSwimmer form-control" formControlName="swimmer3">
         <option value=""></option>
-        <option value="member.id" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+        <option value="{{member.id}}" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
       </select>
     </div>
   </div>
@@ -120,7 +120,7 @@
     <div class="col-sm-10">
       <select name="newTeamSwimmer4" id="newTeamSwimmer4" class="newTeamSwimmer form-control"  formControlName="swimmer4">
         <option value=""></option>
-        <option value="member.id" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+        <option value="{{member.id}}" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
       </select>
     </div>
   </div>
