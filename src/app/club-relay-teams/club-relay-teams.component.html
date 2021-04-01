@@ -1,0 +1,76 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>Club Relay Teams</h1>
+    <h2 *ngIf="club">{{club.clubName}}</h2>
+  </div>
+</div>
+
+<div class="card mb-3 bg-info text-white">
+  <div class="card-body">
+    <div class="card-text">
+      <p>
+        If you have any queries regardig these details please
+        contact the <a href="mailto:recorder@mastersswimmingqld.org.au">Director of Recording</a>.
+        A future version of this page will include more compact views of member entry data.
+      </p>
+    </div>
+  </div>
+</div>
+
+<app-meet-selector></app-meet-selector>
+
+<div *ngIf="meet">
+  <h2>{{meet.meetname}}</h2>
+
+  <div class="card mb-3 bg-info text-white" *ngIf="numRelayEvents === 0">
+    <div class="card-body">
+      <p class="card-text">
+        This meet doesn't have any relay events.
+      </p>
+    </div>
+  </div>
+
+  <div class="card mb-3" *ngFor="let relayEvent of relayEvents">
+    <div class="card-header">
+      <h3 class="card-title">
+        {{getDetails(relayEvent)}}
+      </h3>
+    </div>
+    <div class="card-body">
+      <p class="card-text" *ngIf="getTeamsByEvent(relayEvent.id).length === 0">
+        No relay teams found.
+      </p>
+      <div *ngIf="relayTeams">
+        <div class="row">
+          <div class="card mb-3 mr-1 col-lg-3 col-sm-12" *ngFor="let relayTeam of getTeamsByEvent(relayEvent.id)">
+            <div class="card-header">
+              <h3 class="card-title">
+                {{getRelayTeamName(relayTeam)}}
+              </h3>
+              <h4 *ngIf="relayTeam.teamname && relayTeam.teamname !== ''">{{relayTeam.teamname}}</h4>
+            </div>
+            <div class="card-body">
+              <ol>
+                <li *ngFor="let member of relayTeam.members">{{member.member.firstname}} {{member.member.surname}}</li>
+              </ol>
+
+              <button class="btn btn-primary" *ngIf="eventOpen(relayEvent)" (click)="editTeam(relayTeam)">Edit Team</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 card-text"></div>
+        <button class="btn btn-primary" *ngIf="eventOpen(relayEvent)" (click)="addTeam(relayEvent)">Add Team</button>
+      </div>
+    </div>
+    <div class="card-footer" *ngIf="eventOpen(relayEvent)">
+      Relay entries close {{getClose(relayEvent) | date: 'EEEE, MMMM d y, h:mm:ss a'}}.
+    </div>
+    <div class="card-footer" *ngIf="!eventOpen(relayEvent)">
+      Relay entries are closed for this event.
+    </div>
+  </div>
+
+

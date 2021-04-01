@@ -1,0 +1,226 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>Add Relay Team</h1>
+  </div>
+</div>
+
+<form [formGroup]="relayForm">
+
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <p class="card-text">
+        To allow Quick Entry to automatically determine the correct
+        age group and/or relay letter for your team, use the <strong>Automatically select</strong>
+        options for Age Group and/or Team Letter.
+      </p>
+      <p>
+        If you select an Age Group for your team, you will not be able to lodge the team if
+        the relay team member's age's do not add up to the correct age range.
+      </p>
+      <p>
+        <strong>Note: </strong> The first relay team in <strong>each</strong> age group should have the Team
+        Letter <strong>A</strong>. If you select "Automatically select", Quick Entry will handle this for
+        you.
+      </p>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newAgeGroup" class="col-sm-2 col-form-label text-right">Age Group: </label>
+    <div class="col-sm-10">
+      <select name="newAgeGroup" id="newAgeGroup" class="form-control" formControlName="ageGroup">
+        <option value="">Automatically select</option>
+        <option value="72">72-119</option>
+        <option value="120">120-159</option>
+        <option value="160">160-199</option>
+        <option value="200">200-239</option>
+        <option value="240">240-279</option>
+        <option value="280">280-319</option>
+        <option value="320">320-359</option>
+        <option value="360">360-399</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newTeamLetter" class="col-sm-2 col-form-label text-right">Team Letter: </label>
+    <div class="col-sm-10">
+      <select name="newTeamLetter" id="newTeamLetter" class="form-control" formControlName="letter">
+        <option value="">Automatically select</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+        <option value="E">E</option>
+        <option value="F">F</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <p class="card-text">
+        Your relay team will automatically receive a name based on your club code and age group.
+        You can also give your team an additional fun/team name e.g. "Bob's Awesome Team".
+      </p>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newTeamName" class="col-sm-2 col-form-label text-right">Team Name: </label>
+    <div class="col-sm-10">
+      <input type="text" name="newTeamName" id="newTeamName" size="40" class="form-control" formControlName="teamName" /> optional
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <p class="card-text">
+        Only swimmers with at least one individual event entry for this meet will be shown.
+      </p>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newTeamSwimmer1" class="col-sm-2 col-form-label text-right"
+           id="lblSwimmer1">Swimmer 1:</label>
+    <div class="col-sm-10">
+      <select name="newTeamSwimmer1" id="newTeamSwimmer1" class="newTeamSwimmer form-control" formControlName="swimmer1">
+        <option value=""></option>
+        <option value="member.id" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newTeamSwimmer2" class="col-sm-2 col-form-label text-right"
+           id="lblSwimmer2">Swimmer 2:</label>
+    <div class="col-sm-10">
+      <select name="newTeamSwimmer2" id="newTeamSwimmer2" class="newTeamSwimmer form-control" formControlName="swimmer2">
+        <option value=""></option>
+        <option value="member.id" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newTeamSwimmer3" class="col-sm-2 col-form-label text-right"
+           id="lblSwimmer3">Swimmer 3:</label>
+    <div class="col-sm-10">
+      <select name="newTeamSwimmer3" id="newTeamSwimmer3" class="newTeamSwimmer form-control" formControlName="swimmer3">
+        <option value=""></option>
+        <option value="member.id" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newTeamSwimmer4" class="col-sm-2 col-form-label text-right"
+           id="lblSwimmer4">Swimmer 4:</label>
+    <div class="col-sm-10">
+      <select name="newTeamSwimmer4" id="newTeamSwimmer4" class="newTeamSwimmer form-control"  formControlName="swimmer4">
+        <option value=""></option>
+        <option value="member.id" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-2 col-form-label text-right">Total Age:</div>
+    <div class="col-sm-10">
+      {{totalAge}}
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-warning text-white" id="card-gender-incorrect" *ngIf="errorGenderIncorrect">
+    <div class="card-body">
+      <h5 class="card-title">
+        Gender incorrect for mixed team!
+      </h5>
+      <p class="card-text">
+        The rules of swimming require a mixed team to consist of two males and two females.
+        This team does not contain two male and two female swimmers.
+      </p>
+      <p class="card-text">
+        You are able to still lodge the team, but <strong>you may be disqualified from
+        receiving points, medals or prizes</strong>. Alternately, you can edit the team to have the
+        correct number of male and female runners.
+      </p>
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-danger text-white" id="card-age-incorrect" *ngIf="errorAgeIncorrect">
+    <div class="card-body">
+      <h5 class="card-title">
+        Age incorrect for selected age group
+      </h5>
+      <p class="card-text">
+        You have selected a specific age group for this relay team, however the ages of the
+        members chosen does not add up an acceptable total for this age group.
+      </p>
+      <div class="card-text">
+        <strong>Possible Solutions:</strong>
+      <ul>
+        <li>
+          Change the age group selected
+        </li>
+        <li>
+          Select different swimmers who's ages will add up to a correct total
+        </li>
+      </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-danger text-white" id="card-letter-used" *ngIf="errorLetterUsed">
+    <div class="card-body">
+      <h5 class="card-title">
+        Selected letter already used for this age group
+      </h5>
+      <p class="card-text">
+        You have chosen to specify a letter for your relay team. This letter is already
+        being used by another relay team from your club in this age group in this event.
+      </p>
+      <div class="card-text">
+        <strong>Possible Solutions:</strong>
+      <ul>
+        <li>
+          Delete the existing team using this letter
+        </li>
+        <li>
+          Select a different letter for this team
+        </li>
+        <li>
+          Set team letter to "Automatically select"
+        </li>
+      </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <p class="card-text">
+        Seed time is optional for relay teams. Check the Meet Flyer or with the Meet Director
+        to find out if seed times are being used for this meet.
+      </p>
+      <p class="card-text">
+        e.g. enter 5:10.24 or 51024 for 5 minutes 10 seconds and 24 milliseconds
+      </p>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newTeamSeedTime" class="col-sm-2 col-form-label text-right">Seed time:</label>
+    <div class="col-sm-10">
+      <input type="text" name="newTeamSeedTime" id="newTeamSeedTime" size="40" class="form-control" formControlName="seedTime" /> optional
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <input type="button" class="btn btn-primary" id="editTeamSubmit" value="Save Changes" *ngIf="edit" />
+    <input type="button" class="btn btn-primary" id="newTeamCreate" value="Create Team" *ngIf="!edit" />
+    <input type="button" class="btn btn-danger" id="cancel" value="Cancel"/>
+  </div>
+
+</form>

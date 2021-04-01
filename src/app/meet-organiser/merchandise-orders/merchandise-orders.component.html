@@ -18,9 +18,66 @@
   </div>
 </div>
 <div class="row" *ngIf="orderTable.length > 0">
-  <div class="col-sm-12">
-    <ngx-datatable [rows]="orderTable" [columns]="orderColumns" rowHeight="auto"></ngx-datatable>
-  </div>
+<!--  <div class="col-sm-12">-->
+<!--    <ngx-datatable [rows]="orderTable" [columns]="orderColumns" rowHeight="auto"></ngx-datatable>-->
+<!--  </div>-->
+  <table class="col-sm-12">
+    <thead>
+    <tr>
+      <th>
+        Entry ID:
+      </th>
+      <th>
+        Date/Time:
+      </th>
+      <th>
+        Entrant
+      </th>
+      <th>
+        Club
+      </th>
+      <th>
+        Items
+      </th>
+      <th>
+        Entry Status
+      </th>
+      <th>
+        Total Ex GST
+      </th>
+      <th>
+        Total Inc GST
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let entryRow of orderTable">
+      <td>
+        {{entryRow.meet_entries_id}}
+      </td>
+      <td>
+        {{entryRow.updated_at}}
+      </td>
+      <td>
+        {{entryRow.member_details}}
+      </td>
+      <td>
+        {{entryRow.club_details}}
+      </td>
+      <td [innerHTML]="entryRow.items">
+      </td>
+      <td>
+        {{entryRow.status}}
+      </td>
+      <td>
+        {{entryRow.ex_gst}}
+      </td>
+      <td>
+        {{entryRow.inc_gst}}
+      </td>
+    </tr>
+    </tbody>
+  </table>
 </div>
 <div class="card mb-3 bg-warning text-black" *ngIf="merchandiseExists === false">
   <div class="card-body">
