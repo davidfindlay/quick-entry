@@ -29,6 +29,7 @@ export class ClubRelayTeamsComponent implements OnInit {
               private relayService: RelayService,
               private route: ActivatedRoute,
               private router: Router,
+              private cdRef: ChangeDetectorRef,
               private spinner: NgxSpinnerService) {
   }
 
@@ -143,6 +144,15 @@ export class ClubRelayTeamsComponent implements OnInit {
   public addTeam(relayEvent) {
     this.router.navigate(['create', relayEvent.id ], {
       relativeTo: this.route});
+  }
+
+  deleteTeam(relayTeam) {
+    this.relayService.deleteTeam(relayTeam).subscribe((del: any) => {
+      console.log(del);
+      this.relayTeams = this.relayTeams.filter(x => x.id !== relayTeam.id);
+      console.log(this.relayTeams);
+      this.cdRef.detectChanges();
+    });
   }
 
 }

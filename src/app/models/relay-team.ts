@@ -8,6 +8,8 @@ export class RelayTeam {
   teamname: string;
   letter: string;
   agegroup: number;
+  agegroup_max: number;
+  agegroup_min: number;
   seedtime: number;
   cost: number;
   paid: number;

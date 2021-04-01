@@ -42,7 +42,8 @@
       </p>
       <div *ngIf="relayTeams">
         <div class="row">
-          <div class="card mb-3 mr-1 col-lg-3 col-sm-12" *ngFor="let relayTeam of getTeamsByEvent(relayEvent.id)">
+          <ng-container *ngFor="let relayTeam of relayTeams">
+          <div class="card mb-3 mr-1 col-lg-3 col-sm-12" *ngIf="relayTeam.meetevent_id === relayEvent.id">
             <div class="card-header">
               <h3 class="card-title">
                 {{getRelayTeamName(relayTeam)}}
@@ -54,10 +55,12 @@
                 <li *ngFor="let member of relayTeam.members">{{member.member.firstname}} {{member.member.surname}}</li>
               </ol>
 
-<!--              <button class="btn btn-primary" *ngIf="eventOpen(relayEvent)" (click)="editTeam(relayTeam)">Edit Team</button>-->
+              <button class="btn btn-primary" *ngIf="eventOpen(relayEvent)" (click)="editTeam(relayTeam)" [disabled]="true">Edit Team</button>
+              <button class="btn btn-warning" *ngIf="eventOpen(relayEvent)" (click)="deleteTeam(relayTeam)">Delete Team</button>
             </div>
 
           </div>
+          </ng-container>
         </div>
       </div>
       <div class="row">

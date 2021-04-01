@@ -7,6 +7,7 @@ import {NgxSpinnerService} from 'ngx-spinner';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {TimeService} from '../time.service';
 import {RelayTeam} from '../models/relay-team';
+import {RelayTeamMember} from '../models/relay-team-member';
 
 @Component({
   selector: 'app-club-relay-team-edit',
@@ -226,7 +227,7 @@ export class ClubRelayTeamEditComponent implements OnInit {
 
   getAge(member) {
     const birthYear = member.dob.split('-')[0];
-    const birthDt = new Date(birthYear + '-01-01T00:00:00+1000');
+    const birthDt = new Date(birthYear + '-12-31T23:59:59+1000');
     const age = new Date().getFullYear() - birthDt.getFullYear();
     return age;
   }
@@ -250,7 +251,54 @@ export class ClubRelayTeamEditComponent implements OnInit {
 
   createTeam() {
     const relayTeam = new RelayTeam();
-    console.log(this.relayForm.value);
+    // console.log(this.relayForm.value);
+
+    relayTeam.club_id = this.clubId;
+    relayTeam.meet_id = this.meetId;
+    relayTeam.meetevent_id = this.eventId;
+    relayTeam.teamname = this.relayForm.controls.teamName.value;
+    relayTeam.letter =  this.relayForm.controls.letter.value;
+    relayTeam.seedtime = TimeService.timeStringToSeconds(this.relayForm.controls.seedTime.value);
+    relayTeam.members = [];
+
+    if (this.relayForm.controls.swimmer1.value !== '') {
+      const swimmer1 = new RelayTeamMember();
+      swimmer1.member_id = parseInt(this.relayForm.controls.swimmer1.value, 10);
+      swimmer1.leg = 1;
+      relayTeam.members.push(swimmer1);
+    }
+
+    if (this.relayForm.controls.swimmer2.value !== '') {
+      const swimmer2 = new RelayTeamMember();
+      swimmer2.member_id = parseInt(this.relayForm.controls.swimmer2.value, 10);
+      swimmer2.leg = 2;
+      relayTeam.members.push(swimmer2);
+    }
+
+    if (this.relayForm.controls.swimmer3.value !== '') {
+      const swimmer3 = new RelayTeamMember();
+      swimmer3.member_id = parseInt(this.relayForm.controls.swimmer3.value, 10);
+      swimmer3.leg = 3;
+      relayTeam.members.push(swimmer3);
+    }
+
+    if (this.relayForm.controls.swimmer4.value !== '') {
+      const swimmer4 = new RelayTeamMember();
+      swimmer4.member_id = parseInt(this.relayForm.controls.swimmer4.value, 10);
+      swimmer4.leg = 4;
+      relayTeam.members.push(swimmer4);
+    }
+
+    if (this.relayForm.controls.ageGroup.value !== '') {
+      relayTeam.agegroup_min = parseInt(this.relayForm.controls.ageGroup.value, 10);
+    }
+
+    console.log(relayTeam);
+
+    this.relayService.createRelayTeam(relayTeam).subscribe((relay: any) => {
+      console.log(relay);
+      this.router.navigate(['/', 'club-relays', this.clubId, this.meetId]);
+    });
   }
 
   cancel() {

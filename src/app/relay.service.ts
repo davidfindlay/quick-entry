@@ -16,4 +16,12 @@ export class RelayService {
       return this.http.get(environment.api + 'club/' + clubId + '/relay_teams?meetId=' + meetId);
     }
   }
+
+  createRelayTeam(relayTeam) {
+    return this.http.post(environment.api + 'relay', relayTeam);
+  }
+
+  deleteTeam(relayTeam) {
+    return this.http.delete(environment.api + 'relay/' + relayTeam.id);
+  }
 }
