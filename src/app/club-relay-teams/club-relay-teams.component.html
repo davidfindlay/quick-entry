@@ -19,6 +19,10 @@
 
 <app-meet-selector></app-meet-selector>
 
+<p *ngFor="let alert of alerts">
+  <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+</p>
+
 <div *ngIf="meet">
   <h2>{{meet.meetname}}</h2>
 
@@ -75,5 +79,22 @@
       Relay entries are closed for this event.
     </div>
   </div>
+</div>
 
 
+  <ng-template #confirmDelete let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="generate-new-password">Confirm Delete Relay</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="card-text">Are you sure you want to delete this relay team?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" (click)="modal.close('yes')">Yes</button>
+      <button class="btn-primary" (click)="modal.close('no')">No</button>
+      <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
+    </div>
+  </ng-template>

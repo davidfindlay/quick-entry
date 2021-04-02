@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {ClubsService} from '../clubs.service';
 import {RelayService} from '../relay.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -7,6 +7,8 @@ import {MeetService} from '../meet.service';
 import {Club} from '../models/club';
 import {Meet} from '../models/meet';
 import {RelayTeam} from '../models/relay-team';
+import {Alert} from '../models/alert';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-club-relay-teams',
@@ -14,6 +16,8 @@ import {RelayTeam} from '../models/relay-team';
   styleUrls: ['./club-relay-teams.component.css']
 })
 export class ClubRelayTeamsComponent implements OnInit {
+
+  @ViewChild('confirmDelete', {static: false}) confirmDelete;
 
   club: Club;
   clubId;
@@ -24,11 +28,14 @@ export class ClubRelayTeamsComponent implements OnInit {
   relayEvents = [];
   relayTeams;
 
+  alerts: Alert[];
+
   constructor(private clubService: ClubsService,
               private meetService: MeetService,
               private relayService: RelayService,
               private route: ActivatedRoute,
               private router: Router,
+              private modalService: NgbModal,
               private cdRef: ChangeDetectorRef,
               private spinner: NgxSpinnerService) {
   }
@@ -43,6 +50,8 @@ export class ClubRelayTeamsComponent implements OnInit {
       this.clubId = parseInt(params.get('clubId'), 10);
       this.club = this.clubService.getClubById(this.clubId);
       this.meetId = parseInt(params.get('meetId'), 10);
+
+      this.resetAlerts();
 
       this.meetService.getSingleMeet(this.meetId).subscribe((meet: Meet) => {
         this.meet = meet;
@@ -147,12 +156,33 @@ export class ClubRelayTeamsComponent implements OnInit {
   }
 
   deleteTeam(relayTeam) {
-    this.relayService.deleteTeam(relayTeam).subscribe((del: any) => {
-      console.log(del);
-      this.relayTeams = this.relayTeams.filter(x => x.id !== relayTeam.id);
-      console.log(this.relayTeams);
-      this.cdRef.detectChanges();
+
+    this.modalService.open(this.confirmDelete, { size: 'lg' }).result.then((result) => {
+      if (result === 'yes') {
+        this.spinner.show();
+        this.relayService.deleteTeam(relayTeam).subscribe((del: any) => {
+          this.relayTeams = this.relayTeams.filter(x => x.id !== relayTeam.id);
+          this.cdRef.detectChanges();
+          this.alerts.push({
+            type: 'success',
+            message: del.message
+          });
+          this.spinner.hide();
+        });
+      }
+    }, (reason) => {
+
     });
+
+
+  }
+
+  resetAlerts() {
+    this.alerts = [];
+  }
+
+  closeAlert(alert: Alert) {
+    this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
 
 }
