@@ -12,14 +12,15 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 })
 export class MeetSelectorComponent implements OnInit {
 
-  @Input() meetPreset: number;
-
   meetSelectorForm: FormGroup;
   meets: Meet[];
+  meetPreset;
   meetId;
   filteredMeets = [];
   years = [];
   yearSelected;
+
+  initialLoad = true;
 
   constructor(private fb: FormBuilder,
               private spinner: NgxSpinnerService,
@@ -31,7 +32,9 @@ export class MeetSelectorComponent implements OnInit {
 
     this.spinner.show();
 
+    this.meetPreset = this.route.snapshot.paramMap.get('meetId');
     this.meetId = this.meetPreset;
+
     this.filterMeets();
 
     this.meetSelectorForm = this.fb.group({
@@ -112,17 +115,19 @@ export class MeetSelectorComponent implements OnInit {
         if (this.filteredMeets.length > 0) {
           // console.log('current meetId: ' + this.meetId);
           if (this.meetId !== undefined && this.meetId !== null) {
+            console.log('meet id is set to ' + this.meetId)
             this.meetSelectorForm.patchValue(
               {meet: this.meetId},
               {emitEvent: false}
             );
           } else {
+            console.log('meet id not set');
             this.meetId = this.filteredMeets[0].id;
             this.meetSelectorForm.patchValue(
               {meet: this.meetId},
               {emitEvent: true}
             );
-            // this.router.navigate(['/', 'pending-entries', this.meetId]);
+
           }
         }
       }
