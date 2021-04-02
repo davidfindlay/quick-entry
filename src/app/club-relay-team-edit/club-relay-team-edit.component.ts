@@ -21,11 +21,13 @@ export class ClubRelayTeamEditComponent implements OnInit {
   clubId;
   meetId;
   eventId;
+  teamId;
 
   errorLetterUsed = false;
   errorAgeIncorrect = false;
   errorGenderIncorrect = false;
   edit = false;
+  editTeam;
 
   meet;
   relayTeams = [];
@@ -53,6 +55,8 @@ export class ClubRelayTeamEditComponent implements OnInit {
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
     this.eventId = parseInt(this.route.snapshot.paramMap.get('eventId'), 10);
 
+    this.teamId = parseInt(this.route.snapshot.paramMap.get('teamId'), 10);
+
     this.createForm();
 
     this.meetService.getSingleMeet(this.meetId).subscribe((meet: any) => {
@@ -62,6 +66,11 @@ export class ClubRelayTeamEditComponent implements OnInit {
       this.relayService.getRelayTeams(this.clubId, this.meetId, this.eventId).subscribe((relays: any) => {
         this.relayTeams = relays.relays;
 
+        if (this.teamId) {
+          this.editTeam = this.relayTeams.find(x => x.id === this.teamId);
+          this.eventId = this.editTeam.meetevent_id;
+        }
+
         this.clubService.getEntries(this.clubId, this.meetId).subscribe((entries: any) => {
 
           this.entries = entries.entries;
@@ -70,10 +79,60 @@ export class ClubRelayTeamEditComponent implements OnInit {
           this.getAllMembers();
           this.getAvailableMembers();
 
+          if (this.teamId) {
+
+            // Add team members to available members
+            for (const member of this.editTeam.members) {
+              const swimmer = this.swimmers.find(x => x.id === member.member_id);
+              this.availableSwimmers.push(swimmer);
+            }
+
+            this.availableSwimmers.sort(this.nameSort);
+
+            const swimmer1 = this.editTeam.members.find(x => x.leg === 1);
+            const swimmer2 = this.editTeam.members.find(x => x.leg === 2);
+            const swimmer3 = this.editTeam.members.find(x => x.leg === 3);
+            const swimmer4 = this.editTeam.members.find(x => x.leg === 4);
+
+            let swimmer1Id = null;
+            let swimmer2Id = null;
+            let swimmer3Id = null;
+            let swimmer4Id = null;
+
+            if (swimmer1) {
+              swimmer1Id = swimmer1.member_id;
+            }
+
+            if (swimmer2) {
+              swimmer2Id = swimmer2.member_id;
+            }
+
+            if (swimmer3) {
+              swimmer3Id = swimmer3.member_id;
+            }
+
+            if (swimmer4) {
+              swimmer4Id = swimmer4.member_id;
+            }
+
+            this.relayForm.patchValue({
+              ageGroup: this.editTeam.age_group.min,
+              letter: this.editTeam.letter,
+              teamName: this.editTeam.teamname,
+              swimmer1: swimmer1Id,
+              swimmer2: swimmer2Id,
+              swimmer3: swimmer3Id,
+              swimmer4: swimmer4Id,
+              seedTime: TimeService.formatTime(this.editTeam.seedtime)
+            });
+
+
+          }
           this.spinner.hide();
         });
       });
     });
+
   }
 
   createForm() {
@@ -197,7 +256,11 @@ export class ClubRelayTeamEditComponent implements OnInit {
       this.swimmers.push(entry.member);
     }
 
-    this.swimmers.sort((a, b) => {
+    this.swimmers.sort(this.nameSort);
+  }
+
+  nameSort(a, b) {
+
       // return a.surname - b.surname || a.firstname - b.firstname;
       if (a.surname > b.surname) {
         return 1;
@@ -211,10 +274,11 @@ export class ClubRelayTeamEditComponent implements OnInit {
       if (b.firstname > a.firstname) {
         return -1;
       }
-    });
+
   }
 
   getAvailableMembers() {
+    console.log('getAvailableMembers');
     const member_ids = [];
 
     for (const swimmer of this.swimmers) {
@@ -272,8 +336,31 @@ export class ClubRelayTeamEditComponent implements OnInit {
   }
 
   createTeam() {
+
+    const relayTeam = this.createRelayTeamObj();
+
+    this.relayService.createRelayTeam(relayTeam).subscribe((relay: any) => {
+      console.log(relay);
+      this.router.navigate(['/', 'club-relays', this.clubId, this.meetId]);
+    });
+  }
+
+  saveTeam() {
+    const relayTeam = this.createRelayTeamObj();
+
+    this.relayService.editRelayTeam(relayTeam).subscribe((relay: any) => {
+      console.log(relay);
+      this.router.navigate(['/', 'club-relays', this.clubId, this.meetId]);
+    });
+  }
+
+  createRelayTeamObj() {
     const relayTeam = new RelayTeam();
     // console.log(this.relayForm.value);
+
+    if (this.editTeam) {
+      relayTeam.id = this.editTeam.id;
+    }
 
     relayTeam.club_id = this.clubId;
     relayTeam.meet_id = this.meetId;
@@ -317,10 +404,7 @@ export class ClubRelayTeamEditComponent implements OnInit {
 
     console.log(relayTeam);
 
-    this.relayService.createRelayTeam(relayTeam).subscribe((relay: any) => {
-      console.log(relay);
-      this.router.navigate(['/', 'club-relays', this.clubId, this.meetId]);
-    });
+    return relayTeam;
   }
 
   cancel() {

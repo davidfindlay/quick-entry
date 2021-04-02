@@ -56,10 +56,10 @@
             </div>
             <div class="card-body">
               <ol>
-                <li *ngFor="let member of relayTeam.members">{{member.member.firstname}} {{member.member.surname}}</li>
+                <li *ngFor="let member of relayTeam.members" value="{{member.leg}}">{{member.member.firstname}} {{member.member.surname}}</li>
               </ol>
 
-              <button class="btn btn-primary" *ngIf="eventOpen(relayEvent)" (click)="editTeam(relayTeam)" [disabled]="true">Edit Team</button>
+              <button class="btn btn-primary" *ngIf="eventOpen(relayEvent)" (click)="editTeam(relayTeam)">Edit Team</button>
               <button class="btn btn-warning" *ngIf="eventOpen(relayEvent)" (click)="deleteTeam(relayTeam)">Delete Team</button>
             </div>
 

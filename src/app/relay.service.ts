@@ -21,6 +21,10 @@ export class RelayService {
     return this.http.post(environment.api + 'relay', relayTeam);
   }
 
+  editRelayTeam(relayTeam) {
+    return this.http.put(environment.api + 'relay/' + relayTeam.id, relayTeam);
+  }
+
   deleteTeam(relayTeam) {
     return this.http.delete(environment.api + 'relay/' + relayTeam.id);
   }
