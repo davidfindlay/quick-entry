@@ -196,6 +196,22 @@ export class ClubRelayTeamEditComponent implements OnInit {
     for (const entry of this.entries) {
       this.swimmers.push(entry.member);
     }
+
+    this.swimmers.sort((a, b) => {
+      // return a.surname - b.surname || a.firstname - b.firstname;
+      if (a.surname > b.surname) {
+        return 1;
+      }
+      if (b.surname > a.surname) {
+        return -1;
+      }
+      if (a.firstname > b.firstname) {
+        return 1;
+      }
+      if (b.firstname > a.firstname) {
+        return -1;
+      }
+    });
   }
 
   getAvailableMembers() {
@@ -220,9 +236,15 @@ export class ClubRelayTeamEditComponent implements OnInit {
       }
     }
 
-    console.log(member_ids);
+    // console.log(member_ids);
 
     this.availableSwimmers = this.swimmers.filter(x => !member_ids.includes(x.id));
+    // this.availableSwimmers.sort( (a, b) => {
+    //   // return a.surname - b.surname || a.firstname - b.firstname;
+    //   return a.surname > b.surname;
+    // });
+
+    console.log(this.availableSwimmers);
   }
 
   getAge(member) {
