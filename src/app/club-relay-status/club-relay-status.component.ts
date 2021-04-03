@@ -41,8 +41,10 @@ export class ClubRelayStatusComponent implements OnInit, OnChanges {
 
   getTotalPayments() {
     this.totalPaid = 0;
-    for (const payment of this.payments) {
-      this.totalPaid += payment.amount;
+    if (this.payments) {
+      for (const payment of this.payments) {
+        this.totalPaid += payment.amount;
+      }
     }
   }
 

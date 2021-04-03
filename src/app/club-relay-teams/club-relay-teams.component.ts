@@ -194,4 +194,12 @@ export class ClubRelayTeamsComponent implements OnInit {
     return TimeService.formatTime(timeString);
   }
 
+  getTotalAge(relayTeam) {
+    let totalAge = 0;
+    for (const member of relayTeam.members) {;
+      totalAge += this.relayService.getAge(member.member);
+    }
+    return totalAge;
+  }
+
 }
