@@ -313,7 +313,7 @@ export class ClubRelayTeamEditComponent implements OnInit {
 
   getAge(member) {
     const birthYear = member.dob.split('-')[0];
-    const birthDt = new Date(birthYear + '-12-31T23:59:59+1000');
+    const birthDt = new Date(birthYear + '-01-01T00:00:00+1000');
     const age = new Date().getFullYear() - birthDt.getFullYear();
     return age;
   }

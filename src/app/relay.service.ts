@@ -28,4 +28,19 @@ export class RelayService {
   deleteTeam(relayTeam) {
     return this.http.delete(environment.api + 'relay/' + relayTeam.id);
   }
+
+  getAge(member) {
+    const birthYear = member.dob.split('-')[0];
+    const birthDt = new Date(birthYear + '-01-01T00:00:00+1000');
+    return new Date().getFullYear() - birthDt.getFullYear();
+  }
+
+  getDisplayAge(member) {
+    const age = this.getAge(member);
+    if (member.gender === 1) {
+      return 'M' + age;
+    } else {
+      return 'F' + age;
+    }
+  }
 }

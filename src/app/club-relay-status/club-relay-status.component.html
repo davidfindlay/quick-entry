@@ -1,0 +1,38 @@
+<div class="row mb-2">
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="dashboard-number">
+          {{numberOfTeams}}
+        </div>
+        <div class="dashboard-caption">
+          Relay Teams
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="dashboard-number">
+          {{totalCost | currency}}
+        </div>
+        <div class="dashboard-caption">
+          Relay Team Cost
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="dashboard-number">
+          {{totalPaid | currency}}
+        </div>
+        <div class="dashboard-caption">
+          Paid
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

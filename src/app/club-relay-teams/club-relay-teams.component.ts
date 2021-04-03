@@ -9,6 +9,8 @@ import {Meet} from '../models/meet';
 import {RelayTeam} from '../models/relay-team';
 import {Alert} from '../models/alert';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TimeService} from '../time.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-club-relay-teams',
@@ -27,6 +29,7 @@ export class ClubRelayTeamsComponent implements OnInit {
   numRelayEvents;
   relayEvents = [];
   relayTeams;
+  payments;
 
   alerts: Alert[];
 
@@ -69,7 +72,9 @@ export class ClubRelayTeamsComponent implements OnInit {
 
         this.relayService.getRelayTeams(this.clubId, this.meetId).subscribe((relays: any) => {
           this.relayTeams = relays.relays;
-
+          if (relays.payments) {
+            this.payments = relays.payments;
+          }
         });
 
       });
@@ -123,12 +128,12 @@ export class ClubRelayTeamsComponent implements OnInit {
   public eventOpen(relayEvent) {
     let deadlineDt = null;
     if (relayEvent.deadline) {
-      deadlineDt = new Date(relayEvent.deadline + '+1000');
+      deadlineDt = moment(relayEvent.deadline + '+1000');
     } else {
-      deadlineDt = new Date(this.meet.deadline + 'T23:59:59+1000')
+      deadlineDt = moment(this.meet.deadline + 'T23:59:59+1000');
     }
 
-    if (deadlineDt > new Date()) {
+    if (deadlineDt > moment()) {
       return true;
     } else {
       return false;
@@ -138,9 +143,9 @@ export class ClubRelayTeamsComponent implements OnInit {
   public getClose(relayEvent) {
     let deadlineDt = null;
     if (relayEvent.deadline) {
-      deadlineDt = new Date(relayEvent.deadline + '+1000');
+      deadlineDt = moment(relayEvent.deadline + '+1000');
     } else {
-      deadlineDt = new Date(this.meet.deadline + 'T23:59:59+1000')
+      deadlineDt = moment(this.meet.deadline + 'T23:59:59+1000')
     }
 
     return deadlineDt;
@@ -183,6 +188,10 @@ export class ClubRelayTeamsComponent implements OnInit {
 
   closeAlert(alert: Alert) {
     this.alerts.splice(this.alerts.indexOf(alert), 1);
+  }
+
+  formatTime(timeString) {
+    return TimeService.formatTime(timeString);
   }
 
 }
