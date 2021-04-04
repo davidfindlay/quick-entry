@@ -40,7 +40,7 @@
     "ng2-date-countdown": "1.0.3",
     "ngx-auth": "^5.0.0",
     "ngx-mask": "^7.9.10",
-    "ngx-paypal": "^5.0.0-beta.12",
+    "ngx-paypal": "^5.0.0",
     "ngx-spinner": "^7.0.0",
     "popper": "^1.0.1",
     "popper.js": "^1.14.7",

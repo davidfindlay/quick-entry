@@ -32,7 +32,25 @@
         <div class="dashboard-caption">
           Paid
         </div>
+<!--        <div class="text-center"><button class="btn btn-primary" (click)="makePaymentClick()">Make Payment</button></div>-->
+<!--        <div class="text-center">View Payments</div>-->
       </div>
     </div>
   </div>
 </div>
+
+<ng-template #makePayment let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="make-payment">Make Relay Payment</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-primary" (click)="modal.close('cancel')">Cancel</button>
+    <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
+  </div>
+</ng-template>

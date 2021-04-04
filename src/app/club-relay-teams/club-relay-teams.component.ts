@@ -20,6 +20,7 @@ import * as moment from 'moment';
 export class ClubRelayTeamsComponent implements OnInit {
 
   @ViewChild('confirmDelete', {static: false}) confirmDelete;
+  @ViewChild('makePayment', {static: false}) makePayment;
 
   club: Club;
   clubId;
@@ -28,7 +29,7 @@ export class ClubRelayTeamsComponent implements OnInit {
 
   numRelayEvents;
   relayEvents = [];
-  relayTeams;
+  relayTeams = [];
   payments;
 
   alerts: Alert[];
@@ -50,34 +51,42 @@ export class ClubRelayTeamsComponent implements OnInit {
       this.relayEvents = [];
       this.relayTeams = null;
 
-      this.clubId = parseInt(params.get('clubId'), 10);
-      this.club = this.clubService.getClubById(this.clubId);
-      this.meetId = parseInt(params.get('meetId'), 10);
+      if (params.get('clubId')) {
+        this.clubId = parseInt(params.get('clubId'), 10);
+        this.club = this.clubService.getClubById(this.clubId);
+      }
+
+      if (params.get('meetId')) {
+        this.meetId = parseInt(params.get('meetId'), 10);
+      }
 
       this.resetAlerts();
 
-      this.meetService.getSingleMeet(this.meetId).subscribe((meet: Meet) => {
-        this.meet = meet;
+      if (this.meetId) {
 
-        // Determine if there are relay events
-        this.numRelayEvents = 0;
-        for (const me of this.meet.events) {
-          if (me.legs > 1) {
-            this.numRelayEvents++;
-            this.relayEvents.push(me);
+        this.meetService.getSingleMeet(this.meetId).subscribe((meet: Meet) => {
+          this.meet = meet;
+
+          // Determine if there are relay events
+          this.numRelayEvents = 0;
+          for (const me of this.meet.events) {
+            if (me.legs > 1) {
+              this.numRelayEvents++;
+              this.relayEvents.push(me);
+            }
           }
-        }
 
-        this.relayEvents.sort((a, b) => (a.prognumber - b.prognumber));
+          this.relayEvents.sort((a, b) => (a.prognumber - b.prognumber));
 
-        this.relayService.getRelayTeams(this.clubId, this.meetId).subscribe((relays: any) => {
-          this.relayTeams = relays.relays;
-          if (relays.payments) {
-            this.payments = relays.payments;
-          }
+          this.relayService.getRelayTeams(this.clubId, this.meetId).subscribe((relays: any) => {
+            this.relayTeams = relays.relays;
+            if (relays.payments) {
+              this.payments = relays.payments;
+            }
+          });
+
         });
-
-      });
+      }
 
     });
   }
@@ -201,5 +210,7 @@ export class ClubRelayTeamsComponent implements OnInit {
     }
     return totalAge;
   }
+
+
 
 }

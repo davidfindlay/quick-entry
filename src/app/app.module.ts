@@ -211,7 +211,8 @@ export class SentryErrorHandler implements ErrorHandler {
     PaypalModule,
     MeetOrganiserModule,
     MeetAdministrationModule,
-    SharedModule
+    SharedModule,
+    NgxPayPalModule
   ],
   providers: [
     MeetService,
