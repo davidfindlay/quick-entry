@@ -79,10 +79,13 @@ export class ClubRelayTeamsComponent implements OnInit {
           this.relayEvents.sort((a, b) => (a.prognumber - b.prognumber));
 
           this.relayService.getRelayTeams(this.clubId, this.meetId).subscribe((relays: any) => {
+            console.log(relays);
+
             this.relayTeams = relays.relays;
             if (relays.payments) {
               this.payments = relays.payments;
             }
+            console.log(this.payments);
           });
 
         });
@@ -211,6 +214,25 @@ export class ClubRelayTeamsComponent implements OnInit {
     return totalAge;
   }
 
+  paymentReceived() {
+    this.relayService.getRelayTeams(this.clubId, this.meetId).subscribe((relays: any) => {
+      console.log(relays);
 
+      this.relayTeams = relays.relays;
+      if (relays.payments) {
+        this.payments = relays.payments;
+      }
+      console.log(this.payments);
+      // this.spinner.hide();
+
+      this.alerts.push({
+        type: 'success',
+        message: 'Payment Received'
+      });
+
+      this.cdRef.detectChanges();
+
+    });
+  }
 
 }

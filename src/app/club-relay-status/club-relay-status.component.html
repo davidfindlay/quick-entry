@@ -32,7 +32,7 @@
         <div class="dashboard-caption">
           Paid
         </div>
-<!--        <div class="text-center"><button class="btn btn-primary" (click)="makePaymentClick()">Make Payment</button></div>-->
+        <div class="text-center" *ngIf="enableClientPayments && paymentNeeded"><button class="btn btn-primary" (click)="makePaymentClick()">Make Payment</button></div>
 <!--        <div class="text-center">View Payments</div>-->
       </div>
     </div>
@@ -47,10 +47,23 @@
     </button>
   </div>
   <div class="modal-body">
-    <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+
+    <p *ngFor="let alert of paymentAlerts">
+      <ngb-alert [type]="alert.type" (close)="closePaymentAlert(alert)">{{ alert.message }}</ngb-alert>
+    </p>
+
+    <div *ngIf="!showSuccess">
+      <div class="card-text">
+        Please choose a payment option below:
+      </div>
+
+      <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+    </div>
+
   </div>
   <div class="modal-footer">
-    <button class="btn-primary" (click)="modal.close('cancel')">Cancel</button>
+    <button class="btn-primary" (click)="modal.close('cancel')" *ngIf="!showSuccess">Cancel</button>
+    <button class="btn-primary" (click)="modal.close('cancel')" *ngIf="showSuccess">Close</button>
     <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
   </div>
 </ng-template>

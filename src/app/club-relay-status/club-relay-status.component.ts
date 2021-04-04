@@ -1,9 +1,12 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {
   IPayPalConfig,
   ICreateOrderRequest
 } from 'ngx-paypal';
+import {environment} from '../../environments/environment';
+import {Alert} from '../models/alert';
+import {RelayService} from '../relay.service';
 
 @Component({
   selector: 'app-club-relay-status',
@@ -12,23 +15,42 @@ import {
 })
 export class ClubRelayStatusComponent implements OnInit, OnChanges {
 
+  @Input('clubId') clubId;
+  @Input('meetId') meetId;
   @Input('teamInfo') teamInfo;
   @Input('payments') payments;
-  @ViewChild('makePayment', {static: false}) makePayment;
+  @ViewChild('makePayment', {static: false}) makePayment: NgbModalRef;
+
+  @Output() notifyParent: EventEmitter<any> = new EventEmitter();
 
   public payPalConfig ?: IPayPalConfig;
 
   numberOfTeams;
   totalCost;
   totalPaid = 0;
+  enableClientPayments = false;
 
-  constructor(private modalService: NgbModal) {
+  showSuccess = false;
+  paymentNeeded = false;
+  paymentAlerts: Alert[];
+
+  modalRef: NgbModalRef;
+
+  constructor(private modalService: NgbModal,
+              private relayService: RelayService) {
   }
 
   ngOnInit() {
+    this.initConfig();
+    this.resetPaymentAlerts();
     this.getNumberOfTeams();
     this.getTotalCost();
     this.getTotalPayments();
+
+    if (environment.enableClientPayments) {
+      this.enableClientPayments = true;
+    }
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -50,10 +72,14 @@ export class ClubRelayStatusComponent implements OnInit, OnChanges {
 
   getTotalPayments() {
     this.totalPaid = 0;
-    if (this.payments && this.payments.isArray()) {
+    if (this.payments) {
       for (const payment of this.payments) {
         this.totalPaid += payment.amount;
       }
+    }
+
+    if (this.totalPaid < this.totalCost) {
+      this.paymentNeeded = true;
     }
   }
 
@@ -66,42 +92,108 @@ export class ClubRelayStatusComponent implements OnInit, OnChanges {
     }, (reason) => {
 
     });
+  }
 
-
+  getOwed(): number {
+    return this.totalCost - this.totalPaid;
   }
 
   private initConfig(): void {
-    // this.payPalConfig = {
-    //   clientId: 'sb',
-    //   // for creating orders (transactions) on server see
-    //   // https://developer.paypal.com/docs/checkout/reference/server-integration/set-up-transaction/
-    //   createOrderOnServer: (data) => fetch('/my-server/create-paypal-transaction')
-    //     .then((res) => res.json())
-    //     .then((order) => data.orderID),
-    //   authorizeOnServer: (approveData) => {
-    //     fetch('/my-server/authorize-paypal-transaction', {
-    //       body: JSON.stringify({
-    //         orderID: approveData.orderID
-    //       })
-    //     }).then((res) => {
-    //       return res.json();
-    //     }).then((details) => {
-    //       alert('Authorization created for ' + details.payer_given_name);
-    //     });
-    //   },
-    //   onCancel: (data, actions) => {
-    //     console.log('OnCancel', data, actions);
-    //     this.showCancel = true;
-    //   },
-    //   onError: err => {
-    //     console.log('OnError', err);
-    //     this.showError = true;
-    //   },
-    //   onClick: (data, actions) => {
-    //     console.log('onClick', data, actions);
-    //     this.resetStatus();
-    //   },
-    // };
+    this.payPalConfig = {
+      currency: 'AUD',
+      clientId: environment.paypalClientId,
+      createOrderOnClient: (data) => <ICreateOrderRequest>{
+        intent: 'CAPTURE',
+        purchase_units: [
+          {
+            amount: {
+              currency_code: 'AUD',
+              value: this.getOwed().toString(),
+              breakdown: {
+                item_total: {
+                  currency_code: 'AUD',
+                  value: this.getOwed().toString()
+                }
+              }
+            },
+            items: [
+              {
+                name: 'Relay Teams',
+                quantity: this.numberOfTeams,
+                category: 'DIGITAL_GOODS',
+                unit_amount: {
+                  currency_code: 'AUD',
+                  value: (this.getOwed() / this.numberOfTeams).toString(),
+                },
+              }
+            ]
+          }
+        ],
+        application_context: {
+          'shipping_preference': 'NO_SHIPPING'
+        }
+      },
+      advanced: {
+        commit: 'true'
+      },
+      style: {
+        label: 'paypal',
+        layout: 'vertical'
+      },
+      onApprove: (data, actions) => {
+        console.log('onApprove - transaction was approved, but not authorized', data, actions);
+        actions.order.get().then(details => {
+          console.log('onApprove - you can get full order details inside onApprove: ', details);
+        });
+      },
+      onClientAuthorization: (data) => {
+        console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
+        this.showSuccess = true;
+
+        this.relayService.reportPayment(this.clubId, this.meetId, data).subscribe((status: any) => {
+          console.log(status);
+          this.paymentAlerts.push({
+            type: 'success',
+            message: 'Payment received.'
+          });
+
+          this.notifyParent.emit(true);
+          this.getTotalPayments();
+          this.showSuccess = true;
+          this.paymentNeeded = false;
+          this.modalService.dismissAll();
+
+        });
+
+      },
+      onCancel: (data, actions) => {
+        console.log('OnCancel', data, actions);
+        this.showSuccess = true;
+        this.paymentAlerts.push({
+          type: 'warning',
+          message: 'Payment cancelled.'
+        });
+      },
+      onError: err => {
+        console.log('OnError', err);
+        this.showSuccess = true;
+        this.paymentAlerts.push({
+          type: 'danger',
+          message: 'An error occured. Please try again later.'
+        });
+      },
+      onClick: (data, actions) => {
+        console.log('onClick', data, actions);
+      },
+    };
+  }
+
+  resetPaymentAlerts() {
+    this.paymentAlerts = [];
+  }
+
+  closePaymentAlert(alert: Alert) {
+    this.paymentAlerts.splice(this.paymentAlerts.indexOf(alert), 1);
   }
 
 }

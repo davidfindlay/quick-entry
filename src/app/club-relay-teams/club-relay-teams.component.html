@@ -24,7 +24,8 @@
 <div *ngIf="meet">
   <h2>{{meet.meetname}}</h2>
 
-  <app-club-relay-status [teamInfo]="relayTeams" *ngIf="relayTeams"></app-club-relay-status>
+  <app-club-relay-status [clubId]="clubId" [meetId]="meetId" [teamInfo]="relayTeams" [payments]="payments"
+                         (notifyParent)="paymentReceived()" *ngIf="relayTeams"></app-club-relay-status>
   <p *ngFor="let alert of alerts">
     <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
   </p>

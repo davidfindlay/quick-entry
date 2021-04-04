@@ -43,6 +43,8 @@ export class SubmittedEntryComponent implements OnInit {
       this.loggedIn = true;
     }
 
+    // console.log(this.submittedEntry);
+
     if (this.submittedEntry.meet !== undefined && this.submittedEntry.meet !== null) {
       this.meet = this.submittedEntry.meet;
     }

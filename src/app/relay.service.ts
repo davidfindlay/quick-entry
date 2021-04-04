@@ -43,4 +43,8 @@ export class RelayService {
       return 'F' + age;
     }
   }
+
+  reportPayment(club_id, meet_id, paymentDetails) {
+    return this.http.post(environment.api + 'relay_payment/' + club_id + '/' + meet_id, paymentDetails);
+  }
 }

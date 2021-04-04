@@ -38,4 +38,5 @@ export class MeetEntry {
   code: string;
   created_at: Date;
   updated_at: Date;
+
 }
