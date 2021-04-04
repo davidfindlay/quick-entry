@@ -22,6 +22,7 @@ import {EntryPaymentComponent} from './entry-payment/entry-payment.component';
 import {EntryPayment} from './models/entry-payment';
 import {MealMerchandiseDetails} from './models/meal-merchandise-details';
 import {MerchandiseDetails} from './models/merchandise';
+import * as moment from 'moment';
 
 @Injectable()
 export class EntryService {
@@ -186,6 +187,11 @@ export class EntryService {
   retrieveSubmittedEntries() {
     // TODO: retrieve submitted entries for unauthenticated?
     this.http.get(environment.api + 'meet_entries').subscribe((entries: MeetEntry[]) => {
+      for (const entry of entries) {
+        entry.created_at = moment(entry.created_at).toDate();
+        entry.updated_at = moment(entry.updated_at).toDate();
+      }
+
       this.submittedEntries = entries;
       this.submittedChanged.next(this.submittedEntries);
     });

@@ -12,14 +12,15 @@ import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 })
 export class MeetSelectorComponent implements OnInit {
 
-  @Input() meetPreset: number;
-
   meetSelectorForm: FormGroup;
   meets: Meet[];
+  meetPreset;
   meetId;
   filteredMeets = [];
   years = [];
   yearSelected;
+
+  initialLoad = true;
 
   constructor(private fb: FormBuilder,
               private spinner: NgxSpinnerService,
@@ -31,7 +32,9 @@ export class MeetSelectorComponent implements OnInit {
 
     this.spinner.show();
 
+    this.meetPreset = this.route.snapshot.paramMap.get('meetId');
     this.meetId = this.meetPreset;
+
     this.filterMeets();
 
     this.meetSelectorForm = this.fb.group({
@@ -80,6 +83,15 @@ export class MeetSelectorComponent implements OnInit {
     this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
       this.meets = meets;
 
+      this.meets.sort((a, b) => {
+        if (a.startdate > b.startdate) {
+          return -1;
+        }
+        if (b.startdate > a.startdate) {
+          return 1;
+        }
+      });
+
       for (let i = 0, len = this.meets.length; i < len; i++) {
         const meet = this.meets[i];
         const startDate = new Date(meet.startdate);
@@ -109,20 +121,34 @@ export class MeetSelectorComponent implements OnInit {
           // console.log('Add Meet ' + meet.meetname);
         }
 
+        this.filteredMeets.sort((a, b) => {
+          if (a.startdate > b.startdate) {
+            return -1;
+          }
+          if (b.startdate > a.startdate) {
+            return 1;
+          }
+        });
+
         if (this.filteredMeets.length > 0) {
           // console.log('current meetId: ' + this.meetId);
           if (this.meetId !== undefined && this.meetId !== null) {
+            // console.log('meet id is set to ' + this.meetId)
             this.meetSelectorForm.patchValue(
               {meet: this.meetId},
               {emitEvent: false}
             );
           } else {
+            console.log('meet id not set');
+
+            console.log(this.filteredMeets);
+
             this.meetId = this.filteredMeets[0].id;
             this.meetSelectorForm.patchValue(
               {meet: this.meetId},
               {emitEvent: true}
             );
-            // this.router.navigate(['/', 'pending-entries', this.meetId]);
+
           }
         }
       }

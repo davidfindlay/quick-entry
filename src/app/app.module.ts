@@ -78,6 +78,10 @@ import {SharedModule} from './shared/shared.module';
 import { MeetCalendarComponent } from './meet-calendar/meet-calendar.component';
 import { MyEntriesComponent } from './my-entries/my-entries.component';
 import { ClubEntriesComponent } from './club-entries/club-entries.component';
+import { ClubRelayTeamsComponent } from './club-relay-teams/club-relay-teams.component';
+import {RelayService} from './relay.service';
+import { ClubRelayTeamEditComponent } from './club-relay-team-edit/club-relay-team-edit.component';
+import { ClubRelayStatusComponent } from './club-relay-status/club-relay-status.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -88,6 +92,11 @@ const appRoutes: Routes = [
   { path: 'club-entries', component: ClubEntriesComponent },
   { path: 'club-entries/:clubId', component: ClubEntriesComponent },
   { path: 'club-entries/:clubId/:meetId', component: ClubEntriesComponent },
+  { path: 'club-relays', component: ClubRelayTeamsComponent },
+  { path: 'club-relays/:clubId', component: ClubRelayTeamsComponent },
+  { path: 'club-relays/:clubId/:meetId', component: ClubRelayTeamsComponent },
+  { path: 'club-relays/:clubId/:meetId/create/:eventId', component: ClubRelayTeamEditComponent },
+  { path: 'club-relays/:clubId/:meetId/:teamId', component: ClubRelayTeamEditComponent },
   { path: 'meets/:meetId', component: MeetListItemComponent },
   { path: 'enter/:meet', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step1', component: EntrantDetailsComponent },
@@ -182,7 +191,10 @@ export class SentryErrorHandler implements ErrorHandler {
     RegisterComponent,
     MeetCalendarComponent,
     MyEntriesComponent,
-    ClubEntriesComponent
+    ClubEntriesComponent,
+    ClubRelayTeamsComponent,
+    ClubRelayTeamEditComponent,
+    ClubRelayStatusComponent
   ],
   entryComponents: [ConfirmCancelComponent, SeedtimeHelperComponent, PostalTimeEntryComponent],
   imports: [
@@ -199,7 +211,8 @@ export class SentryErrorHandler implements ErrorHandler {
     PaypalModule,
     MeetOrganiserModule,
     MeetAdministrationModule,
-    SharedModule
+    SharedModule,
+    NgxPayPalModule
   ],
   providers: [
     MeetService,
@@ -208,6 +221,7 @@ export class SentryErrorHandler implements ErrorHandler {
     TimePipe,
     MeetEntryStatusService,
     MemberService,
+    RelayService,
     {provide: ErrorHandler, useClass: SentryErrorHandler}
   ],
   bootstrap: [AppComponent]

@@ -1,0 +1,69 @@
+<div class="row mb-2">
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="dashboard-number">
+          {{numberOfTeams}}
+        </div>
+        <div class="dashboard-caption">
+          Relay Teams
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="dashboard-number">
+          {{totalCost | currency}}
+        </div>
+        <div class="dashboard-caption">
+          Relay Team Cost
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="dashboard-number">
+          {{totalPaid | currency}}
+        </div>
+        <div class="dashboard-caption">
+          Paid
+        </div>
+        <div class="text-center" *ngIf="enableClientPayments && paymentNeeded"><button class="btn btn-primary" (click)="makePaymentClick()">Make Payment</button></div>
+<!--        <div class="text-center">View Payments</div>-->
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #makePayment let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="make-payment">Make Relay Payment</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <p *ngFor="let alert of paymentAlerts">
+      <ngb-alert [type]="alert.type" (close)="closePaymentAlert(alert)">{{ alert.message }}</ngb-alert>
+    </p>
+
+    <div *ngIf="!showSuccess">
+      <div class="card-text">
+        Please choose a payment option below:
+      </div>
+
+      <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn-primary" (click)="modal.close('cancel')" *ngIf="!showSuccess">Cancel</button>
+    <button class="btn-primary" (click)="modal.close('cancel')" *ngIf="showSuccess">Close</button>
+    <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
+  </div>
+</ng-template>

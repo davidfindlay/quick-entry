@@ -105,6 +105,10 @@ export class MeetService {
     });
   }
 
+  getSingleMeet(meet_id) {
+    return this.http.get(environment.api + 'meets/' + meet_id);
+  }
+
   getOpenMeets() {
 
     const meetsArray = [];
