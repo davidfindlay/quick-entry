@@ -15,6 +15,9 @@
             <li class="nav-item">
                 <a class="nav-link" routerLink="login" *ngIf="!users">Log In</a>
             </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="register" *ngIf="!users">Register</a>
+          </li>
             <li class="nav-item">
                 <a class="nav-link" routerLink="login" (click)="onLogOutClick()" *ngIf="users">Log Off</a>
             </li>

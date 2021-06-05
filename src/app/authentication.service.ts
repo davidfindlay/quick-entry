@@ -125,5 +125,4 @@ export class AuthenticationService implements AuthService {
         this.interruptedUrl = url;
     }
 
-
 }

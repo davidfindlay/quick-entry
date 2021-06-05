@@ -1,0 +1,55 @@
+<div class="card merchandiseItem" *ngIf="merchandiseItem !== null">
+  <div class="card-header">
+    <h3>{{merchandiseItem.item_name}}</h3>
+    SKU: {{merchandiseItem.sku}}
+  </div>
+  <div class="card-body">
+    <div>{{merchandiseItem.description}}</div>
+    <p>Stock Control: {{(merchandiseItem.stock_control) ? 'Yes' : 'No'}}</p>
+    <div *ngIf="merchandiseItem.stock_control">
+      <p>Stock: </p> {{merchandiseItem.stock}}
+    </div>
+    <p>Deadline: {{merchandiseItem.deadline}}</p>
+    <p>GST Applicable: {{(merchandiseItem.gst_applicable) ? 'Yes' : 'No'}}</p>
+    <p *ngIf="merchandiseItem.gst_applicable">Ex GST: {{merchandiseItem.exgst | currency}} </p>
+    <p *ngIf="merchandiseItem.gst_applicable">GST: {{merchandiseItem.gst | currency}} </p>
+    <p>Total Price: {{merchandiseItem.total_price | currency}} </p>
+    <p>Maximum Order: {{merchandiseItem.max_qty}}</p>
+    <p>Status: {{statusText}}</p>
+    <p>Images:</p>
+    <div class="row">
+      <div class="card col-sm-4" *ngFor="let merchandiseImage of merchandiseItem.images">
+        <div class="card-body">
+          <img class="img-thumbnail" src="{{fileRoot + 'meets/' + merchandiseItem.meet_id + '/merchandise/' + merchandiseImage.filename}}" alt="{{merchandiseImage.caption}}">
+          <p class="figure-caption text-center">{{merchandiseImage.caption}}</p>
+        </div>
+      </div>
+    </div>
+<div>
+  <button class="btn btn-primary mr-1" (click)="publish()" *ngIf="this.merchandiseItem.status === 0">Publish</button>
+  <button class="btn btn-primary mr-1" (click)="unpublish()" *ngIf="this.merchandiseItem.status === 1">Hide</button>
+  <button class="btn btn-primary mr-1" (click)="edit()">Edit</button>
+  <button class="btn btn-danger" (click)="delete()">Delete</button>
+</div>
+  </div>
+</div>
+
+<ng-template #confirmation let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Are you sure?</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('no')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p><strong>Are you sure you want to delete <span class="text-primary">{{(merchandiseItem.item_name !== '') ? merchandiseItem.item_name: 'this item'}}
+    </span>?</strong></p>
+    <p>
+      <span class="text-danger">This operation can not be undone.</span>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('no')">No</button>
+    <button type="button" class="btn btn-danger" (click)="modal.close('yes')">Yes</button>
+  </div>
+</ng-template>

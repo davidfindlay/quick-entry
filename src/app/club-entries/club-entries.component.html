@@ -1,0 +1,24 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>Club Entries</h1>
+    <h2 *ngIf="club">{{club.clubname}}</h2>
+  </div>
+</div>
+
+<div class="card mb-3 bg-info text-white">
+  <div class="card-body">
+    <div class="card-text">
+      <p>
+        If you have any queries regardig these details please
+        contact the <a href="mailto:recorder@mastersswimmingqld.org.au">Director of Recording</a>.
+        A future version of this page will include more compact views of member entry data.
+      </p>
+    </div>
+  </div>
+</div>
+
+<app-meet-selector></app-meet-selector>
+
+<app-submitted-entry *ngFor="let entry of entries"
+                     [submittedEntry]="entry">
+</app-submitted-entry>

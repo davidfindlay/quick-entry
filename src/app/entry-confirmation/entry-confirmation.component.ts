@@ -70,9 +70,18 @@ export class EntryConfirmationComponent implements OnInit {
   medicalCertificate = 'No';
   medicalCondition = 'No';
 
+  mealName = 'Meal';
+  mealsQuantity = 0;
+  mealSubtotal = 0;
+
+  merchandiseOrders = [];
+
   meetFee = 0;
   eventFee = 0;
+  mealFee = 0;
   totalFee = 0;
+
+  previousScreen = '/enter/' + this.meet_id + '/step4';
 
   showPaymentChoice = true;
 
@@ -98,7 +107,6 @@ export class EntryConfirmationComponent implements OnInit {
     this.pending_entry_code = this.route.snapshot.paramMap.get('pendingId');
     this.meet_entry_code = this.route.snapshot.paramMap.get('entryId');
 
-    console.log(this.meet_id);
     console.log(this.pending_entry_code);
     console.log(this.meet_entry_code);
 
@@ -111,54 +119,64 @@ export class EntryConfirmationComponent implements OnInit {
       this.meetName = this.meet.meetname;
       this.entryService.getIncompleteEntryFO(this.meet_id).subscribe((entry: EntryFormObject) => {
         this.entry = entry;
-        console.log(this.entry);
         if (this.entry !== undefined && this.entry !== null) {
           this.paidAmount = parseFloat(this.entry.edit_paid);
           this.loadEntry();
+        } else {
+          console.error('Unable to get entry via getIncompleteEntryFO');
         }
       });
 
     } else if (this.pending_entry_code !== undefined && this.pending_entry_code !== null && this.pending_entry_code !== 0) {
       this.entryService.getPendingEntry(this.pending_entry_code).subscribe((entry: IncompleteEntry) => {
-        console.log(entry);
-        this.meet = this.meetService.getMeet(entry.meet_id);
-        this.meetName = this.meet.meetname;
-        this.entry = entry.entrydata;
-        this.statusLabel = entry.status_label;
-        this.statusText = entry.status_description;
-        if (this.entry.paymentDetails !== undefined && this.entry.paymentDetails !== null) {
-          this.paidAmount = parseFloat(this.entry.paymentDetails.amount);
+
+        if (entry !== undefined && entry !== null) {
+
+          this.entry = entry.entrydata;
+
+          this.meet = this.meetService.getMeet(entry.meet_id);
+          this.meetName = this.meet.meetname;
+          this.statusLabel = entry.status_label;
+          this.statusText = entry.status_description;
+          if (this.entry.paymentDetails !== undefined && this.entry.paymentDetails !== null) {
+            this.paidAmount = parseFloat(this.entry.paymentDetails.amount);
+          } else {
+            this.paidAmount = parseFloat(this.entry.edit_paid);
+          }
+          console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
+          if (this.paidAmount >= this.meet.meetfee) {
+            this.showPaymentChoice = false;
+            this.workflowNav.enableFinishButton();
+          } else {
+            this.workflowNav.disableBack();
+            this.workflowNav.disableCancel();
+          }
+          this.loadEntry();
         } else {
-          this.paidAmount = parseFloat(this.entry.edit_paid);
+          console.error('Unable to get entry via getPendingEntry');
         }
-        console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
-        if (this.paidAmount >= this.meet.meetfee) {
-          this.showPaymentChoice = false;
-          this.workflowNav.enableFinishButton();
-        } else {
-          this.workflowNav.disableBack();
-          this.workflowNav.disableCancel();
-        }
-        this.loadEntry();
       });
     } else if (this.meet_entry_code !== undefined && this.meet_entry_code !== null && this.meet_entry_code !== 0) {
       this.entryService.getMeetEntryByCodeFO(this.meet_entry_code).subscribe((entry: IncompleteEntry) => {
-        console.log(entry);
-        this.meet = this.meetService.getMeet(entry.meet_id);
-        this.meetName = this.meet.meetname;
-        this.entry = entry.entrydata;
-        this.statusLabel = entry.status_label;
-        this.statusText = entry.status_description;
-        this.paidAmount = entry.paid_amount;
-        console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
-        if (this.paidAmount === this.meet.meetfee) {
-          this.showPaymentChoice = false;
-          this.workflowNav.enableFinishButton();
+        if (entry !== undefined && entry !== null) {
+          this.meet = this.meetService.getMeet(entry.meet_id);
+          this.meetName = this.meet.meetname;
+          this.entry = entry.entrydata;
+          this.statusLabel = entry.status_label;
+          this.statusText = entry.status_description;
+          this.paidAmount = entry.paid_amount;
+          console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
+          if (this.paidAmount >= this.meet.meetfee) {
+            this.showPaymentChoice = false;
+            this.workflowNav.enableFinishButton();
+          } else {
+            this.workflowNav.disableBack();
+            this.workflowNav.disableCancel();
+          }
+          this.loadEntry();
         } else {
-          this.workflowNav.disableBack();
-          this.workflowNav.disableCancel();
+          console.error('Unable to get entry via getMeetEntryByCodeFO');
         }
-        this.loadEntry();
       });
     }
 
@@ -183,40 +201,85 @@ export class EntryConfirmationComponent implements OnInit {
       this.formValidSubject.next(false);
     }
 
-    switch (this.entry.membershipDetails.member_type) {
-      case 'msa':
-        this.membershipType = 'Masters Swimming Australia member';
-        break;
-      case 'international':
-        this.membershipType = 'International Masters Swimming member';
-        break;
-      case 'guest':
-        this.membershipType = 'Guest swimmer';
-        break;
-      case 'non_member':
-        this.membershipType = 'Non-member';
-        break;
+    if (this.entry.membershipDetails !== undefined && this.entry.membershipDetails !== null) {
+      switch (this.entry.membershipDetails.member_type) {
+        case 'msa':
+          this.membershipType = 'Masters Swimming Australia member';
+          break;
+        case 'international':
+          this.membershipType = 'International Masters Swimming member';
+          break;
+        case 'guest':
+          this.membershipType = 'Guest swimmer';
+          break;
+        case 'non_member':
+          this.membershipType = 'Non-member';
+          break;
+      }
     }
 
-    if (this.entry.medicalDetails.classification !== 'no') {
-      this.disabilityClassificationRequired = this.entry.medicalDetails.classification;
-    }
+    if (this.entry.medicalDetails !== undefined && this.entry.medicalDetails !== null) {
+      if (this.entry.medicalDetails.classification !== 'no') {
+        this.disabilityClassificationRequired = this.entry.medicalDetails.classification;
+      }
 
-    if (this.entry.medicalDetails.dispensation === 'true') {
-      this.strokeDispensationRequired = 'Yes';
-    }
+      if (this.entry.medicalDetails.dispensation === 'true') {
+        this.strokeDispensationRequired = 'Yes';
+      }
 
-    if (this.entry.medicalDetails.medicalCertificate === 'true') {
-      this.medicalCertificate = 'Yes';
-    }
+      if (this.entry.medicalDetails.medicalCertificate === 'true') {
+        this.medicalCertificate = 'Yes';
+      }
 
-    if (this.entry.medicalDetails.medicalCondition === 'true') {
-      this.medicalCondition = 'Yes';
+      if (this.entry.medicalDetails.medicalCondition === 'true') {
+        this.medicalCondition = 'Yes';
+      }
     }
 
     this.meetFee = this.entryService.getMeetFee(this.entry);
     this.eventFee = this.entryService.getEventFees(this.entry);
-    this.totalFee = this.meetFee + this.eventFee;
+
+    if (this.meet.mealfee !== null && this.meet.mealfee !== 0) {
+      this.mealFee = this.entryService.getMealFees(this.entry);
+    } else {
+      this.mealFee = 0;
+    }
+
+
+
+    if (this.meet.mealname !== null && this.meet.mealname !== '') {
+      this.mealName = this.meet.mealname;
+    }
+
+    if (this.meet.mealfee !== null) {
+      this.previousScreen = '/enter/' + this.meet_id + '/merchandise';
+    }
+
+    let merchandiseTotal = 0;
+
+    if (this.entry.mealMerchandiseDetails !== undefined && this.entry.mealMerchandiseDetails !== null) {
+      this.mealsQuantity = this.entry.mealMerchandiseDetails.meals;
+
+      if (this.entry.mealMerchandiseDetails.merchandiseItems !== undefined && this.entry.mealMerchandiseDetails.merchandiseItems !== null) {
+        for (let x = 0; x < this.entry.mealMerchandiseDetails.merchandiseItems.length; x++) {
+          const merchandiseItem = this.meet.merchandise.filter(m => m.id === this.entry.mealMerchandiseDetails.merchandiseItems[x].merchandiseId);
+          if (merchandiseItem.length > 0) {
+            const total = parseInt(this.entry.mealMerchandiseDetails.merchandiseItems[x].qty, 10) * parseFloat(merchandiseItem[0].total_price);
+
+            this.merchandiseOrders.push({
+              qty: this.entry.mealMerchandiseDetails.merchandiseItems[x].qty,
+              item_name: merchandiseItem[0].item_name,
+              each: merchandiseItem[0].total_price,
+              subtotal: total
+            });
+
+            merchandiseTotal += total;
+          }
+        }
+      }
+    }
+
+    this.totalFee = this.meetFee + this.eventFee + this.mealFee + merchandiseTotal;
 
     this.ngxSpinner.hide();
 
@@ -240,7 +303,6 @@ export class EntryConfirmationComponent implements OnInit {
         this.entryService.deleteEntry(this.meet_id);
         break;
       case 'saveAndExit':
-        this.saveEntry();
         break;
       case 'submit':
         this.saveEntry().subscribe((saved: any) => {
@@ -380,7 +442,7 @@ export class EntryConfirmationComponent implements OnInit {
     }
 
     const meetPaymentTypes = this.meet.payment_types;
-    if (meetPaymentTypes === undefined && meetPaymentTypes === null) {
+    if (meetPaymentTypes === undefined || meetPaymentTypes === null) {
       return false;
     }
 
@@ -391,6 +453,16 @@ export class EntryConfirmationComponent implements OnInit {
     }
 
     return false;
+  }
+
+  enablePayLater() {
+    const meetPaymentTypes = this.meet.payment_types;
+    if (meetPaymentTypes === undefined || meetPaymentTypes === null || meetPaymentTypes.length === 0) {
+      this.paymentOptionForm.patchValue({
+        paymentOption: 'later'
+      });
+      return true;
+    }
   }
 
   getLegs(event_id) {

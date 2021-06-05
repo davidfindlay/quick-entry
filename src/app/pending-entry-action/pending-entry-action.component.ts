@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {ApplicationRef, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {Meet} from '../models/meet';
 import {EntryEvent} from '../models/entryevent';
 import {EntryService} from '../entry.service';
@@ -8,6 +8,10 @@ import {MemberService} from '../member.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {FormBuilder} from '@angular/forms';
 import {ClubsService} from '../clubs.service';
+import {Observable} from 'rxjs';
+import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
+import {Alert} from '../models/alert';
+import {NgxSpinnerService} from 'ngx-spinner';
 
 @Component({
   selector: 'app-pending-entry-action',
@@ -17,6 +21,7 @@ import {ClubsService} from '../clubs.service';
 export class PendingEntryActionComponent implements OnInit {
 
   @ViewChild('deleteConfirm', {static: true}) deleteConfirm: ElementRef;
+  @ViewChild('emailConfirm', {static: true}) emailConfirm: ElementRef;
 
   meet_id;
   meet: Meet;
@@ -54,8 +59,19 @@ export class PendingEntryActionComponent implements OnInit {
   clubName = '';
   clubCode = '';
 
+  mealName = '';
+
   editing = false;
   pendingActionForm;
+
+  alerts: Alert[];
+
+  clubSearch = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map(term => term.length < 2 ? [] : this.clubService.findClubName(term))
+    );
 
   constructor(private entryService: EntryService,
               private meetService: MeetService,
@@ -64,7 +80,11 @@ export class PendingEntryActionComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router,
               private modalService: NgbModal,
-              private fb: FormBuilder) { }
+              private fb: FormBuilder,
+              private cdref: ChangeDetectorRef,
+              private appref: ApplicationRef,
+              private spinner: NgxSpinnerService) {
+  }
 
   ngOnInit() {
 
@@ -74,13 +94,16 @@ export class PendingEntryActionComponent implements OnInit {
       entrantDob: '',
       entrantGender: '',
       entrantNumber: '',
-      entrantClub: ''
+      entrantClub: '',
+      entrantClubCode: ''
     });
 
     this.pendingEntryCode = this.route.snapshot.paramMap.get('pendingId');
     this.entryService.getPendingEntry(this.pendingEntryCode).subscribe((entry: any) => {
       this.loadEntry(entry);
     });
+
+    this.resetAlerts();
   }
 
   loadEntry(entry) {
@@ -103,6 +126,10 @@ export class PendingEntryActionComponent implements OnInit {
     this.updated_at = entry.updated_at;
     this.finalised_at = entry.finalised_at;
 
+    if (this.meet.mealname !== null && this.meet.mealname !== '') {
+      this.mealName = this.meet.mealname;
+    }
+
     if (this.entry.membershipDetails.club_selector !== '') {
       const club = this.clubService.getClubById(parseInt(this.entry.membershipDetails.club_selector, 10));
       if (club !== null) {
@@ -113,6 +140,9 @@ export class PendingEntryActionComponent implements OnInit {
       this.clubCode = this.entry.membershipDetails.club_code;
       this.clubName = this.entry.membershipDetails.club_name;
     }
+
+    // Update the Membership Type field
+    this.updateMembershipType();
 
     if (this.entry.membershipDetails.member_number !== null && this.entry.membershipDetails.member_number !== '') {
       this.memberService.getMemberByNumber(this.entry.membershipDetails.member_number).subscribe((member: any) => {
@@ -154,7 +184,7 @@ export class PendingEntryActionComponent implements OnInit {
   toTitleCase(str: string) {
     return str.replace(
       /\w\S*/g,
-      function(txt) {
+      function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
@@ -182,6 +212,32 @@ export class PendingEntryActionComponent implements OnInit {
     }
 
     return '';
+  }
+
+  updateMembershipType() {
+    if (this.entry.membershipDetails.member_type !== undefined && this.entry.membershipDetails.member_type !== null) {
+      switch (this.entry.membershipDetails.member_type) {
+        case 'msa': {
+          this.membershipType = 'Masters Swimming Australia Member';
+          break;
+        }
+        case 'international': {
+          this.membershipType = 'International Masters Swimming Member';
+          break;
+        }
+        case 'guest': {
+          this.membershipType = 'Guest Member';
+          break;
+        }
+        case 'non_member': {
+          this.membershipType = 'Non-Member';
+          break;
+        }
+        default : {
+          this.membershipType = 'Unknown membership type';
+        }
+      }
+    }
   }
 
   approve() {
@@ -224,7 +280,9 @@ export class PendingEntryActionComponent implements OnInit {
       entrantFirstName: this.entry.entrantDetails.entrantFirstName,
       entrantGender: this.entry.entrantDetails.entrantGender,
       entrantDob: this.entry.entrantDetails.entrantDob,
-      entrantNumber: this.entry.membershipDetails.member_number
+      entrantNumber: this.entry.membershipDetails.member_number,
+      entrantClub: this.entry.membershipDetails.club_name,
+      entrantClubCode: this.entry.membershipDetails.club_code
     });
 
     this.editing = true;
@@ -239,6 +297,8 @@ export class PendingEntryActionComponent implements OnInit {
     this.entry.entrantDetails.entrantGender = this.pendingActionForm.controls['entrantGender'].value;
     this.entry.entrantDetails.entrantDob = this.pendingActionForm.controls['entrantDob'].value;
     this.entry.membershipDetails.member_number = this.pendingActionForm.controls['entrantNumber'].value;
+    this.entry.membershipDetails.club_name = this.pendingActionForm.controls['entrantClub'].value;
+    this.entry.membershipDetails.club_code = this.pendingActionForm.controls['entrantClubCode'].value;
     this.entryService.updatePending(this.pendingEntryCode, this.incompleteEntry).subscribe((entry) => {
       this.loadEntry(entry);
     });
@@ -246,5 +306,89 @@ export class PendingEntryActionComponent implements OnInit {
 
   cancel() {
     this.editing = false;
+  }
+
+  clubSelected($event) {
+    let clubcode = '';
+    const clubs = this.clubService.findClub($event.item);
+
+    if (clubs != null) {
+      if (clubs.length > 0) {
+        clubcode = clubs[0].code;
+      }
+    }
+
+    this.pendingActionForm.controls['entrantClubCode'].patchValue(clubcode, {});
+  }
+
+  createEventMembership() {
+    console.log('Create Event Membership');
+    this.memberService.createMember({
+      surname: this.entry.entrantDetails.entrantSurname,
+      firstname: this.entry.entrantDetails.entrantFirstName,
+      dob: this.entry.entrantDetails.entrantDob,
+      gender: this.entry.entrantDetails.entrantGender,
+      number: this.entry.membershipDetails.member_number,
+      email: this.entry.entrantDetails.entrantEmail,
+      phone: this.entry.entrantDetails.entrantPhone,
+      club: this.entry.membershipDetails.club_code,
+      membershipType: 'Event Membership',
+      membershipStatus: 'Guest',
+      startdate: this.meet.startdate,
+      enddate: this.meet.enddate
+    }).subscribe((updates: any) => {
+      console.log(updates);
+      const memberNumber = updates.member.number;
+      this.pendingActionForm.patchValue({
+        entrantNumber: memberNumber
+      });
+      this.entry.membershipDetails.member_number = memberNumber;
+
+      this.entryService.updatePending(this.pendingEntryCode, this.incompleteEntry).subscribe((entry) => {
+        this.loadEntry(entry);
+      });
+    })
+  }
+
+  resendEmail() {
+    this.modalService.open(this.emailConfirm).result.then((approved: any) => {
+      if (approved === 'Yes') {
+        this.spinner.show();
+        console.log('resendEmail: Yes');
+        this.entryService.sendPendingEmailConfirmation(this.pendingEntryId).subscribe((response: any) => {
+          if (response.success) {
+            this.alerts.push({
+              type: 'success',
+              message: response.message
+            });
+          } else {
+            this.alerts.push({
+              type: 'danger',
+              message: response.message
+            });
+          }
+          this.spinner.hide();
+
+        }, (error) => {
+          this.alerts.push({
+            type: 'danger',
+            message: 'Unable to send confirmation email for unknown reason. Please contact the system administrator. '
+          });
+          this.spinner.hide();
+        });
+      }
+
+    }, (error: any) => {
+      console.log(error);
+    });
+    this.appref.tick();
+  }
+
+  resetAlerts() {
+    this.alerts = [];
+  }
+
+  closeAlert(alert: Alert) {
+    this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
 }

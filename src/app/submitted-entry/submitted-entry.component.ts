@@ -9,6 +9,7 @@ import {MeetService} from '../meet.service';
 import {PaypalService} from '../paypal/paypal.service';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {UserService} from '../user.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-submitted-entry',
@@ -19,6 +20,7 @@ export class SubmittedEntryComponent implements OnInit {
 
   @Input() meet: Meet;
   @Input() submittedEntry: MeetEntry;
+  @Input() meetTitle: boolean;
 
   paymentOwed = false;
   paymentAmountOwed = 0;
@@ -41,9 +43,16 @@ export class SubmittedEntryComponent implements OnInit {
       this.loggedIn = true;
     }
 
+    // console.log(this.submittedEntry);
+
+    if (this.submittedEntry.meet !== undefined && this.submittedEntry.meet !== null) {
+      this.meet = this.submittedEntry.meet;
+    }
+
     if (this.submittedEntry.events !== undefined && this.submittedEntry.events !== null) {
       if (this.submittedEntry.events.length > 0) {
         for (const eventEntry of this.submittedEntry.events) {
+          // console.log(eventEntry);
           this.eventRows.push({
             progNumber: this.getEventProgramNo(eventEntry.event_id),
             progSuffix: this.getEventProgramNoSuffix(eventEntry.event_id),
@@ -113,10 +122,21 @@ export class SubmittedEntryComponent implements OnInit {
     if (this.meet.events !== undefined && this.meet.events !== null) {
       const event = this.meet.events.filter(x => x.id === eventId);
       if (event.length === 1) {
-        let eventDetails = event[0].event_distance.distance + ' ' + event[0].event_discipline.discipline;
+
+        let relayText = '';
+        if (event[0].legs > 1) {
+          relayText = event[0].legs + 'x';
+        }
+
+        let eventDetails = relayText + event[0].event_distance.distance + ' ' + event[0].event_discipline.discipline;
         if (event[0].eventname !== null && event[0].eventname !== '') {
           eventDetails = event[0].eventname + ': ' + eventDetails;
         }
+
+        if (relayText !== '') {
+          eventDetails = eventDetails + ' (Requested nomination)';
+        }
+
         return eventDetails;
       } else {
         console.log('Event ' + eventId + ' not found.');
@@ -142,7 +162,12 @@ export class SubmittedEntryComponent implements OnInit {
 
   editSubmittedEntry(submittedEntry) {
     this.entryService.editSubmittedEntry(submittedEntry.code).subscribe((edit: any) => {
-      this.router.navigate(['/', 'enter', edit.meet_id, 'step1'])
+      // TODO: if logged in go to step 2
+      if (this.loggedIn) {
+        this.router.navigate(['/', 'enter', edit.meet_id, 'step2'])
+      } else {
+        this.router.navigate(['/', 'enter', edit.meet_id, 'step1'])
+      }
     });
   }
 
@@ -168,6 +193,26 @@ export class SubmittedEntryComponent implements OnInit {
 
       this.spinner.hide();
     });
+  }
+
+  // Returns pretty formatted date of meet
+  getMeetDates(): string {
+
+    let formattedDate = '';
+    const startdate = '';
+    const enddate = '';
+
+    if (startdate === enddate) {
+      formattedDate = moment(this.meet.startdate).format('dddd') + ' ' + moment(this.meet.startdate).format('LL');
+    } else {
+      formattedDate = moment(this.meet.startdate).format('dddd') + ' '
+        + moment(this.meet.startdate).format('LL') + ' to '
+        + moment(this.meet.enddate).format('dddd') + ' '
+        + moment(this.meet.enddate).format('LL');
+    }
+
+    return (formattedDate);
+
   }
 
 }

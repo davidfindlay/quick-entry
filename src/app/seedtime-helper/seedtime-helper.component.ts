@@ -23,6 +23,9 @@ export class SeedtimeHelperComponent implements OnInit {
 
   @Input() timeIn: number;
 
+  @Input() inHideHistory: Observable<boolean>;
+  public hideHistory: boolean;
+
   @Output() timeEntered = new EventEmitter();
 
   // @ViewChild(DatatableComponent) pbTable: DatatableComponent;
@@ -88,11 +91,14 @@ export class SeedtimeHelperComponent implements OnInit {
       discipline: this.inDiscipline,
       course: this.inCourse,
       freetime: this.inFreetime
+      // hideHistory: this.inHideHistory
     }).subscribe((eventDetails) => {
+      console.log(eventDetails);
       this.distance = eventDetails.distance;
       this.discipline = eventDetails.discipline;
       this.course = eventDetails.course;
       this.freetime = eventDetails.freetime;
+      // this.hideHistory = eventDetails.hideHistory;
       this.shouldShowHours();
 
       this.memberHistoryService.getPersonalBest(this.memberNo, this.distance, this.discipline, this.course).subscribe((pbs) => {
@@ -108,7 +114,7 @@ export class SeedtimeHelperComponent implements OnInit {
         }
       });
 
-    });
+    }, (error) => console.error(error));
 
     this.seedTimeForm.valueChanges.subscribe((inputData) => {
       const hours = parseInt(inputData.hours, 10) || 0;

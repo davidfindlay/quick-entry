@@ -1,4 +1,8 @@
-<div class="card">
+<p>
+  <a [routerLink]="['/', 'calendar']">Back to Meet Calendar</a>
+</p>
+
+<div class="card" *ngIf="meet">
   <div class="card-header">
     <h2 class="card-title">
       {{meet.meetname}}
@@ -8,7 +12,39 @@
     </div>
   </div>
   <div class="card-body">
-    <div class="location">
+    <div class="row">
+    <div class="meetfees col-md-6" *ngIf="meet.meetfee">
+      <h3>Entry Fees:</h3>
+      <table border="0">
+        <tr>
+          <th class="tableLabel">Entry Fee:</th>
+          <td>
+            {{meet.meetfee | currency}}
+            <span *ngIf="meet.included_events !== null">
+              includes {{meet.included_events}} individual events
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="meet.included_events !== null">
+          <th class="tableLabel">Additional Individual Events: </th>
+          <td>{{meet.extra_event_fee | currency}}</td>
+        </tr>
+        <tr>
+          <th class="tableLabel">Maximum Individual Events:</th>
+          <td>{{meet.maxevents}} events</td>
+        </tr>
+        <tr *ngIf="meet.mealfee > 0">
+          <th class="tableLabel">{{mealName}} Tickets:</th>
+          <td>
+            {{(meet.mealsincluded > 0) ? 'Entry Fee includes ' + meet.mealsincluded + ' tickets. Additional ticket fee: ' : ''}}
+            {{meet.mealfee | currency}}
+          </td>
+        </tr>
+
+      </table>
+    </div>
+
+    <div class="location col-md-6" *ngIf="meet.location">
       <h3>Location:</h3>
       <p>
         <a href="https://maps.google.com/?q={{meet.location}}" target="_blank">{{meet.location}}
@@ -16,50 +52,62 @@
       </p>
     </div>
 
-    <div class="contact">
+    <div class="contact col-md-6" *ngIf="meet.contactname && meet.contactname !== ''">
       <h3>Contact Details:</h3>
       <table>
         <tr>
-          <th>Name: </th>
+          <th class="tableLabel">Name: </th>
           <td>{{meet.contactname}}</td>
         </tr>
         <tr>
-          <th>Phone: </th>
+          <th class="tableLabel">Phone: </th>
           <td><a href="tel:{{meet.phone.phonenumber}}" *ngIf="meet.phone !== undefined && meet.phone !== null">{{meet.phone.phonenumber}}</a></td>
         </tr>
         <tr>
-          <th>Email: </th>
+          <th class="tableLabel">Email: </th>
           <td><a href="mailto:{{meet.email.address}}" *ngIf="meet.email !== undefined && meet.email !== null">{{meet.email.address}}</a></td>
         </tr>
       </table>
     </div>
+    </div>
 
-    <div class="card" *ngIf="!isOpen()">
+    <div class="card bg-info text-white" *ngIf="!meet.contactname">
+      <div class="card-header">
+        <h3 class="card-title">
+        Please check back later
+        </h3>
+      </div>
+      <div class="card-body">
+        <p class="card-text">Details of this meet have not yet been provided. Please check back later.</p>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="meet.deadline && !isOpen()">
       This meet is not yet open. Please try again later.
     </div>
 
-    <div class="mt-3" *ngIf="submittedEntries.length > 0 || incompleteEntries.length > 0">
-      <h3>Submitted Entries:</h3>
+    <div *ngIf="loggedIn">
+      <div class="mt-3" *ngIf="submittedEntries.length > 0 || incompleteEntries.length > 0 || pendingEntries.length > 0">
+        <h3>Submitted Entries:</h3>
 
-      <app-pending-entry *ngFor="let pendingEntry of pendingEntries"
-                         [meet]="meet"
-                         [incompleteEntry]="pendingEntry">
-      </app-pending-entry>
-
-      <app-submitted-entry *ngFor="let submittedEntry of submittedEntries"
+        <app-pending-entry *ngFor="let pendingEntry of pendingEntries"
                            [meet]="meet"
-                           [submittedEntry]="submittedEntry">
-      </app-submitted-entry>
+                           [incompleteEntry]="pendingEntry">
+        </app-pending-entry>
+
+        <app-submitted-entry *ngFor="let submittedEntry of submittedEntries"
+                             [meet]="meet"
+                             [submittedEntry]="submittedEntry">
+        </app-submitted-entry>
+      </div>
     </div>
 
-    <div class="mt-3">
-      <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && !hasEntry">Enter Meet</button>
-      <button type="button" class="btn btn-warning mr-1" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry">Resume Incomplete Entry</button>
-      <button type="button" class="btn btn-danger" (click)="cancelExistingEntry()" *ngIf="isOpen() && hasEntry">Cancel Incomplete Entry</button>
-    </div>
+    <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && !hasEntry">Enter Meet</button>
+    <button type="button" class="btn btn-warning mr-1" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry">Resume Incomplete Entry</button>
+    <button type="button" class="btn btn-danger" (click)="cancelExistingEntry()" *ngIf="isOpen() && hasEntry">Cancel Incomplete Entry</button>
 
   </div>
-  <div class="card-footer">
+  <div class="card-footer" *ngIf="meet.deadline">
     <span *ngIf="isOpen()">
       Closes {{getMeetDeadline()}}
     </span>

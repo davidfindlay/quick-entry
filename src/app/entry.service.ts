@@ -18,6 +18,12 @@ import {EntrantDetails} from './models/entrant-details';
 import {of} from 'rxjs/internal/observable/of';
 import {map} from 'rxjs/operators';
 import {angularInnerClassDecoratorKeys} from 'codelyzer/util/utils';
+import {EntryPaymentComponent} from './entry-payment/entry-payment.component';
+import {EntryPayment} from './models/entry-payment';
+import {MealMerchandiseDetails} from './models/meal-merchandise-details';
+import {MerchandiseDetails} from './models/merchandise';
+import * as moment from 'moment';
+import {MeetEntryPayment} from './models/meet-entry-payment';
 
 @Injectable()
 export class EntryService {
@@ -63,6 +69,13 @@ export class EntryService {
           observer.next(updated);
         });
       } else {
+        // Delete existing entries to prevent duplicates
+        if (this.incompleteEntries === null) {
+          this.incompleteEntries = [];
+        } else {
+          this.incompleteEntries = this.incompleteEntries.filter(x => x.meet_id !== entry.meetId);
+        }
+
         const incompleteEntry = <IncompleteEntry>{
           meet_id: entry.meetId,
           entrydata: entry
@@ -84,12 +97,23 @@ export class EntryService {
         if (this.incompleteEntries !== undefined && this.incompleteEntries !== null && this.incompleteEntries.length === 0) {
           this.http.get(environment.api + 'entry_incomplete').subscribe((incompleteEntries: any) => {
 
-
-            this.incompleteEntries = incompleteEntries;
-            observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+            if (incompleteEntries !== null) {
+              this.incompleteEntries = incompleteEntries;
+              console.log(this.incompleteEntries);
+              observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+            } else {
+              console.error('Unable to retrieve incomplete entries from server');
+            }
+          }, (error: any) => {
+            console.error('Unable to retrieve incomplete enries from server');
+            console.error(error);
           });
         } else {
-          observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+          if (this.incompleteEntries) {
+            observer.next(this.incompleteEntries.find(x => x.meet_id === meetId, 10));
+          } else {
+            observer.next(of(null));
+          }
         }
       } else {
         if (this.incompleteEntries) {
@@ -121,24 +145,37 @@ export class EntryService {
   }
 
   retrieveIncompleteEntries() {
-    this.http.get(environment.api + 'entry_incomplete').subscribe((incomplete: IncompleteEntry[]) => {
-      this.incompleteEntries = incomplete;
-      this.incompleteChanged.next(this.incompleteEntries);
-      this.incompleteEntries = [];
-      this.pendingEntries = [];
+    if (this.userService.isLoggedIn()) {
 
-      for (const incompleteEntry of incomplete) {
-        if (incompleteEntry.status_id === 12) {
-          this.incompleteEntries.push(incompleteEntry);
-        } else {
-          this.pendingEntries.push(incompleteEntry)
+      this.http.get(environment.api + 'entry_incomplete').subscribe((incomplete: IncompleteEntry[]) => {
+        this.incompleteEntries = incomplete;
+        this.incompleteChanged.next(this.incompleteEntries);
+        this.incompleteEntries = [];
+        this.pendingEntries = [];
+
+        for (const incompleteEntry of incomplete) {
+          if (incompleteEntry.status_id === 12) {
+            this.incompleteEntries.push(incompleteEntry);
+          } else {
+            this.pendingEntries.push(incompleteEntry)
+          }
         }
-      }
 
-      console.log('Update incomplete entries');
+        console.log('Update incomplete entries');
+        this.incompleteChanged.next(this.incompleteEntries);
+        this.pendingChanged.next(this.pendingEntries);
+      });
+    } else {
+      const incompleteEntries = JSON.parse(localStorage.getItem('entries'));
+      if (incompleteEntries !== undefined && incompleteEntries !== null) {
+        this.incompleteEntries = incompleteEntries;
+      } else {
+        this.incompleteEntries = [];
+      }
       this.incompleteChanged.next(this.incompleteEntries);
-      this.pendingChanged.next(this.pendingEntries);
-    });
+      console.log('loaded incomplete entries');
+      console.log(this.incompleteEntries);
+    }
   }
 
   getSubmittedEntries(meetId: number) {
@@ -149,7 +186,13 @@ export class EntryService {
   }
 
   retrieveSubmittedEntries() {
+    // TODO: retrieve submitted entries for unauthenticated?
     this.http.get(environment.api + 'meet_entries').subscribe((entries: MeetEntry[]) => {
+      for (const entry of entries) {
+        entry.created_at = moment(entry.created_at).toDate();
+        entry.updated_at = moment(entry.updated_at).toDate();
+      }
+
       this.submittedEntries = entries;
       this.submittedChanged.next(this.submittedEntries);
     });
@@ -198,6 +241,42 @@ export class EntryService {
         } else {
           console.error('Unable to find entry');
         }
+      });
+    });
+  }
+
+  setMealMerchandiseDetails(meetId: number, mealsQuantity: number, mealsComments: string) {
+    return new Observable((observer) => {
+      this.getIncompleteEntryFO(meetId).subscribe((entry: EntryFormObject) => {
+        if (entry !== null) {
+
+          if (entry.mealMerchandiseDetails === undefined || entry.mealMerchandiseDetails === null) {
+            entry.mealMerchandiseDetails = new MealMerchandiseDetails();
+          }
+
+          entry.mealMerchandiseDetails.meals = mealsQuantity;
+          entry.mealMerchandiseDetails.mealComments = mealsComments;
+
+          // If logged in store to server
+          if (this.userService.getUsers() !== null) {
+            console.log('User is logged in, store to server');
+
+            this.storeIncompleteEntry(entry).subscribe((result: any) => {
+              console.log('Stored medical details to server');
+              console.log(result);
+              observer.next(result.entrydata);
+            });
+          } else {
+            this.storeEntries();
+            observer.next(entry);
+          }
+
+          console.log(entry);
+
+        } else {
+          console.error('Unable to find entry');
+        }
+
       });
     });
   }
@@ -283,6 +362,18 @@ export class EntryService {
           classification: null,
           seedtime: null
         });
+
+        // If logged in store to server
+        if (this.userService.getUsers() !== null) {
+          console.log('User is logged in, store to server');
+
+          this.storeIncompleteEntry(entry).subscribe((result) => {
+            console.log(result);
+          });
+        } else {
+          this.storeEntries();
+        }
+
         entry.validEvents = this.validateEntryEvents(entry);
         this.incompleteChanged.next(this.incompleteEntries);
 
@@ -312,7 +403,7 @@ export class EntryService {
         this.incompleteChanged.next(this.incompleteEntries);
 
         // If logged in store to server
-        if (this.authService.isAuthorized()) {
+        if (this.userService.isLoggedIn()) {
           console.log('User is logged in, store to server');
 
           this.storeIncompleteEntry(entry).subscribe((result) => {
@@ -344,7 +435,7 @@ export class EntryService {
 
         // Check that entry is now valid with this seed time change
         entry.validEvents = this.validateEntryEvents(entry);
-        this.storeEntries();
+        this.incompleteChanged.next(this.incompleteEntries);
 
         // If logged in store to server
         if (this.userService.getUsers() !== null) {
@@ -353,6 +444,46 @@ export class EntryService {
           this.storeIncompleteEntry(entry).subscribe((result) => {
             console.log(result);
           });
+        } else {
+          this.storeEntries();
+        }
+      }
+    });
+  }
+
+  updateMerchandiseOrder(merchandise, qty) {
+    this.getIncompleteEntryFO(merchandise.meet_id).subscribe((entry: EntryFormObject) => {
+      if (entry) {
+        if (entry.mealMerchandiseDetails === undefined || entry.mealMerchandiseDetails === null) {
+          entry.mealMerchandiseDetails = new MealMerchandiseDetails();
+        }
+
+        if (entry.mealMerchandiseDetails.merchandiseItems === undefined || entry.mealMerchandiseDetails.merchandiseItems === null) {
+          entry.mealMerchandiseDetails.merchandiseItems = [];
+        }
+
+        // Check if this item is already listed
+        const existingItem = entry.mealMerchandiseDetails.merchandiseItems.filter(x => x.merchandiseId === merchandise.id);
+        console.log(existingItem);
+
+        if (existingItem.length === 0) {
+          const entryItem = new MerchandiseDetails();
+          entryItem.qty = qty;
+          entryItem.merchandiseId = merchandise.id;
+          entry.mealMerchandiseDetails.merchandiseItems.push(entryItem);
+        } else {
+          existingItem[0].qty = qty;
+        }
+
+        // If logged in store to server
+        if (this.userService.getUsers() !== null) {
+          console.log('User is logged in, store to server');
+
+          this.storeIncompleteEntry(entry).subscribe((result) => {
+            console.log(result);
+          });
+        } else {
+          this.storeEntries();
         }
       }
     });
@@ -362,6 +493,12 @@ export class EntryService {
    *  Checks the meet entry complies with the rules
    */
   validateEntryEvents(entryFO: EntryFormObject): boolean {
+
+    if (entryFO === undefined || entryFO === null) {
+      console.log('validateEntryEvents: entryFO is undefined or null');
+
+      return false;
+    }
 
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
 
@@ -394,7 +531,7 @@ export class EntryService {
       return false;
     }
 
-    console.log('validateEntryEvents: valid')
+    console.log('validateEntryEvents: valid');
     return true;
   }
 
@@ -409,18 +546,16 @@ export class EntryService {
   checkForNT(entryFO: EntryFormObject) {
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
 
-    for (const event of meetDetails.events) {
-      if (event.times_required) {
-        for (const eventEntry of entryFO.entryEvents) {
-          if (event.id === eventEntry.event_id) {
-            if (eventEntry.seedtime === 0) {
-              console.log('Event ' + event.prognumber + ' has disallowed 0 seedtime!');
-              return true;
-            }
-          }
+    for (const eventEntry of entryFO.entryEvents) {
+      const meetEvent = meetDetails.events.find(x => x.id === eventEntry.event_id);
+      if (meetEvent.times_required) {
+        if (eventEntry.seedtime === null || eventEntry.seedtime === 0) {
+          console.log('Event ' + meetEvent.prognumber + ' has disallowed 0 seedtime!');
+          return true;
         }
       }
     }
+
     return false;
   }
 
@@ -465,9 +600,12 @@ export class EntryService {
 
   getEventFees(entryFO: EntryFormObject) {
     let entryFee = 0;
+    let individualEvents = 0;
     const meetDetails = this.meetService.getMeet(entryFO.meetId);
     if (meetDetails !== undefined && meetDetails !== null) {
       if (entryFO.entryEvents !== undefined && entryFO.entryEvents !== null) {
+
+        // Handle fees for specific events
         for (const eventEntry of entryFO.entryEvents) {
           const eventDetails = meetDetails.events.find(x => x.id === eventEntry.event_id);
 
@@ -485,13 +623,54 @@ export class EntryService {
             }
           }
         }
+
+        // Handle included events and extra event fee
+        if (meetDetails.included_events !== null) {
+          console.log('included events is ' + meetDetails.included_events);
+          for (const eventEntry of entryFO.entryEvents) {
+            const eventDetails = meetDetails.events.find(x => x.id === eventEntry.event_id);
+
+            // Only charge for individual events, and if there isn't a specific fee for this event
+            if (eventDetails.legs === 1 && (eventDetails.eventfee === null || eventDetails.eventfee === 0)) {
+              individualEvents++;
+              if (individualEvents > meetDetails.included_events) {
+                entryFee += meetDetails.extra_event_fee;
+                console.log('add ' + entryFee);
+              }
+            }
+          }
+        }
+
       }
     }
+
+    console.log('entry fee: ' + entryFee);
+
     return entryFee;
   }
 
+  getMealFees(entryFO: EntryFormObject) {
+    let mealFees = 0;
+    const meetDetails = this.meetService.getMeet(entryFO.meetId);
+    if (meetDetails !== undefined && meetDetails !== null) {
+      if (entryFO.mealMerchandiseDetails !== undefined && entryFO.mealMerchandiseDetails !== null) {
+        if (meetDetails.mealfee !== null) {
+          mealFees = entryFO.mealMerchandiseDetails.meals * meetDetails.mealfee;
+        } else {
+          mealFees = 0;
+        }
+      }
+    }
+
+    return mealFees;
+  }
+
   getEntryCost(entryFO: EntryFormObject) {
-    return this.getMeetFee(entryFO) + this.getEventFees(entryFO);
+    if (entryFO !== undefined && entryFO !== null) {
+      return this.getMeetFee(entryFO) + this.getEventFees(entryFO);
+    } else {
+      console.error('entryFO is undefined or null');
+    }
   }
 
   deleteEntry(meetId: number) {
@@ -511,6 +690,7 @@ export class EntryService {
       this.incompleteEntries = this.incompleteEntries.filter(x => x.meet_id !== meetId);
       // console.log(this.incompleteEntries);
       this.storeEntries();
+      this.incompleteChanged.next(this.incompleteEntries);
     }
   }
 
@@ -674,8 +854,11 @@ export class EntryService {
   }
 
   getMeetEntryByCodeFO(meetEntryCode) {
+    console.log('getMeetEntryByCodeFO');
     return new Observable((observer) => {
       this.http.get(environment.api + 'meet_entry_by_code/' + meetEntryCode).subscribe((entry: any) => {
+
+          console.log(entry);
 
           const incompleteEntry = this.convertMeetEntryToEntryFO(entry);
           observer.next(incompleteEntry);
@@ -706,10 +889,12 @@ export class EntryService {
   convertMeetEntryToEntryFO(entry) {
     console.log('convertMeetEntryToEntryFO');
     if (entry === undefined || entry === null) {
+      console.error('entry is undefined');
       return null;
     }
 
-    if (entry.meet_entry === undefined || entry === null) {
+    if (entry.meet_entry === undefined) {
+      console.error('meet_entry is undefined');
       return null;
     }
 
@@ -720,12 +905,18 @@ export class EntryService {
     const entrantDetailsFO = new EntrantDetails();
     const membershipDetailsFO = new MembershipDetails();
     const medicalDetailsFO = new MedicalDetails();
+    const mealMerchandiseDetailsFO = new MealMerchandiseDetails();
 
     if (meetEntry.member === undefined || meetEntry.member === null) {
       console.log('convertMeetEntryToEntryFO: member is undefined or null');
       console.log(meetEntry);
       return null;
     }
+
+    entryFO.created_at = new Date(meetEntry.created_at);
+    entryFO.updated_at = new Date(meetEntry.updated_at);
+    entryFO.meetEntryId = meetEntry.id;
+    entryFO.incompleteId = meetEntry.incomplete_entry_id
 
     entrantDetailsFO.entrantFirstName = meetEntry.member.firstname;
     entrantDetailsFO.entrantSurname = meetEntry.member.surname;
@@ -777,7 +968,7 @@ export class EntryService {
       medicalDetailsFO.classification = 'classified';
     }
 
-    if (meetEntry.disability_status !== 0) {
+    if (meetEntry.disability_status !== null && meetEntry.disability_status !== 0) {
       if (meetEntry.disability_s.classification !== undefined && meetEntry.disability_s.classification !== null) {
         medicalDetailsFO.classFreestyle = meetEntry.disability_s.classification;
       }
@@ -807,6 +998,25 @@ export class EntryService {
       medicalDetailsFO.medicalCondition = 'false';
     }
 
+    mealMerchandiseDetailsFO.meals = meetEntry.meals;
+    mealMerchandiseDetailsFO.mealComments = meetEntry.mealComments;
+    entryFO.mealMerchandiseDetails = mealMerchandiseDetailsFO;
+
+    // Find merchandise
+    if (entry.merchandise !== undefined && entry.merchandise !== null && entry.merchandise.length > 0) {
+      mealMerchandiseDetailsFO.merchandiseItems = [];
+      for (const order of entry.merchandise) {
+        console.log(order);
+
+        for (const item of order.items) {
+          const merchandiseItem = new MerchandiseDetails();
+          merchandiseItem.qty = item.qty;
+          merchandiseItem.merchandiseId = item.meet_merchandise_id;
+          mealMerchandiseDetailsFO.merchandiseItems.push(merchandiseItem);
+        }
+      }
+    }
+
     medicalDetailsFO.medicalDetails = meetEntry.medical_details;
     entryFO.medicalDetails = medicalDetailsFO;
 
@@ -827,6 +1037,7 @@ export class EntryService {
     }
 
     entryFO.meetId = meetEntry.meet_id;
+    entryFO.code = meetEntry.code;
     entryFO.validEvents = true;
 
     // console.log(entryFO);
@@ -842,14 +1053,30 @@ export class EntryService {
     incompleteEntry.entrydata = entryFO;
     incompleteEntry.meet_id = meetEntry.meet_id;
 
+    console.log(meetEntry);
+
     let paidAmount = 0;
+    const payments = [];
 
     if (meetEntry.payments !== undefined && meetEntry.payments !== null) {
       for (const payment of meetEntry.payments) {
         paidAmount += payment.amount;
+
+        const currentPayment = new MeetEntryPayment();
+        currentPayment.id = payment.id;
+        currentPayment.club_id = payment.club_id;
+        currentPayment.entry_id = payment.entry_id;
+        currentPayment.received = new Date(payment.received);
+        currentPayment.comment = payment.comment;
+        currentPayment.amount = payment.amount;
+        currentPayment.method = payment.method;
+        currentPayment.member_id = payment.member_id;
+
+        payments.push(currentPayment);
       }
     }
-    incompleteEntry.paid_amount = paidAmount;
+    entryFO.paidAmount = paidAmount;
+    entryFO.payments = payments;
 
     console.log(incompleteEntry);
 
@@ -926,4 +1153,11 @@ export class EntryService {
     return this.http.put(environment.api + 'entry_incomplete/' + pendingCode, pendingEntry);
   }
 
+  sendEmailConfirmation(entryId) {
+    return this.http.post(environment.api + 'meet_entry/' + entryId + '/resendConfirmation', {});
+  }
+
+  sendPendingEmailConfirmation(entryId) {
+    return this.http.post(environment.api + 'pending_entry/' + entryId + '/resendConfirmation', {});
+  }
 }

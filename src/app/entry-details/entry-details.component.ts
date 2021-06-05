@@ -31,6 +31,8 @@ export class EntryDetailsComponent implements OnInit {
 
     isAnonymousEntry = true;
 
+    nextScreen;
+
     constructor(private fb: FormBuilder,
                 private route: ActivatedRoute,
                 private router: Router,
@@ -56,15 +58,21 @@ export class EntryDetailsComponent implements OnInit {
           });
         }
 
+        if ((this.meet.mealname !== null && this.meet.mealname !== '') || (this.meet.merchandise && this.meet.merchandise.length > 0)) {
+          this.nextScreen = '/enter/' + this.meet_id + '/merchandise';
+        } else {
+          this.nextScreen = '/enter/' + this.meet_id + '/confirmation';
+        }
+
         this.createForm();
 
         // Monitor changes to the entry
       this.entryService.incompleteChanged.subscribe((entries: IncompleteEntry[]) => {
-        const meetEntry = entries.filter(x => x.meet_id === this.meet_id);
-        if (meetEntry !== null && meetEntry.length === 1) {
-          // console.log('valid events: ');
-          // console.log(meetEntry[0].entrydata.validEvents);
-          this.formValidSubject.next(meetEntry[0].entrydata.validEvents);
+        console.log('incompleteChanges');
+        const meetEntry = entries.find(x => x.meet_id === this.meet_id);
+        if (meetEntry && meetEntry.entrydata) {
+          console.log(meetEntry.entrydata.validEvents);
+          this.formValidSubject.next(meetEntry.entrydata.validEvents);
         }
       });
 

@@ -53,15 +53,58 @@ import { ClubMemberSelectorComponent } from './club-member-selector/club-member-
 
 import * as Sentry from '@sentry/browser';
 import {environment} from '../environments/environment';
+import { MeetEntryContactListComponent } from './meet-entry-contact-list/meet-entry-contact-list.component';
+import { EntryMealsMerchandiseComponent } from './entry-meals-merchandise/entry-meals-merchandise.component';
+import {MeetDashboardComponent} from './meet-organiser/meet-dashboard/meet-dashboard.component';
+import {MeetMerchandiseComponent} from './meet-organiser/meet-merchandise/meet-merchandise.component';
+import {MeetOrganiserModule} from './meet-organiser/meet-organiser.module';
+import {MeetMerchandiseEditComponent} from './meet-organiser/meet-merchandise-edit/meet-merchandise-edit.component';
+import { EntryMerchandiseItemComponent } from './entry-merchandise-item/entry-merchandise-item.component';
+import {MerchandiseOrdersComponent} from './meet-organiser/merchandise-orders/merchandise-orders.component';
+import {MealOrdersComponent} from './meet-organiser/meal-orders/meal-orders.component';
+import {EmergencyContactsComponent} from './meet-organiser/emergency-contacts/emergency-contacts.component';
+import {ContactsComponent} from './meet-organiser/contacts/contacts.component';
+import {PendingEntriesComponent} from './meet-organiser/pending-entries/pending-entries.component';
+import {EntryListComponent} from './meet-organiser/entry-list/entry-list.component';
+import { MeetSelectorComponent } from './meet-selector/meet-selector.component';
+import { PostalTimeEntryComponent } from './postal-time-entry/postal-time-entry.component';
+import { UserListComponent } from './user-list/user-list.component';
+import {NgbdSortableHeader} from './sortable.directive';
+import { UserEditComponent } from './user-edit/user-edit.component';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
+import { RegisterComponent } from './register/register.component';
+import {MeetAdministrationModule} from './meet-administration/meet-administration.module';
+import {SharedModule} from './shared/shared.module';
+import { MeetCalendarComponent } from './meet-calendar/meet-calendar.component';
+import { MyEntriesComponent } from './my-entries/my-entries.component';
+import { ClubEntriesComponent } from './club-entries/club-entries.component';
+import { ClubRelayTeamsComponent } from './club-relay-teams/club-relay-teams.component';
+import {RelayService} from './relay.service';
+import { ClubRelayTeamEditComponent } from './club-relay-team-edit/club-relay-team-edit.component';
+import { ClubRelayStatusComponent } from './club-relay-status/club-relay-status.component';
+import { RelayGuestComponent } from './relay-guest/relay-guest.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
     { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'reset-password/:token', component: PasswordResetComponent },
+  { path: 'my-entries', component: MyEntriesComponent },
+  { path: 'club-entries', component: ClubEntriesComponent },
+  { path: 'club-entries/:clubId', component: ClubEntriesComponent },
+  { path: 'club-entries/:clubId/:meetId', component: ClubEntriesComponent },
+  { path: 'club-relays', component: ClubRelayTeamsComponent },
+  { path: 'club-relays/:clubId', component: ClubRelayTeamsComponent },
+  { path: 'club-relays/:clubId/:meetId', component: ClubRelayTeamsComponent },
+  { path: 'club-relays/:clubId/:meetId/create/:eventId', component: ClubRelayTeamEditComponent },
+  { path: 'club-relays/:clubId/:meetId/:teamId', component: ClubRelayTeamEditComponent },
+  { path: 'meets/:meetId', component: MeetListItemComponent },
   { path: 'enter/:meet', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step1', component: EntrantDetailsComponent },
     { path: 'enter/:meet/step2', component: MembershipClubDetailsComponent},
   { path: 'enter/:meet/step3', component: ClassificationMedicalDetailsComponent},
   { path: 'enter/:meet/step4', component: EntryDetailsComponent},
+  { path: 'enter/:meet/merchandise', component: EntryMealsMerchandiseComponent},
   { path: 'enter/:meet/step5', component: EntryPaymentComponent},
   { path: 'enter/:meet/confirmation', component: EntryConfirmationComponent},
   { path: 'pending-entry-confirmation/:pendingId', component: EntryConfirmationComponent},
@@ -75,6 +118,22 @@ const appRoutes: Routes = [
   { path: 'pending-entries/:meetId', component: PendingEntryListComponent },
   { path: 'pending-entries', component: PendingEntryListComponent },
   { path: 'pending-entry/:pendingId', component: PendingEntryActionComponent },
+  { path: 'entrant-contact-list', component: MeetEntryContactListComponent },
+  { path: 'meet-organiser/:meetId', component: MeetDashboardComponent },
+  { path: 'meet-organiser/:meetId/merchandise', component: MerchandiseOrdersComponent },
+  { path: 'meet-organiser/:meetId/merchandise/items', component: MeetMerchandiseComponent },
+  { path: 'meet-organiser/:meetId/merchandise/items/add', component: MeetMerchandiseEditComponent },
+  { path: 'meet-organiser/:meetId/merchandise/items/:merchandiseId/edit', component: MeetMerchandiseEditComponent },
+  { path: 'meet-organiser/:meetId/meals', component: MealOrdersComponent },
+  { path: 'meet-organiser/:meetId/emergency', component: EmergencyContactsComponent },
+  { path: 'meet-organiser/:meetId/contacts', component: ContactsComponent },
+  { path: 'meet-organiser/:meetId/pending-entries', component: PendingEntriesComponent },
+  { path: 'meet-organiser/:meetId/entry-list', component: EntryListComponent },
+  { path: 'meet-organiser/:meetId/dashboard', component: MeetDashboardComponent },
+  { path: 'user-list', component: UserListComponent },
+  { path: 'user-list/:userId', component: UserEditComponent },
+  { path: 'calendar', component: MeetCalendarComponent },
+  { path: 'guest-relay', component: RelayGuestComponent },
     { path: '**', component: MeetListComponent }
 ];
 
@@ -93,60 +152,82 @@ export class SentryErrorHandler implements ErrorHandler {
 
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        HeaderComponent,
-        MeetListComponent,
-        MeetListItemComponent,
-        EntrantDetailsComponent,
-        EntryDetailsComponent,
-        EntryConfirmComponent,
-        LoginComponent,
-        ConfirmCancelComponent,
-        WorkflowNavComponent,
-        MembershipClubDetailsComponent,
-        ClassificationMedicalDetailsComponent,
-        EntryPaymentComponent,
-        EntryConfirmationComponent,
-        EntryDetailsEventComponent,
-        EventSelectCheckboxComponent,
-        TimePipe,
-        SeedtimeHelperComponent,
-        EntryDetailsTotalsComponent,
-        SubmittedEntryComponent,
-        PendingEntryComponent,
-        SidebarMenuComponent,
-        MyProfileComponent,
-        MeetEntryListComponent,
-        PendingEntryListComponent,
-        PendingEntryActionComponent,
-        MeetEntryActionComponent,
-        ClubMemberSelectorComponent
-    ],
-    entryComponents: [ ConfirmCancelComponent, SeedtimeHelperComponent ],
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    MeetListComponent,
+    MeetListItemComponent,
+    EntrantDetailsComponent,
+    EntryDetailsComponent,
+    EntryConfirmComponent,
+    LoginComponent,
+    ConfirmCancelComponent,
+    WorkflowNavComponent,
+    MembershipClubDetailsComponent,
+    ClassificationMedicalDetailsComponent,
+    EntryPaymentComponent,
+    EntryConfirmationComponent,
+    EntryDetailsEventComponent,
+    EventSelectCheckboxComponent,
+    TimePipe,
+    SeedtimeHelperComponent,
+    EntryDetailsTotalsComponent,
+    SubmittedEntryComponent,
+    PendingEntryComponent,
+    SidebarMenuComponent,
+    MyProfileComponent,
+    MeetEntryListComponent,
+    PendingEntryListComponent,
+    PendingEntryActionComponent,
+    MeetEntryActionComponent,
+    ClubMemberSelectorComponent,
+    MeetEntryContactListComponent,
+    EntryMealsMerchandiseComponent,
+    EntryMerchandiseItemComponent,
+    MeetSelectorComponent,
+    PostalTimeEntryComponent,
+    UserListComponent,
+    NgbdSortableHeader,
+    UserEditComponent,
+    PasswordResetComponent,
+    RegisterComponent,
+    MeetCalendarComponent,
+    MyEntriesComponent,
+    ClubEntriesComponent,
+    ClubRelayTeamsComponent,
+    ClubRelayTeamEditComponent,
+    ClubRelayStatusComponent,
+    RelayGuestComponent
+  ],
+  entryComponents: [ConfirmCancelComponent, SeedtimeHelperComponent, PostalTimeEntryComponent],
   imports: [
     BrowserModule,
     FormsModule,
     FontAwesomeModule,
     ReactiveFormsModule,
-    NgbModule.forRoot(),
+    NgbModule,
     RouterModule.forRoot(appRoutes, {scrollPositionRestoration: 'enabled'}),
     HttpClientModule,
     AuthenticationModule,
     NgxDatatableModule,
     NgxSpinnerModule,
-    PaypalModule
+    PaypalModule,
+    MeetOrganiserModule,
+    MeetAdministrationModule,
+    SharedModule,
+    NgxPayPalModule
   ],
-    providers: [
-        MeetService,
-        UserService,
-        EntryService,
-      TimePipe,
-      MeetEntryStatusService,
-      MemberService,
-      { provide: ErrorHandler, useClass: SentryErrorHandler }
-    ],
-    bootstrap: [AppComponent]
+  providers: [
+    MeetService,
+    UserService,
+    EntryService,
+    TimePipe,
+    MeetEntryStatusService,
+    MemberService,
+    RelayService,
+    {provide: ErrorHandler, useClass: SentryErrorHandler}
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule {
 }

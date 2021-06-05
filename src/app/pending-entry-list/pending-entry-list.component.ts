@@ -17,71 +17,71 @@ export class PendingEntryListComponent implements OnInit {
   @ViewChild('entryTable', {static: true}) table: any;
 
   meets: Meet[];
+  filteredMeets: Meet[];
   meetId: number;
+  years: number[] = [];
+  yearSelected: number;
 
   meetList = [];
 
   entries;
   tableRows = [];
   columns = [
-    { name: 'Entrant' },
-    { name: 'Club' },
-    { name: 'Cost' },
-    { name: 'Paid' },
-    { name: 'Status' },
-    { name: 'Pending Reason'}
+    {name: 'Entrant'},
+    {name: 'Club'},
+    {name: 'Cost'},
+    {name: 'Paid'},
+    {name: 'Status'},
+    {name: 'Pending Reason'}
 
   ];
 
   showFinalised = false;
   showPending = true;
   showIncomplete = false;
+  showCancelled =  false;
+
+  listControl: FormGroup;
+  meetSelectorFormSub;
 
   meetSelectorForm: FormGroup;
-  meetSelectorFormSub;
 
   constructor(private fb: FormBuilder,
               private meetService: MeetService,
               private http: HttpClient,
               private router: Router,
               private route: ActivatedRoute,
-              private spinner: NgxSpinnerService) { }
+              private spinner: NgxSpinnerService) {
+  }
 
   ngOnInit() {
-    this.meets = this.meetService.getMeets();
-
-    for (const meet in this.meets) {
-
-    }
+    this.spinner.show();
 
     this.meetId = parseInt(this.route.snapshot.paramMap.get('meetId'), 10);
-    this.createForm();
     this.loadMeet();
 
     this.route.params.subscribe(
       params => {
+        console.log('load new meet');
         this.meetId = params['meetId'];
         this.loadMeet();
       });
+
+    this.createForm();
+
   }
 
   createForm() {
-    this.meetSelectorForm = this.fb.group({
-      meetYear: [2019, Validators.required],
-      meet: [this.meetId, Validators.required],
+    const dt = new Date();
+    this.listControl = this.fb.group({
       showPending: true,
       showFinalised: false,
-      showIncomplete: false
+      showIncomplete: false,
+      showCancelled: false
     });
 
-    this.meetSelectorFormSub = this.meetSelectorForm.valueChanges.subscribe((change) => {
+    this.meetSelectorFormSub = this.listControl.valueChanges.subscribe((change) => {
       this.spinner.show();
-      if (change.meet !== this.meetId) {
-        this.router.navigate(['/', 'pending-entries', change.meet]);
-        // console.log('Selected meet ' + this.meetId);
-      }
-
-      // console.log(change);
 
       if (change.showPending) {
         this.showPending = true;
@@ -99,6 +99,12 @@ export class PendingEntryListComponent implements OnInit {
         this.showIncomplete = true;
       } else {
         this.showIncomplete = false;
+      }
+
+      if (change.showCancelled) {
+        this.showCancelled = true;
+      } else {
+        this.showCancelled = false;
       }
 
       this.loadMeet();
@@ -131,7 +137,7 @@ export class PendingEntryListComponent implements OnInit {
           'id': entry.id,
           'code': entry.code,
           'Entrant': entry.entrydata.entrantDetails.entrantSurname + ', ' + entry.entrydata.entrantDetails.entrantFirstName,
-          'Club':  club_code,
+          'Club': club_code,
           'clubname': club_name,
           'Status': entry.status.label,
           'Reason': entry.pending_reason,
@@ -156,6 +162,12 @@ export class PendingEntryListComponent implements OnInit {
           }
         }
 
+        if (!this.showCancelled) {
+          if (entry.status_id === 11) {
+            continue;
+          }
+        }
+
         this.tableRows.push(row);
       }
 
@@ -170,6 +182,7 @@ export class PendingEntryListComponent implements OnInit {
   }
 
   actionEntry(pendingId) {
+    console.log('actionEntry: ' + pendingId);
     this.router.navigate(['/', 'pending-entry', pendingId]);
   }
 

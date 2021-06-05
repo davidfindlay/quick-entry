@@ -16,4 +16,12 @@ export class MemberService {
     }
     return this.http.get(environment.api + 'member_by_number/' + memberNumber);
   }
+
+  createMember(memberDetails) {
+    return this.http.post(environment.api + 'members/create', memberDetails);
+  }
+
+  isMeetOrganiser(meetId) {
+
+  }
 }

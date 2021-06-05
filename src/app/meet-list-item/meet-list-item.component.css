@@ -1,3 +1,12 @@
 .card {
     margin-bottom: 1em;
 }
+
+.tableLabel {
+  text-align: right;
+  padding-right: 1em;
+}
+
+.meetfees {
+  margin-bottom: 1em;
+}

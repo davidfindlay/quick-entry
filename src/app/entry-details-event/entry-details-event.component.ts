@@ -55,6 +55,7 @@ export class EntryDetailsEventComponent implements OnInit {
   seedTimeTooShort = false;
   seedTimeTooLong = false;
   seedTimeNT = false;
+  seedTime;
 
   constructor(private fb: FormBuilder,
               private memberHistoryService: MemberHistoryService,
@@ -74,11 +75,14 @@ export class EntryDetailsEventComponent implements OnInit {
 
       if (this.entry !== undefined && this.entry !== null) {
         if (this.entry.entryEvents !== undefined && this.entry.entryEvents !== null) {
-          const currentEvents = this.entry.entryEvents.filter(x => x.event_id === this.meetEvent.id)
+          const currentEvents = this.entry.entryEvents.filter(x => x.event_id === this.meetEvent.id);
           if (currentEvents !== undefined && currentEvents !== null) {
             if (currentEvents.length > 0) {
               const currentEventEntry = currentEvents[0];
+              console.log(currentEventEntry);
               this.showEntered();
+
+
 
               const seedtime = TimeService.formatTime(currentEventEntry.seedtime);
 
@@ -90,7 +94,6 @@ export class EntryDetailsEventComponent implements OnInit {
               if (currentEventEntry.seedtime === 0) {
                 this.seedTimeNT = true;
               }
-
             }
           }
         }
@@ -118,6 +121,9 @@ export class EntryDetailsEventComponent implements OnInit {
               this.eventEntryForm.controls.seedTime.disable();
             }
           }
+        }, (error: any) => {
+          console.error('No entry form object found');
+          console.log(error);
         });
       }
 
@@ -127,6 +133,7 @@ export class EntryDetailsEventComponent implements OnInit {
     this.eventEntryForm.valueChanges.subscribe((entryDetails) => {
       const rawValues = this.eventEntryForm.getRawValue();
       const newSeedTime = TimeService.timeStringToSeconds(rawValues.seedTime);
+      this.seedTime = newSeedTime;
       this.isTimeReasonable(newSeedTime);
       this.entryService.updateEventEntry(this.meetEvent, newSeedTime);
     });
@@ -186,13 +193,15 @@ export class EntryDetailsEventComponent implements OnInit {
   clickMore() {
     const modalRef = this.modalService.open(SeedtimeHelperComponent, {size: 'lg'});
 
-    // console.log(this.meetEvent);
+    console.log(this.meetEvent);
+    console.log(this.memberNo);
 
     modalRef.componentInstance.memberNo = this.memberNo;
     modalRef.componentInstance.inDistance = of(this.meetEvent.event_distance.metres);
     modalRef.componentInstance.inDiscipline = of(this.meetEvent.event_discipline.discipline);
     modalRef.componentInstance.inCourse = of(this.meetEvent.event_distance.course);
     modalRef.componentInstance.inFreetime = of(this.meetEvent.freetime);
+    // modalRef.componentInstance.inHideHistory = of(false);
 
     if (this.eventEntryForm.controls['seedTime'].value !== '') {
       modalRef.componentInstance.timeIn = TimeService.timeStringToSeconds(this.eventEntryForm.controls['seedTime'].value);
@@ -213,6 +222,13 @@ export class EntryDetailsEventComponent implements OnInit {
       if (this.meetEvent.freetime && this.historyAvailable) {
         this.clickPersonalBest();
       }
+
+      if (this.seedTimeMandatory) {
+        if (!this.seedTime || this.seedTime === 0) {
+
+        }
+      }
+
     } else if (this.entered === true) {
       this.entered = false;
       this.enterClass = 'btn btn-outline-primary';

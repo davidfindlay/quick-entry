@@ -1,3 +1,4 @@
+<form [formGroup]="meetActionForm">
 <h1>{{meetName}}</h1>
 <h2>Meet Entry View</h2>
 <!--<div class="card mb-3 bg-info text-white">-->
@@ -14,387 +15,577 @@
 <!--</div>-->
 <div *ngIf="entry !== undefined && entry !== null">
 
-<!--  <div class="card mb-3 bg-danger text-white" *ngIf="existingEntryShow">-->
-<!--    <div class="card-body">-->
-<!--      <p class="card-text">-->
-<!--        The member number provided with the pending entry already has approved Meet Entries. Please check these before-->
-<!--        approving or deleting this pending entry.-->
-<!--      </p>-->
-<!--      <p class="card-text">-->
-<!--        <strong>Existing Entries:</strong>-->
-<!--      </p>-->
-<!--      <ul>-->
-<!--        <li *ngFor="let existingEntry of existingEntries">-->
-<!--          <a routerLink="/meet-entry/{{existingEntry.id}}">-->
-<!--            Entry #{{existingEntry.id}}-->
-<!--          </a>-->
-<!--          - Last Updated {{existingEntry.updated_at | date: 'short'}}-->
-<!--        </li>-->
-<!--      </ul>-->
-<!--    </div>-->
-<!--  </div>-->
+  <!--  <div class="card mb-3 bg-danger text-white" *ngIf="existingEntryShow">-->
+  <!--    <div class="card-body">-->
+  <!--      <p class="card-text">-->
+  <!--        The member number provided with the pending entry already has approved Meet Entries. Please check these before-->
+  <!--        approving or deleting this pending entry.-->
+  <!--      </p>-->
+  <!--      <p class="card-text">-->
+  <!--        <strong>Existing Entries:</strong>-->
+  <!--      </p>-->
+  <!--      <ul>-->
+  <!--        <li *ngFor="let existingEntry of existingEntries">-->
+  <!--          <a routerLink="/meet-entry/{{existingEntry.id}}">-->
+  <!--            Entry #{{existingEntry.id}}-->
+  <!--          </a>-->
+  <!--          - Last Updated {{existingEntry.updated_at | date: 'short'}}-->
+  <!--        </li>-->
+  <!--      </ul>-->
+  <!--    </div>-->
+  <!--  </div>-->
 
-<!--  <div class="row">-->
-<!--    <div class="col-xs-12">-->
-<!--      <button class="btn btn-success" [disabled]="!canBeActioned" (click)="approve()" *ngIf="!editing">Approve</button>-->
-<!--&lt;!&ndash;      <button class="btn btn-primary" (click)="edit()" *ngIf="!editing">Edit</button>&ndash;&gt;-->
-<!--      <button class="btn btn-success" (click)="update()" *ngIf="editing">Update</button>-->
-<!--      <button class="btn btn-danger" (click)="cancel()" *ngIf="editing">Cancel</button>-->
-<!--      <button class="btn btn-warning" (click)="delete()" *ngIf="!editing">Delete</button>-->
-<!--    </div>-->
-<!--  </div>-->
+  <div class="row">
+    <div class="col-xs-12">
+      <!--      <button class="btn btn-success" [disabled]="!canBeActioned" (click)="approve()" *ngIf="!editing">Approve</button>-->
+      <button class="btn btn-primary" (click)="edit()" *ngIf="!editing">Edit</button>
+      <button class="btn btn-success" (click)="update()" *ngIf="editing">Update</button>
+      <button class="btn btn-danger" (click)="cancel()" *ngIf="editing">Cancel</button>
+      <button class="btn btn-warning" (click)="cancelEntry()">Cancel Entry</button>
+      <button class="btn btn-primary" (click)="resendEmail()">Resend Confirmation Email</button>
+    </div>
+  </div>
 
-  <form [formGroup]="meetActionForm">
+  <p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
 
-    <div class="confirmationSection">
-      <h3>Meet Entry Details</h3>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Meet Entry ID:
+    <div class="card mb-1">
+      <div class="card-header">
+        <h3>Meet Entry Details</h3>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Meet Entry ID:
+          </div>
+          <div class="fieldValue">
+            {{meetEntryId}}
+          </div>
         </div>
-        <div class="fieldValue">
-          {{meetEntryId}}
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Entry Code:
+          </div>
+          <div class="fieldValue">
+              {{entry.code}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Entry Status:
+          </div>
+          <div class="fieldValue">
+            {{statusLabel}}: {{statusText}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Created Date/Time:
+          </div>
+          <div class="fieldValue">
+            {{created_at | date: 'd/M/yyyy h:mm:ss a'}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Last Updated Date/Time:
+          </div>
+          <div class="fieldValue">
+            {{updated_at  | date: 'd/M/yyyy h:mm:ss a'}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Incomplete Entry ID:
+          </div>
+          <div class="fieldValue">
+            <a href="/pending-entry/{{entry.code}}">
+              {{entry.incompleteId}}
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="row mb-1">
+      <div class="col-sm-12 col-md-6">
+        <div class="card" *ngIf="entry !== undefined && entry !== null">
+          <div class="card-header">
+            <h3>Entrant Details</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Name:
+              </div>
+              <div class="fieldValue">
+                {{entry.entrantDetails.entrantSurname}}, {{entry.entrantDetails.entrantFirstName}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Sex:
+              </div>
+              <div class="fieldValue">
+                {{entry.entrantDetails.entrantGender | titlecase}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Date of Birth:
+              </div>
+              <div class="fieldValue">
+                {{entry.entrantDetails.entrantDob}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Entrant Email:
+              </div>
+              <div class="fieldValue">
+                <a href="mailto:{{entry.entrantDetails.entrantEmail}}">
+                  {{entry.entrantDetails.entrantEmail}}
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Entrant Phone Number:
+              </div>
+              <div class="fieldValue">
+                {{entry.entrantDetails.entrantPhone}}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Entry Status:
-        </div>
-        <div class="fieldValue">
-          {{statusLabel}}: {{statusText}}
-        </div>
-      </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Created Date/Time:
-        </div>
-        <div class="fieldValue">
-          {{created_at}}
-        </div>
-      </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Last Updated Date/Time:
-        </div>
-        <div class="fieldValue">
-          {{updated_at}}
+
+
+      <!--    <div *ngIf="entry.entrantDetails.who !== 'me'" class="confirmationSection">-->
+      <!--      <h3>Entry Lodged By</h3>-->
+      <!--      <div class="row">-->
+      <!--        <div class="fieldName col-sm-3">-->
+      <!--          Name:-->
+      <!--        </div>-->
+      <!--        <div class="fieldValue">-->
+      <!--          {{entry.entrantDetails.userSurname}}, {{entry.entrantDetails.userFirstName}}-->
+      <!--        </div>-->
+      <!--      </div>-->
+      <!--      <div class="row">-->
+      <!--        <div class="fieldName col-sm-3">-->
+      <!--          Contact Email:-->
+      <!--        </div>-->
+      <!--        <div class="fieldValue">-->
+      <!--          {{entry.entrantDetails.userEmail}}-->
+      <!--        </div>-->
+      <!--      </div>-->
+      <!--      <div class="row">-->
+      <!--        <div class="fieldName col-sm-3">-->
+      <!--          Contact Phone Number:-->
+      <!--        </div>-->
+      <!--        <div class="fieldValue">-->
+      <!--          {{entry.entrantDetails.userPhone}}-->
+      <!--        </div>-->
+      <!--      </div>-->
+      <!--    </div>-->
+
+
+      <div class="col-sm-12 col-md-6">
+        <div class="card" *ngIf="entry !== undefined && entry !== null">
+          <div class="card-header">
+            <h3>Emergency Contact</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Name:
+              </div>
+              <div class="fieldValue">
+                {{entry.entrantDetails.emergencySurname}}, {{entry.entrantDetails.emergencyFirstName}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Email:
+              </div>
+              <div class="fieldValue">
+                {{entry.entrantDetails.emergencyEmail}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Phone Number:
+              </div>
+              <div class="fieldValue">
+                {{entry.entrantDetails.emergencyPhone}}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-        <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
-          <h3>Entrant Details</h3>
-          <div class="row">
-            <div class="fieldName col-sm-6">
-              Name:
+    <div class="row mb-1">
+      <div class="col-sm-12 col-md-6">
+        <div class="card" *ngIf="entry !== undefined && entry !== null">
+          <div class="card-header">
+            <h3>Membership Details</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Member Type:
+              </div>
+              <div class="fieldValue">
+                {{membershipType}}
+              </div>
             </div>
-            <div class="fieldValue">
-              {{entry.entrantDetails.entrantSurname}}, {{entry.entrantDetails.entrantFirstName}}
+            <div class="row" *ngIf="!editing">
+              <div class="fieldName col-sm-6">
+                Membership Number:
+              </div>
+              <div class="fieldValue col-sm-6">
+                {{entry.membershipDetails.member_number}}
+              </div>
+            </div>
+            <div class="row" *ngIf="editing">
+              <label class="fieldName col-sm-6">
+                Membership Number:
+              </label>
+              <div class="fieldValue">
+                <input class="form-control col-sm-12" type="text" formControlName="entrantNumber" id="entrantNumber"/>
+              </div>
+            </div>
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Club:
+              </div>
+              <div class="fieldValue col-sm-6">
+                {{entry.membershipDetails.club_name}}
+                <span *ngIf="entry.membershipDetails.club_code !== ''">({{entry.membershipDetails.club_code}})</span>
+              </div>
             </div>
           </div>
-          <div class="row">
-            <div class="fieldName col-sm-6">
-              Sex:
-            </div>
-            <div class="fieldValue">
-              {{entry.entrantDetails.entrantGender | titlecase}}
-            </div>
-          </div>
-          <div class="row">
-            <div class="fieldName col-sm-6">
-              Date of Birth:
-            </div>
-            <div class="fieldValue">
-              {{entry.entrantDetails.entrantDob}}
-            </div>
-          </div>
-          <div class="row">
-            <div class="fieldName col-sm-6">
-              Entrant Email:
-            </div>
-            <div class="fieldValue">
-              <a href="mailto:{{entry.entrantDetails.entrantEmail}}">
-                {{entry.entrantDetails.entrantEmail}}
-              </a>
-            </div>
-          </div>
-          <div class="row">
-            <div class="fieldName col-sm-6">
-              Entrant Phone Number:
-            </div>
-            <div class="fieldValue">
-              {{entry.entrantDetails.entrantPhone}}
-            </div>
-          </div>
-
-        </div>
-
-
-<!--    <div *ngIf="entry.entrantDetails.who !== 'me'" class="confirmationSection">-->
-<!--      <h3>Entry Lodged By</h3>-->
-<!--      <div class="row">-->
-<!--        <div class="fieldName col-sm-3">-->
-<!--          Name:-->
-<!--        </div>-->
-<!--        <div class="fieldValue">-->
-<!--          {{entry.entrantDetails.userSurname}}, {{entry.entrantDetails.userFirstName}}-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="row">-->
-<!--        <div class="fieldName col-sm-3">-->
-<!--          Contact Email:-->
-<!--        </div>-->
-<!--        <div class="fieldValue">-->
-<!--          {{entry.entrantDetails.userEmail}}-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="row">-->
-<!--        <div class="fieldName col-sm-3">-->
-<!--          Contact Phone Number:-->
-<!--        </div>-->
-<!--        <div class="fieldValue">-->
-<!--          {{entry.entrantDetails.userPhone}}-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-
-
-    <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
-      <h3>Emergency Contact</h3>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Name:
-        </div>
-        <div class="fieldValue">
-          {{entry.entrantDetails.emergencySurname}}, {{entry.entrantDetails.emergencyFirstName}}
         </div>
       </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Email:
-        </div>
-        <div class="fieldValue">
-          {{entry.entrantDetails.emergencyEmail}}
-        </div>
-      </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Phone Number:
-        </div>
-        <div class="fieldValue">
-          {{entry.entrantDetails.emergencyPhone}}
+
+      <div class="col-sm-12 col-md-6">
+        <div class="card" *ngIf="entry !== undefined && entry !== null">
+          <div class="card-header">
+            <h3>Classification and Medical Details</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Disability Classification:
+              </div>
+              <div class="fieldValue">
+                {{disabilityClassificationRequired}}
+              </div>
+            </div>
+            <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
+              <div class="fieldName col-sm-6">
+                Freestyle Classification:
+              </div>
+              <div class="fieldValue">
+                {{entry.medicalDetails.classFreestyle}}
+              </div>
+            </div>
+            <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
+              <div class="fieldName col-sm-6">
+                Breaststroke Classification:
+              </div>
+              <div class="fieldValue">
+                {{entry.medicalDetails.classBreaststroke}}
+              </div>
+            </div>
+            <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
+              <div class="fieldName col-sm-6">
+                Medley Classification:
+              </div>
+              <div class="fieldValue">
+                {{entry.medicalDetails.classMedley}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Stroke Dispensation Required:
+              </div>
+              <div class="fieldValue">
+                {{strokeDispensationRequired}}
+              </div>
+            </div>
+            <div class="row" *ngIf="entry.medicalDetails.dispensation === 'true'">
+              <div class="fieldName col-sm-6">
+                Medical Certificate:
+              </div>
+              <div class="fieldValue">
+                {{medicalCertificate}}
+              </div>
+            </div>
+            <div class="row">
+              <div class="fieldName col-sm-6">
+                Medical Condition:
+              </div>
+              <div class="fieldValue">
+                {{medicalCondition}}
+              </div>
+            </div>
+            <div class="row" *ngIf="entry.medicalDetails.medicalCondition === 'true'">
+              <div class="fieldName col-sm-6">
+                Medical Condition Details:
+              </div>
+              <div class="fieldValue">
+                {{entry.medicalDetails.medicalDetails}}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
-      <h3>Membership Details</h3>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Member Type:
-        </div>
-        <div class="fieldValue">
-          {{membershipType}}
-        </div>
-      </div>
-      <div class="row" *ngIf="!editing">
-        <div class="fieldName col-sm-3">
-          Membership Number:
-        </div>
-        <div class="fieldValue" >
-          {{entry.membershipDetails.member_number}}
-        </div>
-      </div>
-      <div class="row" *ngIf="editing">
-        <label class="fieldName col-sm-3">
-          Membership Number:
-        </label>
-        <div class="fieldValue">
-          <input class="form-control col-sm-12" type="text" formControlName="entrantNumber" id="entrantNumber"/>
-        </div>
-      </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Club:
-        </div>
-        <div class="fieldValue">
-          {{entry.membershipDetails.club_name}}
-          <span *ngIf="entry.membershipDetails.club_code !== ''">({{entry.membershipDetails.club_code}})</span>
-        </div>
-      </div>
+
+  <div class="card mb-1" *ngIf="entry !== undefined && entry !== null">
+    <div class="card-header">
+      <h3>Events Selected</h3>
     </div>
-
-    <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
-      <h3>Classification and Medical Details</h3>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Disability Classification:
-        </div>
-        <div class="fieldValue">
-          {{disabilityClassificationRequired}}
-        </div>
-      </div>
-      <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
-        <div class="fieldName col-sm-3">
-          Freestyle Classification:
-        </div>
-        <div class="fieldValue">
-          {{entry.medicalDetails.classFreestyle}}
-        </div>
-      </div>
-      <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
-        <div class="fieldName col-sm-3">
-          Breaststroke Classification:
-        </div>
-        <div class="fieldValue">
-          {{entry.medicalDetails.classBreaststroke}}
-        </div>
-      </div>
-      <div class="row" *ngIf="entry.medicalDetails.classification !== 'no'">
-        <div class="fieldName col-sm-3">
-          Medley Classification:
-        </div>
-        <div class="fieldValue">
-          {{entry.medicalDetails.classMedley}}
-        </div>
-      </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Stroke Dispensation Required:
-        </div>
-        <div class="fieldValue">
-          {{strokeDispensationRequired}}
-        </div>
-      </div>
-      <div class="row" *ngIf="entry.medicalDetails.dispensation === 'true'">
-        <div class="fieldName col-sm-3">
-          Medical Certificate:
-        </div>
-        <div class="fieldValue">
-          {{medicalCertificate}}
-        </div>
-      </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Medical Condition:
-        </div>
-        <div class="fieldValue">
-          {{medicalCondition}}
-        </div>
-      </div>
-      <div class="row" *ngIf="entry.medicalDetails.medicalCondition === 'true'">
-        <div class="fieldName col-sm-3">
-          Medical Condition Details:
-        </div>
-        <div class="fieldValue">
-          {{entry.medicalDetails.medicalDetails}}
-        </div>
-      </div>
-    </div>
-
-  </form>
-
-  <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
-    <h3>Events Selected</h3>
-    <table>
-      <thead>
-      <tr>
-        <th class="pr-4">Event</th>
-        <th class="pr-4">Description</th>
-        <th>Seed Time</th>
-      </tr>
-      </thead>
-      <tr *ngFor="let event of eventEntries">
-        <td class="pr-4">
-          {{event.program_no}}
-        </td>
-        <td class="pr-4">
+    <div class="card-body">
+      <table class="col-sm-12">
+        <thead>
+        <tr>
+          <th class="pr-4">Event</th>
+          <th class="pr-4">Description</th>
+          <th class="text-right">Seed Time</th>
+        </tr>
+        </thead>
+        <tr *ngFor="let event of eventEntries">
+          <td class="pr-4">
+            {{event.program_no}}
+          </td>
+          <td class="pr-4">
         <span *ngIf="getEventName(event.event_id) !== ''">
           {{getEventName(event.event_id)}}:
         </span>
-          <span *ngIf="getLegs(event.event_id) > 1">
+            <span *ngIf="getLegs(event.event_id) > 1">
           {{getLegs(event.event_id)}}x</span>{{event.distance}} {{event.discipline}}
-          <span *ngIf="getLegs(event.event_id) > 1">
+            <span *ngIf="getLegs(event.event_id) > 1">
           Relay
         </span>
-        </td>
-        <td class="seedtimeCol">
+          </td>
+          <td class="seedtimeCol">
         <span *ngIf="getLegs(event.event_id) === 1">
           {{event.seedtime | time}}
         </span>
-        </td>
-      </tr>
-    </table>
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
 
-  <div>
-    <h2>
-      Entry Cost
-    </h2>
-    <h3>
-      Amount Due
-    </h3>
-    <table>
-      <thead>
-      <tr>
-        <th class="pr-4">
-          Qty
-        </th>
-        <th class="pr-4">
-          Item
-        </th>
-        <th class="moneycol pr-4">
-          Each
-        </th>
-        <th class="moneycol pr-4">
-          Subtotal
-        </th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td>
+  <div class="row">
+    <div class="col-sm-12 col-md-6">
+      <div class="card mb-1">
+        <div class="card-header">
+          <h3>
+            Amount Due
+          </h3>
+        </div>
+        <div class="card-body">
+          <table class="col-md-12">
+            <thead>
+            <tr>
+              <th>
+                Qty
+              </th>
+              <th>
+                Item
+              </th>
+              <th class="moneycol">
+                Each
+              </th>
+              <th class="moneycol">
+                Subtotal
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>
 
-        </td>
-        <td>
-          Meet Entry Fee
-        </td>
-        <td class="moneycol">
-          {{meetFee | currency}}
-        </td>
-        <td class="moneycol">
-          {{meetFee | currency}}
-        </td>
-      </tr>
-      <tr>
-        <td colspan="3" class="moneycol">
-          Total
-        </td>
-        <td class="moneycol">
-          {{meetFee | currency}}
-        </td>
-      </tr>
-      <tr>
-        <td colspan="3" class="moneycol">
-          Paid
-        </td>
-        <td class="moneycol">
-          {{paidAmount | currency}}
-        </td>
-      </tr>
-      </tbody>
-    </table>
+              </td>
+              <td>
+                Meet Entry Fee
+              </td>
+              <td class="moneycol">
+                {{meetFee | currency}}
+              </td>
+              <td class="moneycol">
+                {{meetFee | currency}}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3" class="moneycol">
+                Total
+              </td>
+              <td class="moneycol">
+                {{meetFee | currency}}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3" class="moneycol">
+                Paid
+              </td>
+              <td class="moneycol">
+                {{paidAmount | currency}}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3" class="moneycol">
+                Amount Owing
+              </td>
+              <td class="moneycol">
+                {{owedAmount | currency}}
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3>Payment History</h3>
+        </div>
+        <div class="card-body">
+          <table class="col-sm-12">
+            <thead>
+            <tr>
+              <th>
+                Date/Time
+              </th>
+              <th>
+                Comment
+              </th>
+              <th class="moneycol">
+                Amount
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let payment of entry.payments">
+              <td>
+                {{payment.received | date: 'd/M/yy h:mm:ss a'}}
+              </td>
+              <td>
+                {{payment.comment}}
+              </td>
+              <td class="moneycol">
+                {{payment.amount | currency}}
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="moneycol">Total Payments:</td>
+              <td class="moneycol">{{totalPayments | currency}}</td>
+            </tr>
+            </tbody>
+          </table>
+          <div>
+            <button class="btn btn-primary mr-1" (click)="clickApplyPayment()">Apply Payment</button>
+            <button class="btn btn-primary" (click)="clickTransferPayment()">Transfer Payment</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-
+<ng-template #applyPayment let-modal>
+  <div class="modal-header">
+    <h3>Apply Payment</h3>
+  </div>
+  <div class="modal-body">
     <div class="card mb-3 bg-info text-white">
       <div class="card-body">
-        <h4 class="card-title">
-          Entry Status
-        </h4>
         <p class="card-text">
-          {{statusLabel}}: {{statusText}}
+          Use this to manually adjust payment status. Supply a negative amount for a refund. Do not use this
+          option if transferring a payment from another entry.
         </p>
       </div>
+    </div>
+    <div class="form-group">
+      <div class="row">
+        <label class="form-control-label col-sm-6" for="applyAmount">Amount:</label>
+        <input class="form-control col-sm-6" type="text" formControlName="applyAmount"
+               id="applyAmount" required/>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="row">
+        <label class="form-control-label col-sm-6" for="applyReason">Reason:</label>
+        <input class="form-control col-sm-6" type="text" formControlName="applyReason"
+               id="applyReason" required/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="modal.close('apply')">Apply</button>
+      <button class="btn btn-danger" (click)="modal.close('cancel')">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #transferPayment let-modal>
+  <div class="modal-header">
+    <h3>Transfer Payment</h3>
+  </div>
+  <div class="modal-body">
+    <div class="card mb-3 bg-info text-white">
+      <div class="card-body">
+        <p class="card-text">
+          Please provide the Meet Entry Id or Incomplete Entry Id of the entry to transfer the payment from.
+        </p>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="row">
+        <label class="form-control-label col-sm-6" for="transferMeetEntryId">Meet Entry Id:</label>
+        <input class="form-control col-sm-6" type="text" formControlName="transferMeetEntryId"
+               id="transferMeetEntryId" required/>
+      </div>
+    </div>
+    <p class="card-text">
+      or
+    </p>
+    <div class="form-group">
+      <div class="row">
+        <label class="form-control-label col-sm-6" for="transferIncompleteEntryId">Incomplete Entry Id:</label>
+        <input class="form-control col-sm-6" type="text" formControlName="transferIncompleteEntryId"
+               id="transferIncompleteEntryId" required/>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="row">
+        <label class="form-control-label col-sm-6" for="transferReason">Reason:</label>
+        <input class="form-control col-sm-6" type="text" formControlName="transferReason"
+               id="transferReason" required/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="modal.close('transfer')">Transfer</button>
+      <button class="btn btn-danger" (click)="modal.close('cancel')">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+
+<div *ngIf="unableToLoad">
+  <div class="card mb-3 bg-danger text-white">
+    <div class="card-body">
+      <p class="card-text">
+        Unable to load this entry.
+      </p>
     </div>
   </div>
 </div>
@@ -412,3 +603,18 @@
     <button type="button" class="btn btn-success" (click)="modal.close('No')">No</button>
   </div>
 </ng-template>
+</form>
+
+<ng-template #emailConfirm let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal2-basic-title">Confirm Resending Email Confirmation</h4>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to resend the email confirmation?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Yes')">Yes</button>
+    <button type="button" class="btn btn-success" (click)="modal.close('No')">No</button>
+  </div>
+</ng-template>
+

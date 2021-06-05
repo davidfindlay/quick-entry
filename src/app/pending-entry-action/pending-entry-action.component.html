@@ -8,7 +8,8 @@
       entry may be Approved.
     </p>
     <p class="card-text">
-      If the pending entry is duplicate or no longer required, please Delete.
+      If the pending entry is duplicate or no longer required, please click <strong>Mark Processed</strong>. This will hide the entry. It can
+      be viewed again by selecting "Show Finalised" in Display Options on the Pending Entry List.
     </p>
   </div>
 </div>
@@ -40,9 +41,14 @@
       <button class="btn btn-primary" (click)="edit()" *ngIf="!editing">Edit</button>
       <button class="btn btn-success" (click)="update()" *ngIf="editing">Update</button>
       <button class="btn btn-danger" (click)="cancel()" *ngIf="editing">Cancel</button>
-      <button class="btn btn-warning" (click)="markProcessed()" *ngIf="!editing">Mark Processed</button>
+      <button class="btn btn-warning" (click)="markProcessed()" *ngIf="!editing && entry.finalised_at !== null">Mark Processed</button>
+      <button class="btn btn-primary" (click)="resendEmail()">Resend Confirmation Email</button>
     </div>
   </div>
+
+  <p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
 
   <form [formGroup]="pendingActionForm">
 
@@ -123,7 +129,8 @@
               First Name:
             </label>
             <div class="fieldValue">
-              <input class="form-control col-sm-12" type="text" formControlName="entrantFirstName" id="entrantFirstName"/>
+              <input class="form-control col-sm-12" type="text" formControlName="entrantFirstName"
+                     id="entrantFirstName"/>
             </div>
           </div>
           <div class="row" *ngIf="!editing">
@@ -223,7 +230,7 @@
             Gender:
           </div>
           <div class="fieldValue">
-            {{memberSearchResult.gender}}
+            {{(memberSearchResult.gender === 1) ? 'Male' : 'Female'}}
           </div>
         </div>
         <div class="row">
@@ -302,46 +309,71 @@
       </div>
     </div>
 
-    <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
-      <h3>Membership Details</h3>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Member Type:
-        </div>
-        <div class="fieldValue">
-          {{membershipType}}
-        </div>
+    <div class="card mb-1" *ngIf="entry !== undefined && entry !== null">
+      <div class="card-header">
+        <h3>Membership Details</h3>
       </div>
-      <div class="row" *ngIf="!editing">
-        <div class="fieldName col-sm-3">
-          Membership Number:
+      <div class="card-body">
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Member Type:
+          </div>
+          <div class="fieldValue">
+            {{membershipType}}
+          </div>
         </div>
-        <div class="fieldValue" >
-          {{entry.membershipDetails.member_number}}
+        <div>
+          <div class="row" *ngIf="!editing">
+            <div class="fieldName col-sm-3">
+              Membership Number:
+            </div>
+            <div class="fieldValue">
+              {{entry.membershipDetails.member_number}}
+            </div>
+          </div>
+          <div class="row" *ngIf="editing">
+            <label class="fieldName col-sm-3">
+              Membership Number:
+            </label>
+            <div class="fieldValue">
+              <input class="form-control col-sm-12" type="text" formControlName="entrantNumber" id="entrantNumber"/>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="row" *ngIf="editing">
-        <label class="fieldName col-sm-3">
-          Membership Number:
-        </label>
-        <div class="fieldValue">
-          <input class="form-control col-sm-12" type="text" formControlName="entrantNumber" id="entrantNumber"/>
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Club Name:
+          </div>
+          <div class="fieldValue" *ngIf="!editing">
+            {{clubName}}
+            <!--          {{entry.membershipDetails.club_name}}-->
+            <!--          <span *ngIf="entry.membershipDetails.club_code !== ''">({{entry.membershipDetails.club_code}})</span>-->
+          </div>
+          <div class="fieldValue" *ngIf="editing">
+            <input class="form-control col-sm-10" type="text" formControlName="entrantClub" id="club-name"
+                   [ngbTypeahead]="clubSearch" (selectItem)="clubSelected($event)"/>
+
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="fieldName col-sm-3">
-          Club:
+
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Club Code:
+          </div>
+          <div class="fieldValue" *ngIf="!editing">
+            <span *ngIf="entry.membershipDetails.club_code !== ''">{{entry.membershipDetails.club_code}}</span>
+          </div>
+          <div class="fieldValue" *ngIf="editing">
+            <input class="form-control col-sm-6" type="text" formControlName="entrantClubCode" id="club-code" />
+          </div>
         </div>
-        <div class="fieldValue">
-          {{clubName}}
-          <span *ngIf="clubCode !== ''">({{clubCode}})</span>
-<!--          {{entry.membershipDetails.club_name}}-->
-<!--          <span *ngIf="entry.membershipDetails.club_code !== ''">({{entry.membershipDetails.club_code}})</span>-->
-        </div>
+
+        <button class="btn btn-primary" (click)="createEventMembership()">Approve Event Membership</button>
+
       </div>
     </div>
 
-    <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null">
+    <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null && entry.medicalDetails !== undefined && entry.medicalDetails !== null">
       <h3>Classification and Medical Details</h3>
       <div class="row">
         <div class="fieldName col-sm-3">
@@ -405,6 +437,26 @@
         </div>
         <div class="fieldValue">
           {{entry.medicalDetails.medicalDetails}}
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmationSection" *ngIf="entry !== undefined && entry !== null && meet.mealfee > 0">
+      <h3>Meals and Merchandise</h3>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          {{mealName}} Tickets:
+        </div>
+        <div class="fieldValue">
+          {{entry.mealMerchandiseDetails.meals}}
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          Dietary Requirements or Other Comments:
+        </div>
+        <div class="fieldValue">
+          {{entry.mealMerchandiseDetails.mealComments}}
         </div>
       </div>
     </div>
@@ -502,6 +554,31 @@
       </tbody>
     </table>
 
+    <h3>Payments</h3>
+    <table>
+      <thead>
+      <tr>
+        <th class="pr-4">
+          Date/Time
+        </th>
+        <th class="pr-4">
+          Transaction ID
+        </th>
+        <th class="pr-4">
+          Paid By
+        </th>
+        <th class="pr-4">
+          Amount
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+
+      </tr>
+      </tbody>
+    </table>
+
 
     <div class="card mb-3 bg-info text-white">
       <div class="card-body">
@@ -528,3 +605,17 @@
     <button type="button" class="btn btn-success" (click)="modal.close('No')">No</button>
   </div>
 </ng-template>
+
+<ng-template #emailConfirm let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal2-basic-title">Confirm Resending Email Confirmation</h4>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to resend the email confirmation?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Yes')">Yes</button>
+    <button type="button" class="btn btn-success" (click)="modal.close('No')">No</button>
+  </div>
+</ng-template>
+

@@ -1,0 +1,194 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>Guest Relay Team Application</h1>
+  </div>
+</div>
+
+<p *ngFor="let alert of paymentAlerts">
+  <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+</p>
+
+<form [formGroup]="relayForm">
+
+  <div class="form-group row">
+    <label for="relayMeet" class="col-sm-2 col-form-label text-right"
+           id="relayMeetLbl">Meet:</label>
+    <div class="col-sm-10">
+<!--      <select name="relayMeet" id="relayMeet" class="form-control" formControlName="relayMeet">-->
+<!--        <option value="200">Great Barrier Reef Masters Games</option>-->
+<!--      </select>-->
+      Great Barrier Reef Masters Games
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="relayEvent" class="col-sm-2 col-form-label text-right"
+           id="relayEventLbl">Event:</label>
+    <div class="col-sm-10">
+      <select name="relayEvent" id="relayEvent" class="form-control" formControlName="relayEvent">
+        <option value="{{relayEvent.eventId}}}" *ngFor="let relayEvent of relayEvents">
+          {{getEventDetails(relayEvent)}}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <p class="card-text">
+        To apply to create an unattached or mixed club relay team, please fill out the form below.
+        Please provide your contact details, as the person submitting the relay team.
+      </p>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="contactFirstName" class="col-sm-2 col-form-label text-right">First Name: </label>
+    <div class="col-sm-10">
+      <input type="text" name="contactFirstName" id="contactFirstName" size="40" class="form-control" formControlName="contactFirstName" />
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="contactSurname" class="col-sm-2 col-form-label text-right">Surname: </label>
+    <div class="col-sm-10">
+      <input type="text" name="contactSurname" id="contactSurname" size="40" class="form-control" formControlName="contactSurname" />
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="contactEmail" class="col-sm-2 col-form-label text-right">Email Address: </label>
+    <div class="col-sm-10">
+      <input type="text" name="contactEmail" id="contactEmail" size="40" class="form-control" formControlName="contactEmail" />
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="contactMobile" class="col-sm-2 col-form-label text-right">Mobile Number: </label>
+    <div class="col-sm-10">
+      <input type="text" name="contactMobile" id="contactMobile" size="40" class="form-control" formControlName="contactMobile" />
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <p class="card-text">
+        Your relay team will automatically receive a name based on your club code and age group.
+        You can also give your team an additional fun/team name e.g. "Bob's Awesome Team".
+      </p>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newTeamName" class="col-sm-2 col-form-label text-right">Team Name: </label>
+    <div class="col-sm-10">
+      <input type="text" name="newTeamName" id="newTeamName" size="40" class="form-control" formControlName="teamName" /> optional
+    </div>
+  </div>
+
+  <div class="card mb-3 bg-info text-white">
+    <div class="card-body">
+      <p class="card-text">
+        You must provide the first name, surname, age and mobile phone number of all relay team members. For reasons of
+        privacy we will not provide you any details of other competitors on this form.
+      </p>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-2 col-form-label text-right"
+           id="lblSwimmer1">Swimmer 1:</div>
+    <div class="col-sm-10">
+      <label>First Name:</label>
+      <input type="text" class="form-control" formControlName="swimmer1FirstName">
+      <label>Surname:</label>
+      <input type="text" class="form-control" formControlName="swimmer1Surname">
+      <label>Age:</label>
+      <input type="text" class="form-control" formControlName="swimmer1Age">
+      <label>Mobile Number:</label>
+      <input type="text" class="form-control" formControlName="swimmer1Mobile">
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-2 col-form-label text-right"
+         id="lblSwimmer2">Swimmer 2:</div>
+    <div class="col-sm-10">
+      <label>First Name:</label>
+      <input type="text" class="form-control" formControlName="swimmer2FirstName">
+      <label>Surname:</label>
+      <input type="text" class="form-control" formControlName="swimmer2Surname">
+      <label>Age:</label>
+      <input type="text" class="form-control" formControlName="swimmer2Age">
+      <label>Mobile Number:</label>
+      <input type="text" class="form-control" formControlName="swimmer2Mobile">
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-2 col-form-label text-right"
+         id="lblSwimmer3">Swimmer 3:</div>
+    <div class="col-sm-10">
+      <label>First Name:</label>
+      <input type="text" class="form-control" formControlName="swimmer3FirstName">
+      <label>Surname:</label>
+      <input type="text" class="form-control" formControlName="swimmer3Surname">
+      <label>Age:</label>
+      <input type="text" class="form-control" formControlName="swimmer3Age">
+      <label>Mobile Number:</label>
+      <input type="text" class="form-control" formControlName="swimmer3Mobile">
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-2 col-form-label text-right"
+         id="lblSwimmer4">Swimmer 4:</div>
+    <div class="col-sm-10">
+      <label>First Name:</label>
+      <input type="text" class="form-control" formControlName="swimmer4FirstName">
+      <label>Surname:</label>
+      <input type="text" class="form-control" formControlName="swimmer4Surname">
+      <label>Age:</label>
+      <input type="text" class="form-control" formControlName="swimmer4Age">
+      <label>Mobile Number:</label>
+      <input type="text" class="form-control" formControlName="swimmer4Mobile">
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-2 col-form-label text-right">Total Age: </div>
+    <div class="col-sm-10">
+      Age
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="newTeamSeedTime" class="col-sm-2 col-form-label text-right">Seed time:</label>
+    <div class="col-sm-10">
+      <input type="text" name="newTeamSeedTime" id="newTeamSeedTime" size="40" class="form-control"
+             formControlName="seedTime" (blur)="fixSeedTime()" /> optional
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-2 col-form-label text-right">Team Entry Fee: </div>
+    <div class="col-sm-10">
+      $20.00
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-2 col-form-label text-right">Select Payment Method: </div>
+    <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+
+  </div>
+
+  <p *ngFor="let alert of paymentAlerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
+
+  <div class="form-group row">
+    <button class="btn btn-secondary" (click)="resetForm()">Reset Form</button>
+  </div>
+
+</form>

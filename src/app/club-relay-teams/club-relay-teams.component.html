@@ -1,0 +1,141 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>Club Relay Teams</h1>
+    <h2 *ngIf="club">{{club.clubname}}</h2>
+  </div>
+</div>
+
+<div class="card mb-3 bg-info text-white">
+  <div class="card-body">
+    <div class="card-text">
+      <p>
+        If you have any queries regarding these details please
+        contact the <a href="mailto:recorder@mastersswimmingqld.org.au">Director of Recording</a>.
+        A future version of this page will include more compact views of member entry data.
+      </p>
+    </div>
+  </div>
+</div>
+
+<app-meet-selector class="mb-2"></app-meet-selector>
+
+
+
+<div *ngIf="meet">
+  <h2>{{meet.meetname}}</h2>
+
+  <app-club-relay-status [clubId]="clubId" [meetId]="meetId" [teamInfo]="relayTeams" [payments]="payments"
+                         (notifyParent)="paymentReceived()" *ngIf="relayTeams"></app-club-relay-status>
+  <p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
+
+  <div class="card mb-3 bg-info text-white" *ngIf="numRelayEvents === 0">
+    <div class="card-body">
+      <p class="card-text">
+        This meet doesn't have any relay events.
+      </p>
+    </div>
+  </div>
+
+  <div class="card mb-3" *ngFor="let relayEvent of relayEvents">
+    <div class="card-header">
+      <h3 class="card-title mb-0">
+        {{getDetails(relayEvent)}}
+      </h3>
+    </div>
+    <div class="card-body">
+      <p class="card-text" *ngIf="getTeamsByEvent(relayEvent.id).length === 0">
+        No relay teams found.
+      </p>
+      <div *ngIf="relayTeams">
+        <div class="row">
+          <ng-container *ngFor="let relayTeam of relayTeams">
+          <div class="card p-0 mb-3 mr-1 col-lg-3 col-sm-12" *ngIf="relayTeam.meetevent_id === relayEvent.id">
+            <div class="card-header">
+              <h3 class="card-title mb-0">
+                {{getRelayTeamName(relayTeam)}}
+              </h3>
+              <h4 *ngIf="relayTeam.teamname && relayTeam.teamname !== ''">{{relayTeam.teamname}}</h4>
+            </div>
+            <div class="card-body">
+              <table class="col-sm-12">
+                <tr *ngFor="let member of relayTeam.members" value="">
+                  <th class="text-center">
+                    {{member.leg}}
+                  </th>
+                  <td>
+                    {{member.member.firstname}} {{member.member.surname}}
+                  </td>
+                  <td class="text-right">
+                    {{relayService.getDisplayAge(member.member)}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                  </td>
+                  <th>
+                    Total Age:
+                  </th>
+                  <td class="text-right">
+                    {{getTotalAge(relayTeam)}}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                  </td>
+                  <th>
+                    Seed Time:
+                  </th>
+                  <td class="text-right">
+                    {{formatTime(relayTeam.seedtime)}}
+                  </td>
+                </tr>
+              </table>
+
+              <div class="card bg-warning text-white" *ngIf="relayTeam.seedtime === 0 && relayEvent.times_required">
+                <div class="card-body">
+                  <p class="card-text">Seed times are required for this event</p>
+                </div>
+              </div>
+
+              <button class="btn btn-primary mr-1" *ngIf="eventOpen(relayEvent)" (click)="editTeam(relayTeam)">Edit Team</button>
+              <button class="btn btn-warning" *ngIf="eventOpen(relayEvent)" (click)="deleteTeam(relayTeam)">Delete Team</button>
+            </div>
+
+          </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 card-text"></div>
+        <button class="btn btn-primary" *ngIf="eventOpen(relayEvent)" (click)="addTeam(relayEvent)">Add Team</button>
+      </div>
+    </div>
+    <div class="card-footer" *ngIf="eventOpen(relayEvent)">
+      Relay entries close {{getClose(relayEvent) | date: 'EEEE, MMMM d y, h:mm:ss a'}}.
+    </div>
+    <div class="card-footer" *ngIf="!eventOpen(relayEvent)">
+      Relay entries are closed for this event.
+    </div>
+  </div>
+</div>
+
+
+  <ng-template #confirmDelete let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="generate-new-password">Confirm Delete Relay</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="card-text">Are you sure you want to delete this relay team?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" (click)="modal.close('yes')">Yes</button>
+      <button class="btn-primary" (click)="modal.close('no')">No</button>
+      <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
+    </div>
+  </ng-template>
+

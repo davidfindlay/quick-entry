@@ -3,6 +3,8 @@ import {EntrantDetails} from './entrant-details';
 import {MembershipDetails} from './membership-details';
 import {MedicalDetails} from './medical-details';
 import {PaymentOption} from './paymentoption';
+import {MealMerchandiseDetails} from './meal-merchandise-details';
+import {EntryPayment} from './entry-payment';
 
 export class EntryFormObject {
 
@@ -13,6 +15,10 @@ export class EntryFormObject {
   membershipDetails: MembershipDetails;
   medicalDetails: MedicalDetails;
   paymentOptions: PaymentOption;
+  mealMerchandiseDetails: MealMerchandiseDetails;
+
+  payments: EntryPayment[];
+  paidAmount: number;
 
   // Membership
   memberType: string;
@@ -31,11 +37,18 @@ export class EntryFormObject {
   validEvents: boolean;
 
   incompleteId: number;
+  meetEntryId: number;
 
   edit_mode: boolean;
   edit_entry_id: number;
   edit_paid: number;
 
+  cost: number;
+
   status: number;
+
+  created_at: Date;
+  updated_at: Date;
+  code: string;
 
 }

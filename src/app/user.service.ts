@@ -12,19 +12,21 @@ import * as moment from 'moment';
 import {BehaviorSubject} from 'rxjs';
 
 import {environment} from '../environments/environment';
+import {Member} from './models/member';
 
 @Injectable()
 export class UserService {
 
   authSub: Subscription;
   userChanged = new BehaviorSubject<User>(null);
-  memberChanged = new BehaviorSubject<User>(null);
+  memberChanged = new BehaviorSubject<Member>(null);
 
   user;
   member;
 
   currentMemberships;
   previousMemberships;
+  clubRoles;
 
   constructor(private http: HttpClient,
               private authenticationService: AuthenticationService) {
@@ -63,9 +65,10 @@ export class UserService {
 
           if (member.success) {
             this.member = member.member;
-            // console.log(this.member);
+            console.log(this.member);
             this.currentMemberships = this.loadCurrentMemberships();
             this.previousMemberships = this.loadPreviousMemberships();
+            this.clubRoles = this.member.club_roles;
             this.memberChanged.next(this.member);
           }
 
@@ -73,10 +76,12 @@ export class UserService {
     }
   }
 
-  getUsers()
-    :
-    User {
+  getUsers(): User {
     return this.user;
+  }
+
+  getUser(userId) {
+    return this.http.get(environment.api + 'users/' + userId);
   }
 
 // Returns the member if the user has one
@@ -120,7 +125,6 @@ export class UserService {
       });
     }
 
-    console.log(currentMemberships);
     return currentMemberships;
   }
 
@@ -178,17 +182,91 @@ export class UserService {
 
           this.authenticationService.login(registeredUser.user.username, userDetails.password).subscribe((loggedIn) => {
             observer.next(registeredUser);
+            observer.complete();
           });
 
         }
       }, (error: any) => {
-        observer.next(error);
+        console.log(error.error);
+        observer.error(error.error);
+        observer.complete();
       });
 
     });
   }
 
+  update(userDetails) {
+    console.log('Update user: ' + userDetails.id);
+    console.log(userDetails);
+    return this.http.put(environment.api + 'users/' + userDetails.id, userDetails);
+  }
+
   linkMember(memberNumber) {
     return this.http.post(environment.api + 'users/link_member/' + memberNumber, {});
+  }
+
+  isUserMeetOrganiser() {
+    if (this.member !== undefined && this.member !== null) {
+      if (this.member.meet_access !== undefined && this.member.meet_access !== null) {
+        if (this.member.meet_access.length > 0) {
+          console.log('User/member has meet access');
+          return true;
+        } else {
+          console.log('User/member dose not have meet access');
+          return false;
+        }
+      }
+    } else {
+      console.log('User/member has meet access');
+      return false;
+    }
+  }
+
+  // TODO: move meet access to primarily by user not member
+  getMeetsOrganised() {
+    console.log('getMeetsOrganised');
+    const meetsOrganised = [];
+    const member = this.getMember();
+    if (member !== undefined && member !== null) {
+      if (member.meet_access !== undefined && member.meet_access !== null) {
+        for (let x = 0; x < member.meet_access.length; x++) {
+          meetsOrganised.push(member.meet_access[x].meet_id);
+        }
+      }
+    }
+
+    return meetsOrganised;
+  }
+
+  getCurrentClubAdmins() {
+    return this.clubRoles;
+  }
+
+  getUserList() {
+    return this.http.get(environment.api + 'users');
+  }
+
+  public sendPasswordResetRequest(email, user_id = null) {
+    return this.http.post(environment.api + 'reset/' + email, { user_id: user_id });
+  }
+
+  public verifyPasswordResetToken(token) {
+    return this.http.post(environment.api + 'resetToken/' + token, {});
+  }
+
+  public usePasswordResetToken(token, newPassword) {
+    return this.http.post(environment.api + 'resetPassword/' + token, {newPassword: newPassword});
+  }
+
+  public getRandomPassword() {
+    return this.http.get(environment.api + 'generateRandomPassword');
+  }
+
+  public changePassword(userId, newPassword, adminUserId) {
+    return this.http.post(environment.api + 'changePassword/' + userId, {
+      userId: userId,
+      newPassword: newPassword,
+      adminUserId: adminUserId
+    });
   }
 }

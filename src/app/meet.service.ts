@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Meet} from './models/meet';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import 'rxjs/Rx';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
@@ -9,6 +9,13 @@ import {MeetEvent} from './models/meet-event';
 import {EntryEvent} from './models/entryevent';
 
 import { environment } from '../environments/environment';
+import {Subscription} from 'rxjs';
+
+const httpOptions = {
+  headers: new HttpHeaders({
+    'Content-Type': 'application/json',
+  })
+};
 
 @Injectable()
 export class MeetService {
@@ -28,7 +35,6 @@ export class MeetService {
 
     this.http.get<Meet[]>(environment.api + 'meets?year=' + year)
       .subscribe(data => {
-          console.log('got meets');
           this.meets = data;
           this.meetsChanged.next(this.meets.slice());
           // Store meet data
@@ -73,12 +79,18 @@ export class MeetService {
 
   loadMeetDetails(meet_id: number) {
     this.http.get(environment.api + 'meets/' + meet_id).subscribe((result: Meet) => {
-      const index = this.meets.indexOf(this.getMeet(meet_id));
 
-      if (index !== -1) {
-        this.meets[index] = result;
+      if (this.meets === undefined || this.meets === null) {
+        // If meets is for some reason undefined or null, just put this one in
+        this.meets = [];
+        this.meets.push(result);
+      } else {
+        const index = this.meets.indexOf(this.getMeet(meet_id));
+
+        if (index !== -1) {
+          this.meets[index] = result;
+        }
       }
-
       localStorage.setItem('meets', JSON.stringify(this.meets));
       this.meetsChanged.next(this.meets);
     });
@@ -91,6 +103,10 @@ export class MeetService {
         observer.next(this.getMeet(meet_id));
       });
     });
+  }
+
+  getSingleMeet(meet_id) {
+    return this.http.get(environment.api + 'meets/' + meet_id);
   }
 
   getOpenMeets() {
@@ -170,5 +186,43 @@ export class MeetService {
     }
 
     return eventIds;
+  }
+
+  getAllMeets():  Observable<Meet[]> {
+    return this.http.get<Meet[]>(environment.api + 'meets/all');
+  }
+
+  createMerchandise(merchandiseItem): Observable<any> {
+    console.log('createMerchandise');
+    console.log(merchandiseItem);
+    return this.http.post(environment.api + 'merchandise/create', merchandiseItem);
+  }
+
+  updateMerchandise(merchandiseItem): Observable<any> {
+    console.log('updateMerchandise');
+    console.log(merchandiseItem);
+    return this.http.put(environment.api + 'merchandise/' + merchandiseItem.id, merchandiseItem);
+  }
+
+  deleteMerchandise(merchandiseItemId): Observable<any> {
+    console.log('deleteMerchandise: ' + merchandiseItemId);
+    return this.http.delete(environment.api + 'merchandise/' + merchandiseItemId);
+  }
+
+  addMerchandiseImage(image: File, imageData): Observable<any> {
+    console.log('addMerchandiseImage');
+    const formData: FormData = new FormData();
+    formData.append('image', image, image.name);
+    formData.append('imageData', JSON.stringify(imageData))
+    return this.http.post(environment.api + 'merchandise/' + imageData.meet_merchandise_id + '/addImage', formData);
+  }
+
+  deleteMerchandiseImage(merchandiseImageId) {
+    console.log('deleteMerchandiseImage: ' + merchandiseImageId);
+    return this.http.delete(environment.api + 'merchandise/images/' + merchandiseImageId);
+  }
+
+  getMerchandiseOrders(meetId) {
+    return this.http.get(environment.api + 'meet_entry_orders/' + meetId);
   }
 }

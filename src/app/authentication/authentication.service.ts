@@ -91,18 +91,18 @@ export class AuthenticationService implements AuthService {
 
     // this.spinner.show();
     //
-    // console.log('refreshToken');
-    // console.log(environment.api + 'refresh');
+    console.log('refreshToken');
+    console.log(environment.api + 'refresh');
 
-    // return this.http.post(environment.api + `refresh`, {})
-    //   .pipe(tap((tokens: AccessData) => {
-    //     this.saveAccessData(tokens);
-    //     // if (this.getInterruptedUrl() !== undefined && this.getInterruptedUrl() !== null) {
-    //     //   console.log('Attempt to navigate to interrupted route' + this.getInterruptedUrl());
-    //     //   // this.router.navigate()
-    //     // }
-    //   }));
-
+    return this.http.post(environment.api + `refresh`, {})
+      .pipe(tap((tokens: AccessData) => {
+        this.saveAccessData(tokens);
+        // if (this.getInterruptedUrl() !== undefined && this.getInterruptedUrl() !== null) {
+        //   console.log('Attempt to navigate to interrupted route' + this.getInterruptedUrl());
+        //   // this.router.navigate()
+        // }
+      }));
+    //
     // return this.tokenStorage
     //   .getRefreshToken()
     //   .pipe(
@@ -126,9 +126,9 @@ export class AuthenticationService implements AuthService {
     //       return Observable.throw(err);
     //     })
     //   );
-    this.logout();
-    this.router.navigate(['/login']);
-    return of(null);
+    // this.logout();
+    // this.router.navigate(['/login']);
+    // return of(null);
   }
 
   /**
@@ -156,10 +156,12 @@ export class AuthenticationService implements AuthService {
    * EXTRA AUTH METHODS
    */
 
-  public login(username, password): Observable<any> {
+  public login(username, password, keepmeloggedin): Observable<any> {
     console.log('login request for ' + username);
-    return this.http.post(environment.api + `login/`, {'username': username, 'password': password})
+    return this.http.post(environment.api + `login/`, {'username': username, 'password': password,
+      'keepmeloggedin': keepmeloggedin})
       .pipe(tap((tokens: AccessData) => {
+        console.log(tokens);
         this.saveAccessData(tokens);
         if (this.getInterruptedUrl() !== undefined && this.getInterruptedUrl() !== null) {
           console.log('Attempt to navigate to interrupted route' + this.getInterruptedUrl());

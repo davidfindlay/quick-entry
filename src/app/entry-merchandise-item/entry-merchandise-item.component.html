@@ -1,0 +1,35 @@
+<div class="card card-block mb-3" [formGroup]="merchandiseItemForm">
+  <div class="card-header">
+    <h4>{{merchandiseItem.item_name}}</h4>
+  </div>
+  <div class="row align-items-center">
+    <div class="col-md-2 h-100">
+      <div class="col-md-12 text-center">Quantity:</div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <button class="btn btn-outline-secondary" type="button" id="button-removeItem" aria-label="Remove Item" (click)="removeItem()">-</button>
+        </div>
+        <input class="form-control quantity" width="2" type="text" formControlName="qty" aria-label="Item Quantity" id="qty"/>
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" id="button-addITem" aria-label="Add Item" (click)="addItem()">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-10 h-100">
+
+      <div class="card-body">
+        <p>{{merchandiseItem.description}}</p>
+
+        <div class="row">
+          <div class="col-sm-4" *ngFor="let merchandiseImage of merchandiseItem.images; let i = index">
+            <img class="img-thumbnail" src="{{fileRoot + 'meets/' + merchandiseItem.meet_id + '/merchandise/' + merchandiseImage.filename}}" alt="{{merchandiseImage.caption}}" (click)="openImage(i)">
+            <p class="figure-caption text-center" (click)="openImage(i)">{{merchandiseImage.caption}}</p>
+          </div>
+        </div>
+
+        <p><strong>Price:</strong> {{merchandiseItem.total_price | currency}} each {{(merchandiseItem.gst_applicable) ? 'including GST' : ''}}</p>
+
+      </div>
+    </div>
+  </div>
+</div>

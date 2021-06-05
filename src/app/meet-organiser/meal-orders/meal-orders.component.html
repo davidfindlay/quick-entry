@@ -1,0 +1,140 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>{{meetName}}</h1>
+    <h2>Meal Orders</h2>
+  </div>
+</div>
+<!--<div class="row">-->
+<!--  <div class="col-xs-12">-->
+<!--    <button class="btn btn-primary" (click)="configureMeal()">Configure Meals</button>-->
+<!--  </div>-->
+<!--</div>-->
+<div class="card mb-3 bg-info text-white" *ngIf="meet.mealfee !== null && meet.mealfee !== 0">
+  <div class="card-body">
+    <p>
+      Meals orders from pending or paid pending orders will only appear here after the pending order has been
+      processed.
+    </p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="dashboard-number">
+          {{totalMealsOrdered}}
+        </div>
+        <div class="dashboard-caption">
+          Meals Ordered
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="dashboard-number">
+          {{totalMealsComments}}
+        </div>
+        <div class="dashboard-caption">
+          Comments or Dietary Requirements
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<form [formGroup]="tableControl">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light ">
+    <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
+      <div class="dropdown" ngbDropdown>
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+          Export...
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" ngbDropdownMenu>
+          <a class="dropdown-item" href="#" ngbDropdownItem>CSV</a>
+          <a class="dropdown-item" href="#" ngbDropdownItem>Excel</a>
+          <a class="dropdown-item" href="#" ngbDropdownItem>PDF</a>
+        </div>
+      </div>
+      <!--    <form class="form-inline my-2 my-lg-0">-->
+      <div class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" (keyup)="updateFilter($event)">
+      </div>
+      <!--    </form>-->
+      <div class="form-inline">
+        <label for="limit" class="pr-1">Show Items:</label>
+        <select id="limit" class="form-control" formControlName="limit">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="all">All</option>
+        </select>
+      </div>
+    </div>
+  </nav>
+<div class="row">
+  <div class="col-sm-12">
+    <table width="100%">
+      <thead>
+      <tr>
+        <th>
+          Entry Id:
+        </th>
+        <th>
+          Entrant:
+        </th>
+        <th>
+          Club:
+        </th>
+        <th>
+          Meals:
+        </th>
+        <th>
+          Comments:
+        </th>
+        <th>
+          Status:
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let order of orderTable">
+        <td>
+          {{order.meet_entries_id}}
+        </td>
+        <td>
+          {{order.member_details}}
+        </td>
+        <td>
+          {{order.club_details}}
+        </td>
+        <td>
+          {{order.meals}}
+        </td>
+        <td>
+        {{order.comments}}
+      </td>
+        <td>
+          {{order.status}}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+  <div class="row">
+    <div class="col-sm-3">
+
+    </div>
+  </div>
+
+<div class="card mb-3 bg-warning text-black" *ngIf="(meet.mealfee === null || meet.mealfee === 0) && meet.mealname === null">
+  <div class="card-body">
+    <p>
+      No meal details have been configured for this meet.
+    </p>
+  </div>
+</div>
+</form>

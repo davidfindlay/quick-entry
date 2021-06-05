@@ -28,7 +28,7 @@ export class TokenStorage {
    * @returns {Observable<string>}
    */
   public getRefreshToken(): Observable<string> {
-    const token: string = <string>localStorage.getItem('accessToken');
+    const token: string = <string>localStorage.getItem('refreshToken');
 
     return of(token);
   }

@@ -3,14 +3,18 @@ import {Member} from './member';
 import {MeetEntryEvent} from './meet-entry-event';
 import {MeetEntryStatus} from './meet-entry-status';
 import {MeetEntryPayment} from './meet-entry-payment';
+import {MerchandiseDetails} from './merchandise';
+import {Meet} from './meet';
 
 export class MeetEntry {
   id: number;
   meet_id: number;
+  meet: Meet;
   member_id: number;
   member: Member;
   age_group_id: number;
   meals: number;
+  mealComments: string;
   medical: boolean;
   cost: number;
   notes: string;
@@ -28,9 +32,11 @@ export class MeetEntry {
   medical_safety: boolean;
   medical_details: string;
   events: MeetEntryEvent[];
+  merchandise: MerchandiseDetails[];
   status: MeetEntryStatus;
   payments: MeetEntryPayment[];
   code: string;
   created_at: Date;
   updated_at: Date;
+  incomplete_entry_id: number;
 }
