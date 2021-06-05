@@ -372,7 +372,7 @@ export class EntrantDetailsComponent implements OnInit {
     console.log('User log in!');
 
     this.authenticationService.login(this.inlineLoginForm.value.loginUsername,
-      this.inlineLoginForm.value.loginPassword)
+      this.inlineLoginForm.value.loginPassword, false)
       .subscribe(result => {
         console.log(result);
           if (result !== undefined && result !== null) {

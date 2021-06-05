@@ -180,7 +180,7 @@ export class UserService {
         if (registeredUser.success) {
           console.log('Successfully registered new user ' + registeredUser.user.username);
 
-          this.authenticationService.login(registeredUser.user.username, userDetails.password).subscribe((loggedIn) => {
+          this.authenticationService.login(registeredUser.user.username, userDetails.password, false).subscribe((loggedIn) => {
             observer.next(registeredUser);
             observer.complete();
           });
