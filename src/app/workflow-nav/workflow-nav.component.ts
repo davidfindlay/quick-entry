@@ -28,6 +28,7 @@ export class WorkflowNavComponent implements OnInit {
 
   showNextButton = true;
   showFinishButton = false;
+  showPayButton = false;
 
   @Output() submitEvent = new EventEmitter<string>();
 
@@ -72,6 +73,10 @@ export class WorkflowNavComponent implements OnInit {
     this.submitEvent.emit('submit');
   }
 
+  clickPay() {
+    this.submitEvent.emit('pay');
+  }
+
   navigateNext() {
     this.router.navigate([this.next]);
   }
@@ -99,6 +104,15 @@ export class WorkflowNavComponent implements OnInit {
     this.btnSaveDisable = true;
     this.showNextButton = false;
     this.showFinishButton = true;
+  }
+
+  enablePayButton() {
+    this.btnBackDisable = true;
+    this.btnCancelDisable = true;
+    this.btnSaveDisable = true;
+    this.showNextButton = false;
+    this.showFinishButton = false;
+    this.showPayButton = true;
   }
 
 }
