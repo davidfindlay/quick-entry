@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit {
     this.loading = true;
     this.spinner.show();
     console.log(this.model);
-    this.authenticationService.login(this.model.username, this.model.password)
+    this.authenticationService.login(this.model.username, this.model.password, this.model.keepmeloggedin)
       .subscribe(result => {
           this.spinner.hide();
           console.log('Logged in');

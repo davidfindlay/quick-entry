@@ -156,9 +156,10 @@ export class AuthenticationService implements AuthService {
    * EXTRA AUTH METHODS
    */
 
-  public login(username, password): Observable<any> {
+  public login(username, password, keepmeloggedin): Observable<any> {
     console.log('login request for ' + username);
-    return this.http.post(environment.api + `login/`, {'username': username, 'password': password})
+    return this.http.post(environment.api + `login/`, {'username': username, 'password': password,
+      'keepmeloggedin': keepmeloggedin})
       .pipe(tap((tokens: AccessData) => {
         console.log(tokens);
         this.saveAccessData(tokens);
