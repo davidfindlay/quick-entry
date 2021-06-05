@@ -38,5 +38,5 @@ export class MeetEntry {
   code: string;
   created_at: Date;
   updated_at: Date;
-
+  incomplete_entry_id: number;
 }

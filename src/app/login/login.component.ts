@@ -25,6 +25,8 @@ export class LoginComponent implements OnInit {
   loading = false;
   error = '';
 
+  saveLogin = true;
+
   alerts: Alert[];
 
   constructor(private router: Router,
@@ -44,6 +46,7 @@ export class LoginComponent implements OnInit {
   login() {
     this.loading = true;
     this.spinner.show();
+    console.log(this.model);
     this.authenticationService.login(this.model.username, this.model.password)
       .subscribe(result => {
           this.spinner.hide();

@@ -47,4 +47,10 @@ export class RelayService {
   reportPayment(club_id, meet_id, paymentDetails) {
     return this.http.post(environment.api + 'relay_payment/' + club_id + '/' + meet_id, paymentDetails);
   }
+
+  reportGuestPayment(meet_id, paymentDetails) {
+    console.log(paymentDetails);
+    return this.http.post(environment.api + 'relay_payment_guest/' + meet_id, paymentDetails);
+  }
+
 }

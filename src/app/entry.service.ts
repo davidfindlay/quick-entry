@@ -23,6 +23,7 @@ import {EntryPayment} from './models/entry-payment';
 import {MealMerchandiseDetails} from './models/meal-merchandise-details';
 import {MerchandiseDetails} from './models/merchandise';
 import * as moment from 'moment';
+import {MeetEntryPayment} from './models/meet-entry-payment';
 
 @Injectable()
 export class EntryService {
@@ -912,6 +913,11 @@ export class EntryService {
       return null;
     }
 
+    entryFO.created_at = new Date(meetEntry.created_at);
+    entryFO.updated_at = new Date(meetEntry.updated_at);
+    entryFO.meetEntryId = meetEntry.id;
+    entryFO.incompleteId = meetEntry.incomplete_entry_id
+
     entrantDetailsFO.entrantFirstName = meetEntry.member.firstname;
     entrantDetailsFO.entrantSurname = meetEntry.member.surname;
     entrantDetailsFO.entrantDob = meetEntry.member.dob;
@@ -1031,6 +1037,7 @@ export class EntryService {
     }
 
     entryFO.meetId = meetEntry.meet_id;
+    entryFO.code = meetEntry.code;
     entryFO.validEvents = true;
 
     // console.log(entryFO);
@@ -1046,14 +1053,30 @@ export class EntryService {
     incompleteEntry.entrydata = entryFO;
     incompleteEntry.meet_id = meetEntry.meet_id;
 
+    console.log(meetEntry);
+
     let paidAmount = 0;
+    const payments = [];
 
     if (meetEntry.payments !== undefined && meetEntry.payments !== null) {
       for (const payment of meetEntry.payments) {
         paidAmount += payment.amount;
+
+        const currentPayment = new MeetEntryPayment();
+        currentPayment.id = payment.id;
+        currentPayment.club_id = payment.club_id;
+        currentPayment.entry_id = payment.entry_id;
+        currentPayment.received = new Date(payment.received);
+        currentPayment.comment = payment.comment;
+        currentPayment.amount = payment.amount;
+        currentPayment.method = payment.method;
+        currentPayment.member_id = payment.member_id;
+
+        payments.push(currentPayment);
       }
     }
-    incompleteEntry.paid_amount = paidAmount;
+    entryFO.paidAmount = paidAmount;
+    entryFO.payments = payments;
 
     console.log(incompleteEntry);
 

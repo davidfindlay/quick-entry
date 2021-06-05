@@ -16,6 +16,7 @@ export class SidebarMenuComponent implements OnInit {
 
   userIsAdmin = false;
   userIsMeetOrganiser = true;
+  guestRelay = false;
   userLoggedIn;
 
   meetName = 'Meet Organiser';

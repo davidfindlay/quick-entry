@@ -5,3 +5,12 @@ th.moneycol {
 .moneycol {
   text-align: right;
 }
+
+.seedtimeCol {
+  text-align: right;
+}
+
+.fieldName {
+  font-weight: bold;
+  text-align: right;
+}

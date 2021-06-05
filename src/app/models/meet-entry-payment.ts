@@ -2,7 +2,7 @@ export class MeetEntryPayment {
   id: number;
   entry_id: number;
   member_id: number;
-  received: string;
+  received: Date;
   amount: number;
   method: number;
   comment: string;

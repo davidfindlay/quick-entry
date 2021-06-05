@@ -100,15 +100,18 @@ export class MeetEntryActionComponent implements OnInit {
     this.statusLabel = entry.status_label;
     this.statusText = entry.status_description;
     this.eventEntries = entry.entrydata.entryEvents;
-    this.paidAmount = entry.paidAmount;
+    this.paidAmount = this.entry.paidAmount;
     this.spinner.hide();
-    this.entry = entry.entrydata;
+    this.created_at = this.entry.created_at;
+    this.updated_at = this.entry.updated_at;
+
+    console.log(this.entry);
 
     for (const payment of this.entry.payments) {
       this.totalPayments += payment.amount;
     }
 
-    this.owedAmount = this.entry.cost - this.totalPayments;
+    this.owedAmount = this.meetFee - this.paidAmount;
 
     this.cdref.detectChanges();
   }

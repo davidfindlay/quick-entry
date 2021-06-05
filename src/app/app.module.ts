@@ -82,6 +82,7 @@ import { ClubRelayTeamsComponent } from './club-relay-teams/club-relay-teams.com
 import {RelayService} from './relay.service';
 import { ClubRelayTeamEditComponent } from './club-relay-team-edit/club-relay-team-edit.component';
 import { ClubRelayStatusComponent } from './club-relay-status/club-relay-status.component';
+import { RelayGuestComponent } from './relay-guest/relay-guest.component';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -132,6 +133,7 @@ const appRoutes: Routes = [
   { path: 'user-list', component: UserListComponent },
   { path: 'user-list/:userId', component: UserEditComponent },
   { path: 'calendar', component: MeetCalendarComponent },
+  { path: 'guest-relay', component: RelayGuestComponent },
     { path: '**', component: MeetListComponent }
 ];
 
@@ -194,7 +196,8 @@ export class SentryErrorHandler implements ErrorHandler {
     ClubEntriesComponent,
     ClubRelayTeamsComponent,
     ClubRelayTeamEditComponent,
-    ClubRelayStatusComponent
+    ClubRelayStatusComponent,
+    RelayGuestComponent
   ],
   entryComponents: [ConfirmCancelComponent, SeedtimeHelperComponent, PostalTimeEntryComponent],
   imports: [

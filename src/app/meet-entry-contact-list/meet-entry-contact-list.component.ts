@@ -57,7 +57,7 @@ export class MeetEntryContactListComponent implements OnInit {
         this.entries = entries.meet_entries;
 
         this.tableRows = [];
-        console.log(entries);
+        console.log(this.entries);
 
         for (const entry of this.entries) {
 

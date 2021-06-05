@@ -18,6 +18,7 @@ export class EntryFormObject {
   mealMerchandiseDetails: MealMerchandiseDetails;
 
   payments: EntryPayment[];
+  paidAmount: number;
 
   // Membership
   memberType: string;
@@ -36,6 +37,7 @@ export class EntryFormObject {
   validEvents: boolean;
 
   incompleteId: number;
+  meetEntryId: number;
 
   edit_mode: boolean;
   edit_entry_id: number;
@@ -44,5 +46,9 @@ export class EntryFormObject {
   cost: number;
 
   status: number;
+
+  created_at: Date;
+  updated_at: Date;
+  code: string;
 
 }

@@ -65,6 +65,14 @@
         </div>
         <div class="row">
           <div class="fieldName col-sm-3">
+            Entry Code:
+          </div>
+          <div class="fieldValue">
+              {{entry.code}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="fieldName col-sm-3">
             Entry Status:
           </div>
           <div class="fieldValue">
@@ -76,7 +84,7 @@
             Created Date/Time:
           </div>
           <div class="fieldValue">
-            {{created_at}}
+            {{created_at | date: 'd/M/yyyy h:mm:ss a'}}
           </div>
         </div>
         <div class="row">
@@ -84,9 +92,20 @@
             Last Updated Date/Time:
           </div>
           <div class="fieldValue">
-            {{updated_at}}
+            {{updated_at  | date: 'd/M/yyyy h:mm:ss a'}}
           </div>
         </div>
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Incomplete Entry ID:
+          </div>
+          <div class="fieldValue">
+            <a href="/pending-entry/{{entry.code}}">
+              {{entry.incompleteId}}
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -338,7 +357,7 @@
         <tr>
           <th class="pr-4">Event</th>
           <th class="pr-4">Description</th>
-          <th>Seed Time</th>
+          <th class="text-right">Seed Time</th>
         </tr>
         </thead>
         <tr *ngFor="let event of eventEntries">
@@ -419,7 +438,7 @@
                 Paid
               </td>
               <td class="moneycol">
-                {{totalPayments | currency}}
+                {{paidAmount | currency}}
               </td>
             </tr>
             <tr>
@@ -458,7 +477,7 @@
             <tbody>
             <tr *ngFor="let payment of entry.payments">
               <td>
-                {{payment.received}}
+                {{payment.received | date: 'd/M/yy h:mm:ss a'}}
               </td>
               <td>
                 {{payment.comment}}
