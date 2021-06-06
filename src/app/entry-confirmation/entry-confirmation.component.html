@@ -378,16 +378,17 @@
           </h4>
           <ul>
             <li *ngIf="enablePaymentOption('paypal')">
-              Credit/Debit Card: We accept payment via Credit or Debit card using PayPal's card payment processing.
-              You do not need to have a PayPal account to use this option.
+              <strong>Credit/Debit Card:</strong> We accept payment via Credit or Debit card using PayPal's card payment processing.
+              You do not need to have a PayPal account to use this option. <strong>To pay via card, click "Pay with a Card"
+            at the bottom of the PayPal screen.</strong>
             </li>
             <li *ngIf="enablePaymentOption('club')">
-              Pay via Club: Your club may make a bulk payment on behalf of members. Please check with your Club Recorder
+              <strong>Pay via Club:</strong> Your club may make a bulk payment on behalf of members. Please check with your Club Recorder
               or Club Captain. Note that if you do not pay for your entry by the Meet Entry Deadline your entry may not
               be accepted.
             </li>
-            <li>
-              Pay Later: You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
+            <li *ngIf="enablePayLater()">
+              <strong>Pay Later:</strong> You can choose to pay at a later date by returning to Quick Entry. Note that if you do not pay
               for your entry by the Meet Entry Deadline your entry <strong><u>may be rejected</u></strong>.
             </li>
           </ul>

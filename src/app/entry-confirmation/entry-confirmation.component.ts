@@ -42,6 +42,8 @@ export class EntryConfirmationComponent implements OnInit {
   meet: Meet;
   meetName;
 
+  meetEntry;
+
   @Input() entry;
   pending_entry_code;
   meet_entry_code;
@@ -59,6 +61,7 @@ export class EntryConfirmationComponent implements OnInit {
 
   paidAmount = 0;
   paypalData = null;
+  payLater = true;
 
   statusCode = 0;
   statusLabel = 'Not Submitted';
@@ -162,14 +165,24 @@ export class EntryConfirmationComponent implements OnInit {
           this.meet = this.meetService.getMeet(entry.meet_id);
           this.meetName = this.meet.meetname;
           this.entry = entry.entrydata;
+          this.meetEntry = entry.meet_entry;
           this.statusLabel = entry.status_label;
           this.statusText = entry.status_description;
-          this.paidAmount = entry.paid_amount;
+
+          console.log(entry);
+          this.paidAmount = 0;
+          if (entry.entrydata && entry.entrydata.paidAmount) {
+            this.paidAmount = entry.entrydata.paidAmount;
+          }
+
           console.log('meet fee: ' + this.meet.meetfee + ' paid: ' + this.paidAmount);
           if (this.paidAmount >= this.meet.meetfee) {
             this.showPaymentChoice = false;
             this.workflowNav.enableFinishButton();
           } else {
+
+            this.workflowNav.enablePayButton();
+
             this.workflowNav.disableBack();
             this.workflowNav.disableCancel();
           }
@@ -304,6 +317,11 @@ export class EntryConfirmationComponent implements OnInit {
         break;
       case 'saveAndExit':
         break;
+      case 'pay':
+        console.log('pay clicked');
+        const paypalPayment = this.paypalService.createPaymentFinalisedEntry(this.meetEntry);
+        this.doPaypalDepart(paypalPayment);
+        break;
       case 'submit':
         this.saveEntry().subscribe((saved: any) => {
           this.entry = saved;
@@ -368,28 +386,7 @@ export class EntryConfirmationComponent implements OnInit {
                 paypalPayment = this.paypalService.createPaymentFinalisedEntry(finalised.meet_entry);
               }
 
-              if (paypalPayment.success !== false) {
-
-                this.router.navigate(['/', 'paypal-depart']);
-
-                paypalPayment.subscribe((paymentDetails: any) => {
-                  this.ngxSpinner.hide();
-                  window.location.assign(paymentDetails.approvalUrl);
-                }, (error: any) => {
-
-                  // Handle paypal error
-                  console.log('Got error can\'t go to paypal');
-
-                  this.ngxSpinner.hide();
-                  this.showPaymentChoice = false;
-                  this.workflowNav.enableFinishButton();
-
-                });
-              } else {
-                this.ngxSpinner.hide();
-                this.showPaymentChoice = false;
-                this.workflowNav.enableFinishButton();
-              }
+              this.doPaypalDepart(paypalPayment);
 
             } else {
               this.ngxSpinner.hide();
@@ -462,6 +459,32 @@ export class EntryConfirmationComponent implements OnInit {
         paymentOption: 'later'
       });
       return true;
+    }
+  }
+
+  doPaypalDepart(paypalPayment) {
+    if (paypalPayment.success !== false) {
+
+      this.router.navigate(['/', 'paypal-depart']);
+
+      paypalPayment.subscribe((paymentDetails: any) => {
+        this.ngxSpinner.hide();
+        window.location.assign(paymentDetails.approvalUrl);
+      }, (error: any) => {
+
+        // Handle paypal error
+        console.log('Got error can\'t go to paypal');
+
+        this.ngxSpinner.hide();
+        this.showPaymentChoice = false;
+        this.workflowNav.enableFinishButton();
+
+      });
+    } else {
+      console.log('Error going to paypal:', paypalPayment);
+      this.ngxSpinner.hide();
+      // this.showPaymentChoice = false;
+      // this.workflowNav.enableFinishButton();
     }
   }
 

@@ -81,6 +81,7 @@ export class SubmittedEntryComponent implements OnInit {
     }
 
     // Is PayPal option available?
+    console.log(this.meet);
     if (this.meet.payment_types !== undefined && this.meet.payment_types !== null) {
       for (const paymentType of this.meet.payment_types) {
         if (paymentType.payment_type_id === 1) {

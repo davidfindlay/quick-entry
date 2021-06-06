@@ -1050,6 +1050,7 @@ export class EntryService {
       incompleteEntry.status_description = currentStatus.status.description;
 
     }
+    incompleteEntry.meet_entry = meetEntry;
     incompleteEntry.entrydata = entryFO;
     incompleteEntry.meet_id = meetEntry.meet_id;
 
