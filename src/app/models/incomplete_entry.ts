@@ -1,5 +1,6 @@
 import {EntryFormObject} from './entry-form-object';
 import {MeetEntryStatusCode} from './meet-entry-status-code';
+import {MeetEntry} from './meet-entry';
 
 export class IncompleteEntry {
   id: number;
@@ -18,4 +19,5 @@ export class IncompleteEntry {
   created_at: Date;
   updated_at: Date;
   finalised_at: Date;
+  meet_entry: MeetEntry;
 }

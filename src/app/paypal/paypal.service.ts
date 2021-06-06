@@ -30,7 +30,6 @@ export class PaypalService {
 
   handleLanding() {
     // Paypal status
-    console.log(this.route.snapshot);
     const paypalSuccess = this.route.snapshot.queryParams['paypalsuccess'];
     const paypalToken = this.route.snapshot.queryParams['token'];
     const paymentId = this.route.snapshot.queryParams['paymentId'];
@@ -67,6 +66,7 @@ export class PaypalService {
 
       });
     } else {
+      console.log('paypal success: false');
       if (pendingId !== undefined && pendingId !== null) {
         this.router.navigate(['/', 'pending-entry-confirmation', pendingId]);
       }

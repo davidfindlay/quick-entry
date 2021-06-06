@@ -7,5 +7,6 @@
     </div>
     <button type="submit" class="btn btn-success" id="btnNext" (click)="clickNext()" [disabled]="btnNextDisable" *ngIf="showNextButton">{{nextText}}</button>
     <button type="submit" class="btn btn-success" id="btnFinish" (click)="clickFinish()" *ngIf="showFinishButton">Finish</button>
+    <button type="submit" class="btn btn-success" id="btnPay" (click)="clickPay()" *ngIf="showPayButton">Pay Now</button>
   </div>
 </fieldset>
