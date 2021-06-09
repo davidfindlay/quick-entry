@@ -22,6 +22,7 @@ export class MeetEntryActionComponent implements OnInit {
   @ViewChild('applyPayment', {static: true}) applyPayment: ElementRef;
   @ViewChild('transferPayment', {static: true}) transferPayment: ElementRef;
   @ViewChild('emailConfirm', {static: true}) emailConfirm: ElementRef;
+  @ViewChild('paymentLinkConfirm', {static: true}) paymentLinkConfirm: ElementRef;
 
   meet_id;
   meet: Meet;
@@ -201,7 +202,38 @@ export class MeetEntryActionComponent implements OnInit {
   }
 
   payEmail() {
-    console.log('pay email');
+    this.modal.open(this.paymentLinkConfirm).result.then((approved: any) => {
+      if (approved === 'Yes') {
+        this.spinner.show();
+        console.log('resendEmail: Yes');
+        this.entryService.sendPaymentLink(this.meetEntryId).subscribe((response: any) => {
+          if (response.success) {
+            this.alerts.push({
+              type: 'success',
+              message: response.message
+            });
+          } else {
+            this.alerts.push({
+              type: 'danger',
+              message: response.message
+            });
+          }
+          this.spinner.hide();
+
+        }, (error) => {
+          console.error(error);
+          this.alerts.push({
+            type: 'danger',
+            message: 'Unable to send payment link email for unknown reason. Please contact the system administrator. '
+          });
+          this.spinner.hide();
+        });
+      }
+
+    }, (error: any) => {
+      console.log(error);
+    });
+    this.appref.tick();
   }
 
   resendEmail() {
@@ -224,6 +256,7 @@ export class MeetEntryActionComponent implements OnInit {
           this.spinner.hide();
 
         }, (error) => {
+          console.error(error);
           this.alerts.push({
             type: 'danger',
             message: 'Unable to send confirmation email for unknown reason. Please contact the system administrator. '

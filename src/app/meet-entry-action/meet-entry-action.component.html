@@ -639,3 +639,15 @@
   </div>
 </ng-template>
 
+<ng-template #paymentLinkConfirm let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal3-basic-title">Confirm Sending Payment Link</h4>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to send a payment link?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Yes')">Yes</button>
+    <button type="button" class="btn btn-success" (click)="modal.close('No')">No</button>
+  </div>
+</ng-template>
