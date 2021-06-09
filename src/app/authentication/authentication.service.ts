@@ -88,47 +88,9 @@ export class AuthenticationService implements AuthService {
    * @returns {Observable<any>}
    */
   public refreshToken(): Observable <AccessData> {
-
-    // this.spinner.show();
-    //
-    console.log('refreshToken');
-    console.log(environment.api + 'refresh');
-
-    return this.http.post(environment.api + `refresh`, {})
-      .pipe(tap((tokens: AccessData) => {
-        this.saveAccessData(tokens);
-        // if (this.getInterruptedUrl() !== undefined && this.getInterruptedUrl() !== null) {
-        //   console.log('Attempt to navigate to interrupted route' + this.getInterruptedUrl());
-        //   // this.router.navigate()
-        // }
-      }));
-    //
-    // return this.tokenStorage
-    //   .getRefreshToken()
-    //   .pipe(
-    //     switchMap((refreshToken: string) =>
-    //       this.http.post(environment.api + `refresh`, {})
-    //     ),
-    //     timeout(5000),
-    //     tap((tokens: AccessData) => {
-    //       console.log('got tokens');
-    //       console.log(tokens);
-    //       this.saveAccessData(tokens);
-    //       this.spinner.hide();
-    //     }),
-    //     catchError((err) => {
-    //       console.log('caught error, do logout');
-    //       console.log(err);
-    //       this.logout();
-    //
-    //       this.router.navigate(['/login']);
-    //
-    //       return Observable.throw(err);
-    //     })
-    //   );
-    // this.logout();
-    // this.router.navigate(['/login']);
-    // return of(null);
+    this.logout();
+    this.router.navigate(['/login']);
+    return of(null);
   }
 
   /**

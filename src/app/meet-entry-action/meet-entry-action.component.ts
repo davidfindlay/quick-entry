@@ -3,7 +3,7 @@ import {Meet} from '../models/meet';
 import {EntryEvent} from '../models/entryevent';
 import {ActivatedRoute} from '@angular/router';
 import {EntryService} from '../entry.service';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {Form, FormBuilder, FormGroup} from '@angular/forms';
 import {MeetService} from '../meet.service';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {NgbAlert, NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -56,6 +56,7 @@ export class MeetEntryActionComponent implements OnInit {
   unableToLoad = false;
 
   meetActionForm: FormGroup;
+  applyPaymentForm: FormGroup;
 
   alerts: Alert[];
 
@@ -71,6 +72,25 @@ export class MeetEntryActionComponent implements OnInit {
   ngOnInit() {
     this.spinner.show();
     this.meetEntryId = this.route.snapshot.paramMap.get('entryId');
+
+    this.loadEntry(this.meetEntryId);
+
+    this.meetActionForm = this.fb.group({
+      clubSelector: ''
+    });
+
+    this.applyPaymentForm = this.fb.group({
+      paymentMethod: 1,
+      amount: '',
+      reason: '',
+      received: new Date()
+    });
+
+    this.resetAlerts();
+  }
+
+  loadEntry(entryId) {
+
     this.entryService.getMeetEntryFO(this.meetEntryId).subscribe((entry: any) => {
 
       if (entry === undefined || entry === null) {
@@ -78,42 +98,39 @@ export class MeetEntryActionComponent implements OnInit {
         console.error('Unable to load entry: ' + this.meetEntryId);
       } else {
 
-        this.loadEntry(entry);
+        this.entry = entry.entrydata;
+        this.incompleteEntry = entry;
+        this.meet_id = entry.meet_id;
+        this.meet = this.meetService.getMeet(this.meet_id);
+        this.meetName = this.meet.meetname;
+        this.meetFee = this.meet.meetfee;
+        this.statusLabel = entry.status_label;
+        this.statusText = entry.status_description;
+        this.eventEntries = entry.entrydata.entryEvents;
+        this.paidAmount = this.entry.paidAmount;
+        this.spinner.hide();
+        this.created_at = this.entry.created_at;
+        this.updated_at = this.entry.updated_at;
+
+        console.log(this.entry);
+
+        this.totalPayments = 0;
+
+        for (const payment of this.entry.payments) {
+          console.log(payment);
+          this.totalPayments += payment.amount;
+        }
+
+        this.owedAmount = this.meetFee - this.paidAmount;
+
+        this.cdref.detectChanges();
+
       }
 
     });
 
-    this.meetActionForm = this.fb.group({
-      clubSelector: ''
-    });
 
-    this.resetAlerts();
-  }
 
-  loadEntry(entry) {
-    this.entry = entry.entrydata;
-    this.incompleteEntry = entry;
-    this.meet_id = entry.meet_id;
-    this.meet = this.meetService.getMeet(this.meet_id);
-    this.meetName = this.meet.meetname;
-    this.meetFee = this.meet.meetfee;
-    this.statusLabel = entry.status_label;
-    this.statusText = entry.status_description;
-    this.eventEntries = entry.entrydata.entryEvents;
-    this.paidAmount = this.entry.paidAmount;
-    this.spinner.hide();
-    this.created_at = this.entry.created_at;
-    this.updated_at = this.entry.updated_at;
-
-    console.log(this.entry);
-
-    for (const payment of this.entry.payments) {
-      this.totalPayments += payment.amount;
-    }
-
-    this.owedAmount = this.meetFee - this.paidAmount;
-
-    this.cdref.detectChanges();
   }
 
   getLegs(event_id) {
@@ -143,11 +160,33 @@ export class MeetEntryActionComponent implements OnInit {
   clickApplyPayment() {
     console.log('Open apply payment');
     this.modal.open(this.applyPayment).result.then((details: any) => {
-      console.log(details);
 
+      if (details === 'apply') {
+
+        const received = this.applyPaymentForm.get('received').value;
+        const amount = this.applyPaymentForm.get('amount').value;
+        const reason = this.applyPaymentForm.get('reason').value;
+        const paymentMethod = this.applyPaymentForm.get('paymentMethod').value;
+
+        const paymentDetails = {
+          entry_id: this.meetEntryId,
+          member_id: this.entry.member_id,
+          received: received,
+          method: paymentMethod,
+          amount: amount,
+          comment: reason
+        };
+
+        console.log(paymentDetails);
+
+        this.entryService.applyPayment(this.meetEntryId, paymentDetails).subscribe((response: any) => {
+          this.loadEntry(this.meetEntryId);
+        });
+      }
     }, (error: any) => {
-      console.log(error);
+      console.error(error);
     });
+
     this.appref.tick();
   }
 
@@ -159,6 +198,10 @@ export class MeetEntryActionComponent implements OnInit {
       console.log(error);
     });
     this.appref.tick();
+  }
+
+  payEmail() {
+    console.log('pay email');
   }
 
   resendEmail() {
