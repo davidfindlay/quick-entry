@@ -43,6 +43,7 @@
       <button class="btn btn-danger" (click)="cancel()" *ngIf="editing">Cancel</button>
       <button class="btn btn-warning" (click)="cancelEntry()">Cancel Entry</button>
       <button class="btn btn-primary" (click)="resendEmail()">Resend Confirmation Email</button>
+      <button class="btn btn-primary" (click)="payEmail()" *ngIf="owedAmount > 0">Send Payment Link</button>
     </div>
   </div>
 
@@ -427,7 +428,7 @@
             </tr>
             <tr>
               <td colspan="3" class="moneycol">
-                Total
+                <strong>Total</strong>
               </td>
               <td class="moneycol">
                 {{meetFee | currency}}
@@ -435,7 +436,7 @@
             </tr>
             <tr>
               <td colspan="3" class="moneycol">
-                Paid
+                <strong>Paid</strong>
               </td>
               <td class="moneycol">
                 {{paidAmount | currency}}
@@ -443,7 +444,7 @@
             </tr>
             <tr>
               <td colspan="3" class="moneycol">
-                Amount Owing
+                <strong>Amount Owing</strong>
               </td>
               <td class="moneycol">
                 {{owedAmount | currency}}
@@ -487,7 +488,7 @@
               </td>
             </tr>
             <tr>
-              <td colspan="2" class="moneycol">Total Payments:</td>
+              <td colspan="2" class="moneycol"><strong>Total Payments:</strong></td>
               <td class="moneycol">{{totalPayments | currency}}</td>
             </tr>
             </tbody>
@@ -501,7 +502,9 @@
     </div>
   </div>
 </div>
+</form>
 
+<form [formGroup]="applyPaymentForm">
 <ng-template #applyPayment let-modal>
   <div class="modal-header">
     <h3>Apply Payment</h3>
@@ -517,16 +520,32 @@
     </div>
     <div class="form-group">
       <div class="row">
-        <label class="form-control-label col-sm-6" for="applyAmount">Amount:</label>
-        <input class="form-control col-sm-6" type="text" formControlName="applyAmount"
-               id="applyAmount" required/>
+        <label class="form-control-label col-sm-6" for="paymentMethod">Method:</label>
+        <select id="paymentMethod" formControlName="paymentMethod">
+          <option value="1">PayPal</option>
+          <option value="2">Pay via Club</option>
+        </select>
       </div>
     </div>
     <div class="form-group">
       <div class="row">
-        <label class="form-control-label col-sm-6" for="applyReason">Reason:</label>
-        <input class="form-control col-sm-6" type="text" formControlName="applyReason"
-               id="applyReason" required/>
+        <label class="form-control-label col-sm-6" for="received">Received:</label>
+        <input class="form-control col-sm-6" type="date" formControlName="received"
+               id="received" required/>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="row">
+        <label class="form-control-label col-sm-6" for="amount">Amount:</label>
+        <input class="form-control col-sm-6" type="text" formControlName="amount"
+               id="amount" required/>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="row">
+        <label class="form-control-label col-sm-6" for="reason">Reason:</label>
+        <input class="form-control col-sm-6" type="text" formControlName="reason"
+               id="reason" required/>
       </div>
     </div>
     <div class="modal-footer">
@@ -535,6 +554,7 @@
     </div>
   </div>
 </ng-template>
+</form>
 
 <ng-template #transferPayment let-modal>
   <div class="modal-header">
@@ -546,7 +566,8 @@
         <p class="card-text">
           Please provide the Meet Entry Id or Incomplete Entry Id of the entry to transfer the payment from.
         </p>
-      </div>
+             </div>
+
     </div>
     <div class="form-group">
       <div class="row">
@@ -603,7 +624,7 @@
     <button type="button" class="btn btn-success" (click)="modal.close('No')">No</button>
   </div>
 </ng-template>
-</form>
+
 
 <ng-template #emailConfirm let-modal>
   <div class="modal-header">

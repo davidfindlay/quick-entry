@@ -1161,4 +1161,8 @@ export class EntryService {
   sendPendingEmailConfirmation(entryId) {
     return this.http.post(environment.api + 'pending_entry/' + entryId + '/resendConfirmation', {});
   }
+
+  applyPayment(entryId, paymentDetails) {
+    return this.http.post(environment.api + 'meet_entry/' + entryId + '/applyPayment', paymentDetails);
+  }
 }
