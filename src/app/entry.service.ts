@@ -1163,7 +1163,7 @@ export class EntryService {
   }
 
   sendPaymentLink(entryId) {
-    return this.http.post(environment.api + 'pending_entry/' + entryId + '/paymentLink', {});
+    return this.http.post(environment.api + 'meet_entry/' + entryId + '/paymentLink', {});
   }
 
   applyPayment(entryId, paymentDetails) {
