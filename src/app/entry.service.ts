@@ -1162,6 +1162,10 @@ export class EntryService {
     return this.http.post(environment.api + 'pending_entry/' + entryId + '/resendConfirmation', {});
   }
 
+  sendPaymentLink(entryId) {
+    return this.http.post(environment.api + 'meet_entry/' + entryId + '/paymentLink', {});
+  }
+
   applyPayment(entryId, paymentDetails) {
     return this.http.post(environment.api + 'meet_entry/' + entryId + '/applyPayment', paymentDetails);
   }

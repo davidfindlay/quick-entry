@@ -187,6 +187,12 @@ export class EntryConfirmationComponent implements OnInit {
             this.workflowNav.disableCancel();
           }
           this.loadEntry();
+
+          if (this.route.snapshot.queryParamMap.get('pay') === 'paypal') {
+            console.log('Payment link to redirect to paypal');
+            const paypalPayment = this.paypalService.createPaymentFinalisedEntry(this.meetEntry);
+            this.doPaypalDepart(paypalPayment);
+          }
         } else {
           console.error('Unable to get entry via getMeetEntryByCodeFO');
         }
@@ -473,7 +479,9 @@ export class EntryConfirmationComponent implements OnInit {
       }, (error: any) => {
 
         // Handle paypal error
-        console.log('Got error can\'t go to paypal');
+        console.error('Got error can\'t go to paypal: ', paypalPayment);
+
+        this.router.navigate(['/', 'entry-confirmation', this.meet_entry_code]);
 
         this.ngxSpinner.hide();
         this.showPaymentChoice = false;
@@ -481,8 +489,14 @@ export class EntryConfirmationComponent implements OnInit {
 
       });
     } else {
-      console.log('Error going to paypal:', paypalPayment);
+      console.error('Error going to paypal:', paypalPayment);
       this.ngxSpinner.hide();
+
+      this.router.navigate(['/', 'entry-confirmation', this.meet_entry_code]);
+
+      this.showPaymentChoice = false;
+      this.workflowNav.enableFinishButton();
+
       // this.showPaymentChoice = false;
       // this.workflowNav.enableFinishButton();
     }
