@@ -56,3 +56,8 @@ fieldset.qe-fieldset {
   font-size: large;
   font-weight: bold;
 }
+
+.fieldName {
+  font-weight: bold;
+  text-align: right;
+}

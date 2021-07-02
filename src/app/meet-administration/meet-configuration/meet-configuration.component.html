@@ -1,0 +1,539 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>{{meetName}}</h1>
+  </div>
+</div>
+<button class="btn btn-primary mb-2" (click)="backToMeetList()">Back to Meet List</button>
+<ng-container *ngIf="meet">
+<div class="card mb-1" >
+  <div class="card-header">
+    <h3>Meet Configuration</h3>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="editMeetForm">
+    <div class="row">
+      <div class="col-sm-12">
+        <button class="btn btn-primary mr-1" (click)="edit()" *ngIf="!editMeet">Edit</button>
+        <ng-container *ngIf="!editMeet">
+          <button class="btn btn-primary" *ngIf="meet.status === null || meet.status === 0" (click)="setPublished(true)">Publish</button>
+          <button class="btn btn-warning" *ngIf="meet.status !== null && meet.status !== 0" (click)="setPublished(false)">Unpublish</button>
+        </ng-container>
+        <ng-container *ngIf="editMeet">
+          <button class="btn btn-warning mr-1" (click)="cancelEdit()">Cancel</button>
+          <button class="btn btn-primary" (click)="saveMeet()">Save Changes</button>
+        </ng-container>
+      </div>
+    </div>
+    <div class="row">
+      <div class="fieldName col-sm-3">
+        Status:
+      </div>
+      <div class="fieldValue">
+        {{meet.status > 0 ? 'Published' : 'Not-Published'}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="fieldName col-sm-3">
+        Meet ID:
+      </div>
+      <div class="fieldValue">
+        {{meet.id}}
+      </div>
+    </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Meet Name:
+      </div>
+      <div class="fieldValue">
+        {{meet.meetname}}
+      </div>
+    </div>
+    <div class="row" *ngIf="editMeet">
+      <div class="fieldName col-sm-3">
+        <label for="meetname">Meet Name:</label>
+      </div>
+      <div class="fieldValue">
+        <input type="text" class="form-control" id="meetname" formControlName="meetname" />
+      </div>
+    </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Start Date:
+      </div>
+      <div class="fieldValue">
+        {{meet.startdate | date: 'd/M/yyyy'}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="startdate">Start Date:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="date" class="form-control" id="startdate" formControlName="startdate" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        End Date:
+      </div>
+      <div class="fieldValue">
+        {{meet.enddate | date: 'd/M/yyyy'}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="enddate">End Date:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="date" class="form-control" id="enddate" formControlName="enddate" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Deadline:
+      </div>
+      <div class="fieldValue">
+        {{meet.deadline | date: 'd/M/yyyy'}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          Deadline:
+        </div>
+        <div class="fieldValue">
+          <input type="date" class="form-control" id="deadline" formControlName="deadline" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Contact Name:
+      </div>
+      <div class="fieldValue">
+        {{meet.contactname}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="contactname">Contact Name:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="contactname" formControlName="contactname" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Contact Phone:
+      </div>
+      <div class="fieldValue">
+        <ng-container *ngIf="meet.phone">
+          <a href="tel:{{meet.phone.phonenumber}}">{{meet.phone.phonenumber}}</a>
+        </ng-container>
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="contactphone">Contact Phone:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="contactphone" formControlName="contactphone" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Contact Email:
+      </div>
+      <div class="fieldValue">
+        <ng-container *ngIf="meet.email">
+          <a href="{{meet.email.address}}">{{meet.email.address}}</a>
+        </ng-container>
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="contactemail">Contact Email:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="contactemail" formControlName="contactemail" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Maximum Events:
+      </div>
+      <div class="fieldValue">
+        {{meet.maxevents}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="maxevents">Maximum Events:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="maxevents" formControlName="maxevents" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Minimum Events:
+      </div>
+      <div class="fieldValue">
+        {{meet.minevents}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="minevents">Minimum Events:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="minevents" formControlName="minevents" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Meet Fee:
+      </div>
+      <div class="fieldValue">
+        {{meet.meetfee}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="meetfee">Meet Fee:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="meetfee" formControlName="meetfee" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Meet Fee<br />(non-member):
+      </div>
+      <div class="fieldValue">
+        {{meet.meetfee_nonmember}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="meetfeenonmember">Meet Fee<br />(non-member):</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="meetfeenonmember" formControlName="meetfeenonmember" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Included Events:
+      </div>
+      <div class="fieldValue">
+        {{meet.included_events}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="includedevents">Included Events:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="includedevents" formControlName="includedevents" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Extra Event Fee:
+      </div>
+      <div class="fieldValue">
+        {{meet.extra_event_fee}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="extraeventfee">Extra Event Fee:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="extraeventfee" formControlName="extraeventfee" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Meal Fee:
+      </div>
+      <div class="fieldValue">
+        {{meet.mealfee}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="mealfee">Meal Fee:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="mealfee" formControlName="mealfee" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Meals Included:
+      </div>
+      <div class="fieldValue">
+        {{meet.mealsincluded}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          Meals Included:
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="mealsincluded" formControlName="mealsincluded" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Meal Name:
+      </div>
+      <div class="fieldValue">
+        {{meet.mealname}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="mealname">Meal Name:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="mealname" formControlName="mealname" />
+        </div>
+      </div>
+    <div class="row" *ngIf="!editMeet">
+      <div class="fieldName col-sm-3">
+        Location:
+      </div>
+      <div class="fieldValue">
+        {{meet.location}}
+      </div>
+    </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="location">Location:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="location" formControlName="location" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+  <div class="card mb-1" >
+    <div class="card-header">
+      <h3>Meet Payment Methods</h3>
+    </div>
+    <div class="card-body">
+      <div *ngIf="meet.payment_types.length === 0">No payment methods currently configured.</div>
+      <ul *ngIf="meet.payment_types.length > 0">
+        <li *ngFor="let method of meet.payment_types">{{method.payment_type.type_name}}
+          <button class="btn btn-danger" (click)="removePaymentMethod(method.payment_type_id)">Remove</button>
+        </li>
+      </ul>
+      <button class="btn btn-primary" (click)="addPaymentMethod()">Add Payment Method</button>
+    </div>
+  </div>
+
+  <div class="card mb-1" >
+    <div class="card-header">
+      <h3>Meet Access</h3>
+    </div>
+    <div class="card-body">
+      <div *ngIf="meet.access.length === 0">No meet organiser access currently configured.</div>
+
+      <table datatable *ngIf="meet.access.length > 0" class="col-sm-12 table table-bordered">
+        <thead>
+        <tr>
+          <th>Member ID: </th>
+          <th>Member Surname: </th>
+          <th>Member First Name: </th>
+          <th>Controls:</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let accessDetails of meet.access">
+          <td>
+            {{accessDetails.member_id}}
+          </td>
+          <td>
+            {{accessDetails.member.surname}}
+          </td>
+          <td>
+            {{accessDetails.member.firstname}}
+          </td>
+          <td>
+            <button class="btn btn-danger">Remove</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <button class="btn btn-primary">Add Meet Organiser Access</button>
+    </div>
+  </div>
+
+  <div class="card mb-1" >
+    <div class="card-header">
+      <h3>Meet Events</h3>
+    </div>
+    <div class="card-body">
+      <div *ngIf="meet.events.length === 0">No events currently configured.</div>
+      <table datatable *ngIf="meet.events.length > 0" class="col-sm-12 table table-bordered">
+        <thead>
+        <tr>
+          <th>
+            Num:
+          </th>
+          <th>
+            Type:
+          </th>
+          <th>
+            Distance:
+          </th>
+          <th>
+            Discipline:
+          </th>
+          <th>
+            Legs:
+          </th>
+          <th>
+            Deadline:
+          </th>
+          <th>
+            Fee:
+          </th>
+          <th>
+            Extra:
+          </th>
+          <th>
+            Controls:
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let meetEvent of meet.events">
+          <td>{{meetEvent.prognumber}}{{meetEvent.progsuffix}}</td>
+          <td>
+            {{meetEvent.event_type.typename}}
+          </td>
+          <td>
+            {{meetEvent.event_distance.distance}}
+          </td>
+          <td>
+            {{meetEvent.event_discipline.discipline}}
+          </td>
+          <td>
+            {{meetEvent.legs}}
+          </td>
+          <td>
+            {{meetEvent.deadline}}
+          </td>
+          <td>
+            {{meetEvent.eventfee}}<span *ngIf="meetEvent.eventfee_non_member && meetEvent.eventfee_non_member > 0">/{{meetEvent.eventfee_non_member}}</span>
+          </td>
+          <td>
+            <div *ngIf="meetEvent.eventname"><strong>Event Name:</strong> {{meetEvent.eventname}}</div>
+            <span class="badge badge-pill badge-primary" *ngIf="meetEvent.times_required">Seed Time Required</span>
+            <span class="badge badge-pill badge-primary" *ngIf="meetEvent.disable_seedtime_suggestions">Disable Seed Time Suggestions</span>
+          </td>
+          <td>
+            <button class="btn btn-primary" (click)="configureEventClick(meetEvent.id)">Configure</button>
+<!--            <button class="btn btn-danger">Delete</button>-->
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</ng-container>
+
+<ng-template #publishConfirm let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal3-basic-title">Confirm Publish Meet</h4>
+  </div>
+  <div class="modal-body">
+    <p *ngIf="meet.status === null || meet.status === 0">
+      <strong>Are you sure you want to publish this meet?</strong> If the meet deadline has not expired, this will
+      open the meet to entries.
+    </p>
+    <p *ngIf="meet.status !== null && meet.status !== 0">
+      <strong>Are you sure you want to unpublish this meet?</strong> This will hide the meet for users seeking to enter
+      the meet.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Yes')">Yes</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('No')">No</button>
+  </div>
+</ng-template>
+
+<ng-template #paymentMethod let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal4-basic-title">Add Payment Methods</h4>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="paymentMethodForm">
+      <select class="form-control" id="paymentMethod" formControlName="paymentMethod">
+        <option value="1">PayPal</option>
+        <option value="2">Pay via Club</option>
+      </select>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Add Method')">Add Method</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Cancel')">Cancel</button>
+  </div>
+</ng-template>
+
+<ng-template #configureEvent let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal5-basic-title">Configure Event</h4>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="configureEventForm">
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="eventName">Event Name:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="eventName" formControlName="eventName" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="eventdeadline">Deadline:</label>
+        </div>
+        <div class="fieldValue">
+          <input class="form-control" placeholder="yyyy-mm-dd hh:mm:ss" id="eventdeadline" formControlName="deadline" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="fee">Fee:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="fee" formControlName="fee" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+
+        </div>
+        <div class="fieldValue">
+          <input class="form-check-input" type="checkbox" value="" id="disallowNT" formControlName="disallowNT">
+          <label class="form-check-label" for="disallowNT">
+            Disallow No Time
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Save Changes')">Save Changes</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Cancel')">Cancel</button>
+  </div>
+</ng-template>
+
