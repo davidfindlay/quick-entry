@@ -1,0 +1,13 @@
+<h2>Member Search</h2>
+
+<form>
+  <div class="row">
+    <div class="fieldName col-sm-3">
+      <label for="memberName">Member Name:</label>
+    </div>
+    <div class="fieldValue col-sm-9">
+      <input type="text" class="form-control col-sm-12" id="memberName" formControlName="memberName"
+             [ngbTypeahead]="memberSearch" (selectItem)="memberSelected($event)" />
+    </div>
+  </div>
+</form>

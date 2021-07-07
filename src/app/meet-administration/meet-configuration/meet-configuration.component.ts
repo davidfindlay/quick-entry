@@ -18,6 +18,7 @@ export class MeetConfigurationComponent implements OnInit {
   @ViewChild('publishConfirm', {static: true}) publishConfirm: ElementRef;
   @ViewChild('paymentMethod', {static: true}) paymentMethod: ElementRef;
   @ViewChild('configureEvent', {static: true}) configureEvent: ElementRef;
+  @ViewChild('addOrganiser', {static: true}) addOrganiser: ElementRef;
 
   meet: Meet;
   meetName: string;
@@ -261,6 +262,15 @@ export class MeetConfigurationComponent implements OnInit {
           this.loadMeet(this.meet.id);
         });
       }
+    }, (error: any) => {
+      console.log(error);
+    });
+  }
+
+  addOrganiserClick() {
+
+    this.modal.open(this.addOrganiser).result.then((result: any) => {
+      console.log(result);
     }, (error: any) => {
       console.log(error);
     });

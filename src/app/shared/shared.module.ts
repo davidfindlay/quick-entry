@@ -6,13 +6,15 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {RouterModule, Routes} from '@angular/router';
 import { NotAuthorisedComponent } from './not-authorised/not-authorised.component';
 import {MeetListComponent} from '../meet-list/meet-list.component';
+import { MemberSearchComponent } from './member-search/member-search.component';
 
 const appRoutes: Routes = [{ path: 'not-authorised', component: NotAuthorisedComponent }];
 
 @NgModule({
   declarations: [
     MeetCalendarViewComponent,
-    NotAuthorisedComponent
+    NotAuthorisedComponent,
+    MemberSearchComponent
   ],
   imports: [
     NgbModule,
@@ -23,7 +25,8 @@ const appRoutes: Routes = [{ path: 'not-authorised', component: NotAuthorisedCom
     MeetService
   ],
   exports: [
-    MeetCalendarViewComponent
+    MeetCalendarViewComponent,
+    MemberSearchComponent
   ]
 })
 export class SharedModule { }
