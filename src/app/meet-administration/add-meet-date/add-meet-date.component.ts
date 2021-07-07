@@ -25,7 +25,8 @@ export class AddMeetDateComponent implements OnInit {
     this.addMeetForm = this.fb.group({
       meetDate: ['', Validators.required],
       endDate: '',
-      meetName: ['', Validators.required]
+      meetName: ['', Validators.required],
+      location: ''
     });
   }
 
@@ -55,6 +56,7 @@ export class AddMeetDateComponent implements OnInit {
     console.log(meetDetails);
     this.meetAdministrationService.addMeetDate(meetDetails).subscribe((addMeet: any) => {
       this.activeModal.close('Meet date for ' + meetDetails.meetname + ' saved.');
+      this.meetDateCreated.emit(addMeet.meet);
     });
   }
 
@@ -69,7 +71,8 @@ export class AddMeetDateComponent implements OnInit {
     const meetDetails = {
       startdate: startDate,
       enddate: endDate,
-      meetname: this.addMeetForm.get('meetName').value
+      meetname: this.addMeetForm.get('meetName').value,
+      location: this.addMeetForm.get('location').value,
     };
 
     return meetDetails;

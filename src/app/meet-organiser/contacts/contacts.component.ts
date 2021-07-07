@@ -24,6 +24,7 @@ export class ContactsComponent implements OnInit {
     { name: 'Phone', prop: 'phone'},
     { name: 'Email', prop: 'email'}
   ];
+  dtOptions: DataTables.Settings = {};
 
   constructor(private activatedRoute: ActivatedRoute,
               private router: Router,
@@ -31,6 +32,10 @@ export class ContactsComponent implements OnInit {
               private http: HttpClient) { }
 
   ngOnInit() {
+    this.dtOptions = {
+      pagingType: 'full_numbers'
+    };
+
     this.meetId = parseInt(this.activatedRoute.snapshot.params['meetId'], 10);
     console.log('Entrant Contacts meetId = ' + this.meetId);
     this.meetService.getMeetDetails(this.meetId).subscribe((meet: Meet) => {

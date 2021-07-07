@@ -83,6 +83,7 @@ import {RelayService} from './relay.service';
 import { ClubRelayTeamEditComponent } from './club-relay-team-edit/club-relay-team-edit.component';
 import { ClubRelayStatusComponent } from './club-relay-status/club-relay-status.component';
 import { RelayGuestComponent } from './relay-guest/relay-guest.component';
+import {DataTablesModule} from 'angular-datatables';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -215,7 +216,8 @@ export class SentryErrorHandler implements ErrorHandler {
     MeetOrganiserModule,
     MeetAdministrationModule,
     SharedModule,
-    NgxPayPalModule
+    NgxPayPalModule,
+    DataTablesModule
   ],
   providers: [
     MeetService,

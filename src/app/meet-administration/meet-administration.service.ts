@@ -13,4 +13,25 @@ export class MeetAdministrationService {
     return this.http.post(environment.api + 'meets', meetDetails);
   }
 
+  publishMeet(meetId, published) {
+    return this.http.post(environment.api + 'meets_publish/' + meetId, { publish: published });
+  }
+
+  updateMeet(meetDetails: any) {
+    return this.http.put(environment.api + 'meets/' + meetDetails.id, meetDetails);
+  }
+
+  addPaymentMethod(meetDetails, addMethod) {
+    return this.http.post(environment.api +  'meets_payment_method/' + meetDetails.id,
+      {paymentMethodId: parseInt(addMethod, 10)});
+  }
+
+  removePaymentMethod(meetDetails, removeMethod) {
+    return this.http.post(environment.api +  'meets_payment_method_remove/' + meetDetails.id,
+      {removePaymentMethod: parseInt(removeMethod, 10)});
+  }
+
+  updateEvent(meetId, eventId, eventDetails) {
+    return this.http.post(environment.api + 'meets/' + meetId + '/events/' + eventId + '/configure', eventDetails);
+  }
 }

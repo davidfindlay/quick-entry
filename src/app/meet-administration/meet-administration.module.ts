@@ -7,15 +7,18 @@ import {SharedModule} from '../shared/shared.module';
 import { AddMeetDateComponent } from './add-meet-date/add-meet-date.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ReactiveFormsModule} from '@angular/forms';
+import { MeetConfigurationComponent } from './meet-configuration/meet-configuration.component';
+import {DataTablesModule} from 'angular-datatables';
 
 @NgModule({
-  declarations: [MeetAdministrationComponent, AddMeetDateComponent],
+  declarations: [MeetAdministrationComponent, AddMeetDateComponent, MeetConfigurationComponent],
   imports: [
     CommonModule,
     SharedModule,
     NgbModule,
     MeetAdministrationRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DataTablesModule
   ],
   entryComponents: [AddMeetDateComponent]
 })

@@ -225,4 +225,8 @@ export class MeetService {
   getMerchandiseOrders(meetId) {
     return this.http.get(environment.api + 'meet_entry_orders/' + meetId);
   }
+
+  publishMeet(meetId, published) {
+    return this.http.post(environment.api + 'meets_publish/' + meetId, { publish: published });
+  }
 }

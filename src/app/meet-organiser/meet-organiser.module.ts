@@ -14,6 +14,7 @@ import { PendingEntriesComponent } from './pending-entries/pending-entries.compo
 import { EntryListComponent } from './entry-list/entry-list.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {RouterModule} from '@angular/router';
+import {DataTablesModule} from 'angular-datatables';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import {RouterModule} from '@angular/router';
     ReactiveFormsModule,
     NgxDatatableModule,
     NgbModule,
-    RouterModule
+    RouterModule,
+    DataTablesModule
   ]
 })
 export class MeetOrganiserModule { }

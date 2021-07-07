@@ -24,6 +24,7 @@ export class Meet {
   public contactphone;
   public meetfee;
   public meetfee_non_member;
+  public meetfee_nonmember;
   public mealfee;
   public location;
   public status;
@@ -36,6 +37,7 @@ export class Meet {
   public programfee;
   public included_events;
   public extra_event_fee;
+  public access: any[];
   public sessions: Session[];
   public events: MeetEvent[];
 
