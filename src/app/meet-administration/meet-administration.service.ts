@@ -34,4 +34,12 @@ export class MeetAdministrationService {
   updateEvent(meetId, eventId, eventDetails) {
     return this.http.post(environment.api + 'meets/' + meetId + '/events/' + eventId + '/configure', eventDetails);
   }
+
+  addAccess(meetId, memberId) {
+    return this.http.post(environment.api + 'meets/' + meetId + '/access', { memberId: memberId });
+  }
+
+  removeAccess(meetId, memberId) {
+    return this.http.delete(environment.api + 'meets/' + meetId + '/access/' + memberId);
+  }
 }
