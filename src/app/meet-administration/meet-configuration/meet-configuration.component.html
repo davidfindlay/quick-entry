@@ -364,13 +364,13 @@
             {{accessDetails.member.firstname}}
           </td>
           <td>
-            <button class="btn btn-danger">Remove</button>
+            <button class="btn btn-danger" (click)="removeAccess(accessDetails.member_id)">Remove</button>
           </td>
         </tr>
         </tbody>
       </table>
 
-      <button class="btn btn-primary">Add Meet Organiser Access</button>
+      <button class="btn btn-primary" (click)="addOrganiserClick()">Add Meet Organiser Access</button>
     </div>
   </div>
 
@@ -537,3 +537,24 @@
   </div>
 </ng-template>
 
+<ng-template #addOrganiser let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal6-basic-title">Add Meet Organiser</h4>
+  </div>
+  <div class="modal-body">
+    <app-member-search (onMemberPicked)="addAccessMemberPicked($event)"></app-member-search>
+    <hr />
+    <div class="row">
+      <div class="fieldName col-sm-3">
+        Member Selected:
+      </div>
+      <div class="fieldValue col-sm-9">
+        {{addAccessMemberPickedDetails}}
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Add Access')" [disabled]="addAccessPersonDisabled">Add Access</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Cancel')">Cancel</button>
+  </div>
+</ng-template>

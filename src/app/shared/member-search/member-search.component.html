@@ -1,0 +1,40 @@
+<form [formGroup]="memberSearchForm">
+  <div class="row">
+    <div class="fieldName col-sm-3">
+      <label for="memberName">Member Search:</label>
+    </div>
+    <div class="fieldValue col-sm-9">
+      <div class="input-group col-sm-12">
+      <input type="text" class="form-control" id="memberName" formControlName="memberName">
+      <button class="btn btn-primary" (click)="search()">Search</button>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12"><strong>Search Results:</strong></div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <table datatable class="col-sm-12 hover table table-bordered" [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Surname</th>
+          <th>First Name</th>
+          <th>MSA Number</th>
+          <th>Clubs</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let resultRow of resultRows">
+          <td>{{resultRow.id}}</td>
+          <td>{{resultRow.surname}}</td>
+          <td>{{resultRow.firstname}}</td>
+          <td>{{resultRow.number}}</td>
+          <td></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</form>

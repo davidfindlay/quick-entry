@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../environments/environment';
+import {Club} from './models/club';
+import {Member} from './models/member';
 
 @Injectable({
   providedIn: 'root'
@@ -23,5 +25,9 @@ export class MemberService {
 
   isMeetOrganiser(meetId) {
 
+  }
+
+  findMember(term) {
+    return this.http.post(environment.api + 'members/search', { term: term});
   }
 }

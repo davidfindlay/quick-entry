@@ -18,6 +18,7 @@ export class MeetConfigurationComponent implements OnInit {
   @ViewChild('publishConfirm', {static: true}) publishConfirm: ElementRef;
   @ViewChild('paymentMethod', {static: true}) paymentMethod: ElementRef;
   @ViewChild('configureEvent', {static: true}) configureEvent: ElementRef;
+  @ViewChild('addOrganiser', {static: true}) addOrganiser: ElementRef;
 
   meet: Meet;
   meetName: string;
@@ -29,6 +30,10 @@ export class MeetConfigurationComponent implements OnInit {
   editMeetForm: FormGroup;
   paymentMethodForm: FormGroup;
   configureEventForm: FormGroup;
+
+  addAccessPersonDisabled = true;
+  addAccessMemberPickedDetails = '';
+  addAccessMemberPickedId;
 
   constructor(private meetService: MeetService,
               private meetAdministrationService: MeetAdministrationService,
@@ -263,6 +268,35 @@ export class MeetConfigurationComponent implements OnInit {
       }
     }, (error: any) => {
       console.log(error);
+    });
+  }
+
+  addOrganiserClick() {
+
+    this.addAccessPersonDisabled = true;
+
+    this.modal.open(this.addOrganiser, {size: 'lg'}).result.then((result: any) => {
+      if (result === 'Add Access') {
+        this.meetAdministrationService.addAccess(this.meet.id, this.addAccessMemberPickedId).subscribe((updateResult: any) => {
+          console.log(updateResult);
+          this.loadMeet(this.meet.id);
+        });
+      }
+    }, (error: any) => {
+      console.log(error);
+    });
+  }
+
+  addAccessMemberPicked(memberPicked) {
+    this.addAccessMemberPickedDetails = memberPicked.surname +  ', ' + memberPicked.firstname + '(' + memberPicked.number + ')';
+    this.addAccessMemberPickedId = memberPicked.id;
+    this.addAccessPersonDisabled = false;
+  }
+
+  removeAccess(memberId) {
+    this.meetAdministrationService.removeAccess(this.meet.id, memberId).subscribe((updateResult: any) => {
+      console.log(updateResult);
+      this.loadMeet(this.meet.id);
     });
   }
 
