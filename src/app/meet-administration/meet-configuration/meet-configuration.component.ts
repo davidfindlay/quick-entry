@@ -31,6 +31,10 @@ export class MeetConfigurationComponent implements OnInit {
   paymentMethodForm: FormGroup;
   configureEventForm: FormGroup;
 
+  addAccessPersonDisabled = true;
+  addAccessMemberPickedDetails = '';
+  addAccessMemberPickedId;
+
   constructor(private meetService: MeetService,
               private meetAdministrationService: MeetAdministrationService,
               private modal: NgbModal,
@@ -269,10 +273,30 @@ export class MeetConfigurationComponent implements OnInit {
 
   addOrganiserClick() {
 
-    this.modal.open(this.addOrganiser).result.then((result: any) => {
-      console.log(result);
+    this.addAccessPersonDisabled = true;
+
+    this.modal.open(this.addOrganiser, {size: 'lg'}).result.then((result: any) => {
+      if (result === 'Add Access') {
+        this.meetAdministrationService.addAccess(this.meet.id, this.addAccessMemberPickedId).subscribe((updateResult: any) => {
+          console.log(updateResult);
+          this.loadMeet(this.meet.id);
+        });
+      }
     }, (error: any) => {
       console.log(error);
+    });
+  }
+
+  addAccessMemberPicked(memberPicked) {
+    this.addAccessMemberPickedDetails = memberPicked.surname +  ', ' + memberPicked.firstname + '(' + memberPicked.number + ')';
+    this.addAccessMemberPickedId = memberPicked.id;
+    this.addAccessPersonDisabled = false;
+  }
+
+  removeAccess(memberId) {
+    this.meetAdministrationService.removeAccess(this.meet.id, memberId).subscribe((updateResult: any) => {
+      console.log(updateResult);
+      this.loadMeet(this.meet.id);
     });
   }
 

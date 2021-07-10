@@ -28,12 +28,6 @@ export class MemberService {
   }
 
   findMember(term) {
-    this.http.post(environment.api + 'members/search', { term: term}).subscribe((results: any) => {
-      return results.searchResults;
-    }, (error) => {
-      console.error(error);
-      return [];
-      });
-
+    return this.http.post(environment.api + 'members/search', { term: term});
   }
 }
