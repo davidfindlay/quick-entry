@@ -39,7 +39,7 @@
     "entypo": "^2.1.0",
     "express": "^4.17.1",
     "fsevents": "^2.3.2",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "jwt-decode": "^2.2.0",
     "moment": "^2.24.0",
     "ng2-date-countdown": "1.0.3",
