@@ -62,13 +62,18 @@ export class MeetConfigurationComponent implements OnInit {
       contactEmail = this.meet.email.address;
     }
 
+    let contactPhone = '';
+    if (this.meet && this.meet.phone) {
+      contactPhone = this.meet.phone.phonenumber;
+    }
+
     this.editMeetForm = this.fb.group({
       meetname: this.meet.meetname,
       startdate: this.meet.startdate,
       enddate: this.meet.enddate,
       deadline: this.meet.deadline,
       contactname: this.meet.contactname,
-      contactphone: this.meet.contactphone,
+      contactphone: contactPhone,
       contactemail: contactEmail,
       maxevents: this.meet.maxevents,
       minevents: this.meet.minevents,
