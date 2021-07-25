@@ -56,6 +56,12 @@ export class MeetConfigurationComponent implements OnInit {
 
   createForm() {
     console.log('createForm');
+
+    let contactEmail = '';
+    if (this.meet && this.meet.email) {
+      contactEmail = this.meet.email.address;
+    }
+
     this.editMeetForm = this.fb.group({
       meetname: this.meet.meetname,
       startdate: this.meet.startdate,
@@ -63,7 +69,7 @@ export class MeetConfigurationComponent implements OnInit {
       deadline: this.meet.deadline,
       contactname: this.meet.contactname,
       contactphone: this.meet.contactphone,
-      contactemail: this.meet.contactemail,
+      contactemail: contactEmail,
       maxevents: this.meet.maxevents,
       minevents: this.meet.minevents,
       meetfee: this.meet.meetfee,
@@ -143,12 +149,10 @@ export class MeetConfigurationComponent implements OnInit {
 
   edit() {
     this.editMeet = true;
-    console.log('edit meet: ' + this.editMeet);
   }
 
   cancelEdit() {
     this.editMeet = false;
-    console.log('edit meet: ' + this.editMeet);
   }
 
   backToMeetList() {
@@ -175,6 +179,8 @@ export class MeetConfigurationComponent implements OnInit {
     this.meet.location = this.editMeetForm.get('location').value;
 
     console.log(this.meet);
+
+    this.cancelEdit();
 
     this.meetAdministrationService.updateMeet(this.meet).subscribe((meetDetails: any) => {
       console.log(meetDetails);
