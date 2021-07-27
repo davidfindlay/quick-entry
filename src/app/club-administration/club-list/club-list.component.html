@@ -1,0 +1,61 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>Club Administration</h1>
+  </div>
+</div>
+
+<table datatable class="col-sm-12 hover table table-bordered" [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+  <thead>
+  <tr>
+    <th>
+      ID
+    </th>
+    <th width="3em">
+      Code
+    </th>
+    <th>
+      Club Name
+    </th>
+    <th>
+      Region
+    </th>
+    <th>
+      Members
+    </th>
+    <th>
+      Admins
+    </th>
+    <th>
+      Manage
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let club of clubs">
+    <td>
+      {{club.id}}
+    </td>
+    <td>
+      {{club.code}}
+    </td>
+    <td>
+      {{club.clubname}}
+      <span *ngIf="!club.verified">(Not Verified)</span>
+    </td>
+    <td>
+      <span *ngIf="club.branch_region">
+        {{club.branch_region.regionname}}
+      </span>
+    </td>
+    <td>
+      {{getNumberOfMembers(club)}}
+    </td>
+    <td>
+      {{club.roles.length}}
+    </td>
+    <td>
+      <button class="btn btn-primary" (click)="manageClub(club.id)">Manage</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

@@ -28,6 +28,10 @@ export class ClubsService {
     return this.clubs;
   }
 
+  getAllClubs() {
+    return this.http.get(environment.api + 'clubs/all');
+  }
+
   findClub(term: string): Club[] {
     if (this.clubs !== undefined && this.clubs !== null) {
       return this.clubs.filter(x => x.clubname.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10);
@@ -61,6 +65,10 @@ export class ClubsService {
       console.log('Clubs not available');
     }
     return null;
+  }
+
+  getSingleClub(id: number) {
+    return this.http.get(environment.api + 'clubs/' + id);
   }
 
   getEntries(clubId, meetId) {
