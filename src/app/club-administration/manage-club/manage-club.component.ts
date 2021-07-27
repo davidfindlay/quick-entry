@@ -83,6 +83,7 @@ export class ManageClubComponent implements OnInit {
     console.log(this.manageClubForm.value);
     this.clubAdministrationService.updateClub(this.clubId, this.manageClubForm.value).subscribe((result: any) => {
       this.loadClub(this.clubId);
+      this.cancelEdit();
     });
 
   }
