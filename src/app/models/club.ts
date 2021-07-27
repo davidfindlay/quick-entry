@@ -1,8 +1,11 @@
+import {BranchRegion} from './branch-region';
+import {ClubRole} from './club-role';
+
 export class Club {
-  id;
-  code;
-  clubname;
-  postal;
-  region;
-  verified;
+  id: number;
+  code: string;
+  clubname: string;
+  branch_region: BranchRegion;
+  verified: boolean;
+  roles: ClubRole[];
 }

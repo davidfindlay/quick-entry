@@ -1,0 +1,179 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>{{clubName}}</h1>
+  </div>
+</div>
+<button class="btn btn-primary mb-2" (click)="backToClubList()">Back to Club List</button>
+<ng-container *ngIf="club">
+  <div class="card mb-1">
+    <div class="card-header">
+      <h3>Club Configuration</h3>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="manageClubForm">
+        <div class="row">
+          <div class="col-sm-12">
+            <button class="btn btn-primary mr-1" (click)="edit()" *ngIf="!editClub">Edit</button>
+            <ng-container *ngIf="editClub">
+              <button class="btn btn-warning mr-1" (click)="cancelEdit()">Cancel</button>
+              <button class="btn btn-primary" (click)="saveClub()">Save Changes</button>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="fieldName col-sm-3">
+            Club ID:
+          </div>
+          <div class="fieldValue">
+            {{club.id}}
+          </div>
+        </div>
+
+        <div class="row" *ngIf="!editClub">
+          <div class="fieldName col-sm-3">
+            Club Code:
+          </div>
+          <div class="fieldValue">
+            {{club.code}}
+          </div>
+        </div>
+        <div class="row" *ngIf="editClub">
+          <div class="fieldName col-sm-3">
+            <label for="clubcode">Club Name:</label>
+          </div>
+          <div class="fieldValue">
+            <input type="text" class="form-control col-sm-12" id="clubcode" formControlName="clubcode"/>
+          </div>
+        </div>
+
+        <div class="row" *ngIf="!editClub">
+          <div class="fieldName col-sm-3">
+            Club Name:
+          </div>
+          <div class="fieldValue">
+            {{club.clubname}}
+          </div>
+        </div>
+        <div class="row" *ngIf="editClub">
+          <div class="fieldName col-sm-3">
+            <label for="clubname">Club Name:</label>
+          </div>
+          <div class="fieldValue">
+            <input type="text" class="form-control col-sm-12" id="clubname" formControlName="clubname"/>
+          </div>
+        </div>
+
+        <div class="row" *ngIf="!editClub">
+          <div class="fieldName col-sm-3">
+            Region:
+          </div>
+          <div class="fieldValue">
+          <span *ngIf="club.branch_region">
+            {{club.branch_region.regionname}}
+          </span>
+            <span *ngIf="!club.branch_region">
+            None
+          </span>
+          </div>
+        </div>
+        <div class="row" *ngIf="editClub">
+          <div class="fieldName col-sm-3">
+            <label for="region">Region:</label>
+          </div>
+          <div class="fieldValue">
+            <select name="region" id="region" class="col-sm-12" formControlName="region">
+              <option>None</option>
+              <option value="south">South</option>
+              <option value="sunshine">Sunshine</option>
+              <option value="central">Central</option>
+              <option value="north">North</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" *ngIf="!editClub">
+          <div class="fieldName col-sm-3">
+            Verified:
+          </div>
+          <div class="fieldValue">
+            {{club.verified ? 'Yes' : 'No'}}
+          </div>
+        </div>
+        <div class="row" *ngIf="editClub">
+          <div class="fieldName col-sm-3">
+            <label for="verified">Verified:</label>
+          </div>
+          <div class="fieldValue">
+            <input type="checkbox" id="verified" formControlName="verified"/>
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <div class="card mb-1">
+    <div class="card-header">
+      <h3>Club Administrators</h3>
+    </div>
+    <div class="card-body">
+      <div *ngIf="club.roles.length === 0">No club access currently configured.</div>
+
+      <table datatable *ngIf="club.roles.length > 0" class="col-sm-12 table table-bordered">
+        <thead>
+        <tr>
+          <th>Member ID: </th>
+          <th>Member Surname: </th>
+          <th>Member First Name: </th>
+          <th>Controls:</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let accessDetails of club.roles">
+          <td>
+            {{accessDetails.member_id}}
+          </td>
+          <td>
+            {{accessDetails.member.surname}}
+          </td>
+          <td>
+            {{accessDetails.member.firstname}}
+          </td>
+          <td>
+            <button class="btn btn-danger" (click)="removeAccess(accessDetails.member_id)">Remove</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <button class="btn btn-primary" (click)="addOrganiserClick()">Add Club Access</button>
+    </div>
+
+  </div>
+
+</ng-container>
+
+<ng-template #addAdministrator let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal6-basic-title">Add Club Administrator</h4>
+  </div>
+  <div class="modal-body">
+    <app-member-search (onMemberPicked)="addAccessMemberPicked($event)"></app-member-search>
+    <hr />
+    <div class="row">
+      <div class="fieldName col-sm-3">
+        Member Selected:
+      </div>
+      <div class="fieldValue col-sm-9">
+        {{addAccessMemberPickedDetails}}
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Add Access')" [disabled]="addAccessPersonDisabled">Add Access</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Cancel')">Cancel</button>
+  </div>
+</ng-template>
