@@ -19,6 +19,10 @@ export class MemberService {
     return this.http.get(environment.api + 'member_by_number/' + memberNumber);
   }
 
+  getMember(memberId) {
+    return this.http.get(environment.api + 'member/' + memberId);
+  }
+
   createMember(memberDetails) {
     return this.http.post(environment.api + 'members/create', memberDetails);
   }

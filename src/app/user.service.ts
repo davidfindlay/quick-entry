@@ -201,8 +201,18 @@ export class UserService {
     return this.http.put(environment.api + 'users/' + userDetails.id, userDetails);
   }
 
-  linkMember(memberNumber) {
-    return this.http.post(environment.api + 'users/link_member/' + memberNumber, {});
+  linkMember(memberNumber, userId = null) {
+    if (!userId) {
+      return this.http.post(environment.api + 'users/link_member/' + memberNumber, {});
+    } else {
+      return this.http.post(environment.api + 'users/link_member/' + memberNumber, {
+        userId: userId
+      });
+    }
+  }
+
+  unlinkMember(userId: number) {
+    return this.http.post(environment.api + 'users/' + userId + '/unlink', {});
   }
 
   isUserMeetOrganiser() {

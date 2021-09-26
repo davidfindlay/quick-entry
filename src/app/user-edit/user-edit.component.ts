@@ -1,10 +1,12 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {UserService} from '../user.service';
 import {ActivatedRoute, Route, Router} from '@angular/router';
 import {User} from '../models/user';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NgxSpinnerService} from 'ngx-spinner';
+import {MemberService} from '../member.service';
+import {Member} from '../models/member';
 
 interface Alert {
   type: string;
@@ -20,16 +22,25 @@ export class UserEditComponent implements OnInit {
 
   @ViewChild('confirmPasswordReset', {static: false}) confirmPasswordReset;
   @ViewChild('generateNewPassword', {static: false}) generateNewPassword;
+  @ViewChild('linkMember', {static: true}) linkMember: ElementRef;
+  @ViewChild('unlinkMember', {static: true}) unlinkMember: ElementRef;
 
   userForm: FormGroup;
   generatePasswordForm: FormGroup;
   user: User;
+  member: Member;
   updatedUser: User;
   generatedPassword: string;
+
+  prefillUser = '';
+  linkMemberDetails = '';
+  linkMemberDisabled = true;
+  linkMemberNumber;
 
   alerts: Alert[];
 
   constructor(private userService: UserService,
+              private memberService: MemberService,
               private route: ActivatedRoute,
               private router: Router,
               private fb: FormBuilder,
@@ -42,15 +53,8 @@ export class UserEditComponent implements OnInit {
     this.createGenerateForm();
 
     const userId = this.route.snapshot.paramMap.get('userId');
+    this.loadUser(userId);
 
-    this.userService.getUser(userId).subscribe((userData: any) => {
-      this.user = userData.user;
-      this.presetForm(this.user);
-
-      console.log(this.user);
-    }, error => {
-      console.log(error);
-    });
     this.resetAlerts();
 
     this.userForm.valueChanges.subscribe((user: any) => {
@@ -61,8 +65,26 @@ export class UserEditComponent implements OnInit {
       this.generatedPassword = pass.newPassword;
     });
 
-    this.updatedUser = new User();
-    this.updatedUser.id = this.user.id;
+  }
+
+  loadUser(userId) {
+    this.userService.getUser(userId).subscribe((userData: any) => {
+      this.user = userData.user;
+      this.presetForm(this.user);
+
+      if (this.user.member) {
+        const memberId = parseInt(this.user.member, 10);
+        this.memberService.getMember(memberId).subscribe((memberData: any) => {
+          this.member = memberData.member;
+        });
+      }
+
+      this.updatedUser = new User();
+      this.updatedUser.id = this.user.id;
+
+    }, error => {
+      console.log(error);
+    });
   }
 
   cancel() {
@@ -212,6 +234,8 @@ export class UserEditComponent implements OnInit {
       emergencyPhone: user.emergency_phone,
       emergencyEmail: user.emergency_email
     });
+
+    this.prefillUser = user.firstname + ' ' + user.surname;
   }
 
   resetAlerts() {
@@ -220,6 +244,43 @@ export class UserEditComponent implements OnInit {
 
   closeAlert(alert: Alert) {
     this.alerts.splice(this.alerts.indexOf(alert), 1);
+  }
+
+  memberSearch() {
+    this.linkMemberDisabled = true;
+
+    this.modalService.open(this.linkMember, {size: 'lg'}).result.then((result: any) => {
+      if (result === 'Link Member') {
+        console.log('Link ' + this.linkMemberNumber);
+        this.userService.linkMember(this.linkMemberNumber, this.user.id).subscribe((linkResult: any) => {
+          console.log(linkResult);
+          this.loadUser(this.user.id)
+        });
+      }
+    }, (error: any) => {
+      console.log(error);
+    });
+  }
+
+  unlinkMemberClick() {
+    this.modalService.open(this.unlinkMember, {size: 'lg'}).result.then((result: any) => {
+      if (result === 'Yes') {
+        console.log('unlink member click');
+        this.userService.unlinkMember(this.user.id).subscribe((unlinkResult: any) => {
+          console.log(unlinkResult);
+          this.member = null;
+          this.loadUser(this.user.id);
+        })
+      }
+    }, (error: any) => {
+      console.log(error);
+    });
+  }
+
+  linkMemberPicked(memberPicked) {
+    this.linkMemberDetails = memberPicked.surname +  ', ' + memberPicked.firstname + '(' + memberPicked.number + ')';
+    this.linkMemberNumber = memberPicked.number;
+    this.linkMemberDisabled = false;
   }
 
 }

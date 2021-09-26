@@ -22,8 +22,9 @@
       <th scope="col" sortable="username" (sort)="onSort($event)">Username</th>
       <th scope="col" sortable="surname" (sort)="onSort($event)">Surname</th>
       <th scope="col" sortable="firstname" (sort)="onSort($event)">First name</th>
-      <th scope="col">Email</th>
       <th scope="col" sortable="created_at" (sort)="onSort($event)">Created</th>
+      <th scope="col" sortable="last_active" (sort)="onSort($event)">Last Active</th>
+      <th scope="col" sortable="member" (sort)="onSort($event)">Linked</th>
       <th scope="col">Action</th>
     </tr>
     </thead>
@@ -41,11 +42,15 @@
       <td>
         <ngb-highlight [result]="user.firstname" [term]="userSearchService.searchTerm"></ngb-highlight>
       </td>
-      <td>
-        {{ user.email }}
-      </td>
-      <td>
+      <td class="text-center">
         {{ user.created_at }}
+      </td>
+      <td class="text-center">
+        {{ user.last_active}}
+      </td>
+      <td class="text-center">
+        <span *ngIf="user.member">Yes</span>
+        <span *ngIf="!user.member">No</span>
       </td>
       <td>
         <button class="btn btn-primary" (click)="userManagement(user.id)">View/Edit User</button>
