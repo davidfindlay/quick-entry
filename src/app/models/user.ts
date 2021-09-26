@@ -17,4 +17,6 @@ export class User {
   is_admin: boolean;
   created_at: Date;
   updated_at: Date;
+  last_active: Date;
+  last_login: Date;
 }

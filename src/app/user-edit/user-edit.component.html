@@ -69,11 +69,45 @@
       <div class="form-group">
         <div class="row">
           <label class="form-control-label col-sm-2">Linked Member:</label>
-          <span *ngIf="!user.member">No member linked</span>
+
+          <div class="col-sm-10" *ngIf="!user.member">
+            <span>No member linked</span>
+            <div>
+              <button class="btn btn-primary" (click)="memberSearch()">Member Search</button>
+            </div>
+          </div>
+
+          <div class="col-sm-10">
+            <div class="card" *ngIf="member">
+              <div class="card-header">{{member.surname}}, {{member.firstname}}</div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-sm-3">Member Number:</div>
+                  <div class="col-sm-9">{{member.number}}</div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-3">Member ID:</div>
+                  <div class="col-sm-9">{{member.id}}</div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <button class="btn btn-warning" (click)="unlinkMemberClick()">Unlink Member</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
     </fieldset>
+
+    <div class="card bg-info">
+      <div class="card-body text-white">
+        If the user is linked to a member, the contact and emergency details from the user's membership will be used
+        for meet entries.
+      </div>
+    </div>
 
     <fieldset class="qe-fieldset">
       <h2>Contact Details</h2>
@@ -178,21 +212,21 @@
     <div class="card bg-info text-white">
       <div class="card-body">
         <p>Clicking Generate Password will automatically create a random password. Please check that the new
-        password is appropriate before giving it to the user. </p>
-      <p>Clicking Save Changes will automatically change the password and send an email to {{user.firstname}}
-        {{user.surname}} with the new password details. </p>
+          password is appropriate before giving it to the user. </p>
+        <p>Clicking Save Changes will automatically change the password and send an email to {{user.firstname}}
+          {{user.surname}} with the new password details. </p>
       </div>
     </div>
     <form [formGroup]="generatePasswordForm">
       <div class="form-group">
         <div class="row">
           <label class="form-control-label col-sm-2" for="newPassword">New Password: </label>
-          <input class="form-control col-sm-6" type="text" formControlName="newPassword" id="newPassword" />
+          <input class="form-control col-sm-6" type="text" formControlName="newPassword" id="newPassword"/>
         </div>
       </div>
       <div class="form-group">
         <div class="row">
-      <button class="btn btn-primary" (click)="generateRandomPassword()">Generate Password</button>
+          <button class="btn btn-primary" (click)="generateRandomPassword()">Generate Password</button>
         </div>
       </div>
     </form>
@@ -204,3 +238,48 @@
   </div>
 </ng-template>
 
+<ng-template #linkMember let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal6-basic-title">Link Member</h4>
+  </div>
+  <div class="modal-body">
+    <app-member-search (onMemberPicked)="linkMemberPicked($event)" showDob="true" [searchPrefill]="prefillUser"></app-member-search>
+    <hr />
+    <div class="row">
+      <div class="fieldName col-sm-3">
+        Member Selected:
+      </div>
+      <div class="fieldValue col-sm-9">
+        {{linkMemberDetails}}
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Link Member')" [disabled]="linkMemberDisabled">Link Member</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Cancel')">Cancel</button>
+  </div>
+</ng-template>
+
+<ng-template #unlinkMember let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="unlink-member-title">Unlink Member</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="card bg-info text-white my-2">
+      <div class="card-body">
+      <p class="card-text">Unlinking this member will mean they will need to manually enter details when entering meets. Only unlink a
+        member if they are linked to the wrong user. Multiple usernames can be linked to the one member with a problem.
+      </p>
+      </div>
+    </div>
+    <p>Are you sure you want to unlink {{user.firstname}} {{user.surname}}?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-warning" (click)="modal.close('Yes')">Yes</button>
+    <button class="btn-primary" (click)="modal.close('No')">No</button>
+    <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
+  </div>
+</ng-template>

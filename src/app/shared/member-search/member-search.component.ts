@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
 import {MemberService} from '../../member.service';
@@ -13,6 +13,8 @@ import {DataTableDirective} from 'angular-datatables';
 export class MemberSearchComponent implements AfterViewInit, OnDestroy, OnInit {
 
   @Output() onMemberPicked = new EventEmitter<any>();
+  @Input('searchPrefill') searchPrefill: string;
+  @Input('showDob') showDob: Boolean;
 
   @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
   dtOptions: any = {
@@ -54,9 +56,20 @@ export class MemberSearchComponent implements AfterViewInit, OnDestroy, OnInit {
               private fb: FormBuilder) { }
 
   ngOnInit() {
+
+    let prefill = '';
+
+    if (this.searchPrefill && this.searchPrefill.trim() !== '') {
+      prefill = this.searchPrefill;
+    }
+
     this.memberSearchForm = this.fb.group({
-      memberName: ''
+      memberName: prefill
     });
+
+    if (prefill !== '') {
+      this.search();
+    }
   }
 
   memberClicked(info: any) {
