@@ -25,6 +25,7 @@ export class MeetListItemComponent implements OnInit {
 
   @Input() meet;
   @Input() index: number;
+  @Input() backLink = true;
 
   incompleteSubscription;
   incompleteEntries: IncompleteEntry[] = [];

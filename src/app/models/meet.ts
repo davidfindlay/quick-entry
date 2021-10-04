@@ -37,6 +37,7 @@ export class Meet {
   public programfee;
   public included_events;
   public extra_event_fee;
+  public logged_in_only;
   public access: any[];
   public sessions: Session[];
   public events: MeetEvent[];

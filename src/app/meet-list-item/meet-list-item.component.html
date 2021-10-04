@@ -1,4 +1,4 @@
-<p>
+<p *ngIf="backLink">
   <a [routerLink]="['/', 'calendar']">Back to Meet Calendar</a>
 </p>
 
@@ -102,9 +102,22 @@
       </div>
     </div>
 
-    <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && !hasEntry">Enter Meet</button>
-    <button type="button" class="btn btn-warning mr-1" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry">Resume Incomplete Entry</button>
-    <button type="button" class="btn btn-danger" (click)="cancelExistingEntry()" *ngIf="isOpen() && hasEntry">Cancel Incomplete Entry</button>
+    <div class="card bg-info text-white" *ngIf="meet.logged_in_only && !loggedIn">
+      <div class="card-body">
+      You must be logged in to enter this meet. If you do not yet have a Quick Entry account,
+      <a [routerLink]="['/', 'register']">register here</a>.
+      </div>
+    </div>
+    <div *ngIf="meet.logged_in_only && loggedIn">
+      <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && !hasEntry">Enter Meet</button>
+      <button type="button" class="btn btn-warning mr-1" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry">Resume Incomplete Entry</button>
+      <button type="button" class="btn btn-danger" (click)="cancelExistingEntry()" *ngIf="isOpen() && hasEntry">Cancel Incomplete Entry</button>
+    </div>
+    <div *ngIf="!meet.logged_in_only">
+      <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && !hasEntry">Enter Meet</button>
+      <button type="button" class="btn btn-warning mr-1" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry">Resume Incomplete Entry</button>
+      <button type="button" class="btn btn-danger" (click)="cancelExistingEntry()" *ngIf="isOpen() && hasEntry">Cancel Incomplete Entry</button>
+    </div>
 
   </div>
   <div class="card-footer" *ngIf="meet.deadline">

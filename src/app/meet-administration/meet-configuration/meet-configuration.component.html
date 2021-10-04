@@ -316,6 +316,23 @@
           <input type="text" class="form-control" id="location" formControlName="location" />
         </div>
       </div>
+      <div class="row" *ngIf="!editMeet">
+        <div class="fieldName col-sm-3">
+          Logged In Only:
+        </div>
+        <div class="fieldValue">
+          <span *ngIf="meet.logged_in_only">Yes</span>
+          <span *ngIf="!meet.logged_in_only">No</span>
+        </div>
+      </div>
+      <div class="row" *ngIf="editMeet">
+        <div class="fieldName col-sm-3">
+          <label for="logged_in_only">Logged In Only:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="checkbox" class="form-check-input" id="logged_in_only" formControlName="logged_in_only" />
+        </div>
+      </div>
     </form>
   </div>
 
@@ -512,10 +529,18 @@
       </div>
       <div class="row">
         <div class="fieldName col-sm-3">
-          <label for="fee">Fee:</label>
+          <label for="fee">Fee (members):</label>
         </div>
         <div class="fieldValue">
           <input type="text" class="form-control" id="fee" formControlName="fee" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="fee_non_member">Fee (non-members):</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="fee_non_member" formControlName="fee_non_member" />
         </div>
       </div>
       <div class="row">
