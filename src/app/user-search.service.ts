@@ -33,10 +33,11 @@ function sort(users: User[], column: string, direction: string): User[] {
 }
 
 function matches(user: User, term: string) {
+  term = term.toLowerCase();
   if (user.firstname && user.surname) {
     return user.username.toLowerCase().includes(term)
-      || user.surname.includes(term)
-      || user.firstname.includes(term);
+      || user.surname.toLowerCase().includes(term)
+      || user.firstname.toLowerCase().includes(term);
   } else {
     return user.username.toLowerCase().includes(term);
   }
