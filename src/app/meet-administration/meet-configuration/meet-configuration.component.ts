@@ -78,13 +78,14 @@ export class MeetConfigurationComponent implements OnInit {
       maxevents: this.meet.maxevents,
       minevents: this.meet.minevents,
       meetfee: this.meet.meetfee,
-      meetfee_nonmember: this.meet.meetfee_nonmember,
+      meetfeenonmember: this.meet.meetfee_nonmember,
       includedevents: this.meet.included_events,
       extraeventfee: this.meet.extra_event_fee,
       mealfee: this.meet.mealfee,
       mealsincluded: this.meet.mealsincluded,
       mealname: this.meet.mealname,
-      location: this.meet.location
+      location: this.meet.location,
+      logged_in_only: this.meet.logged_in_only
     });
 
     this.paymentMethodForm = this.fb.group({
@@ -95,6 +96,7 @@ export class MeetConfigurationComponent implements OnInit {
       eventName: '',
       deadline: '',
       fee: '',
+      fee_non_member: '',
       disallowNT: ''
     });
 
@@ -182,6 +184,7 @@ export class MeetConfigurationComponent implements OnInit {
     this.meet.mealsincluded = this.editMeetForm.get('mealsincluded').value;
     this.meet.mealname = this.editMeetForm.get('mealname').value;
     this.meet.location = this.editMeetForm.get('location').value;
+    this.meet.logged_in_only = this.editMeetForm.get('logged_in_only').value;
 
     console.log(this.meet);
 
@@ -265,7 +268,8 @@ export class MeetConfigurationComponent implements OnInit {
       eventName: currentEvent.eventname,
       deadline: currentEvent.deadline,
       fee: currentEvent.eventfee,
-      disallowNT: currentEvent.times_required
+      disallowNT: currentEvent.times_required,
+      fee_non_member: currentEvent.eventfee_non_member
     });
 
     this.modal.open(this.configureEvent).result.then((result: any) => {
