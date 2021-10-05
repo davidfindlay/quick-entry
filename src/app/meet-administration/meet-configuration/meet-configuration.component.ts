@@ -178,7 +178,7 @@ export class MeetConfigurationComponent implements OnInit {
     this.meet.maxevents = this.editMeetForm.get('maxevents').value;
     this.meet.minevents = this.editMeetForm.get('minevents').value;
     this.meet.meetfee = this.editMeetForm.get('meetfee').value;
-    this.meet.meetfee_nonmember = this.editMeetForm.get('meetfee_nonmember').value;
+    this.meet.meetfee_nonmember = this.editMeetForm.get('meetfeenonmember').value;
     this.meet.included_events = this.editMeetForm.get('includedevents').value;
     this.meet.extra_event_fee = this.editMeetForm.get('extraeventfee').value;
     this.meet.mealsincluded = this.editMeetForm.get('mealsincluded').value;
