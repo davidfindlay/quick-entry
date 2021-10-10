@@ -5,8 +5,19 @@
     </div>
     <div class="fieldValue col-sm-9">
       <div class="input-group col-sm-12">
-      <input type="text" class="form-control" id="memberName" formControlName="memberName">
-      <button class="btn btn-primary" (click)="search()">Search</button>
+        <input type="text" class="form-control" id="memberName" formControlName="memberName">
+        <button class="btn btn-primary" (click)="search()">Search</button>
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="clubPreset">
+    <div class="fieldName col-sm-3">
+      &nbsp;
+    </div>
+    <div class="fieldValue col-sm-9">
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="limitToClub" formControlName="limitToClub">
+        <label class="form-check-label" for="limitToClub">Limit Results to Club Members Only</label>
       </div>
     </div>
   </div>
@@ -21,7 +32,8 @@
           <th>ID</th>
           <th>Surname</th>
           <th>First Name</th>
-          <th>MSA Number</th>
+          <th>Date of Birth</th>
+          <th *ngIf="showDob">MSA Number</th>
           <th>Clubs</th>
         </tr>
         </thead>
@@ -30,11 +42,33 @@
           <td>{{resultRow.id}}</td>
           <td>{{resultRow.surname}}</td>
           <td>{{resultRow.firstname}}</td>
+          <td *ngIf="showDob">{{resultRow.dob | date: 'd/M/yyyy'}}</td>
           <td>{{resultRow.number}}</td>
-          <td></td>
+          <td>
+            <span *ngFor="let club of resultRow.clubListCurrent; index as i">
+              <abbr title="{{club.clubname}}">{{club.code}}</abbr>
+              <span *ngIf="resultRow.clubListCurrent.length > 1 && i < resultRow.clubListCurrent.length - 1">, </span>
+            </span>
+            <span *ngIf="resultRow.clubListCurrent.length > 0 && resultRow.clubListPast.length > 0">, </span>
+            <span *ngFor="let club of resultRow.clubListPast; index as i">
+              <abbr title="{{club.clubname}}" class="font-italic">{{club.code}}</abbr>
+              <span *ngIf="resultRow.clubListPast.length > 1 && i < resultRow.clubListPast.length - 1">, </span>
+            </span>
+          </td>
         </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card bg-info">
+        <div class="card-body">
+          <p class="card-text text-white">
+            Note: Clubs shows all clubs a member has been associated with. Past clubs are italicised.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </form>
