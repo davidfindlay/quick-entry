@@ -91,23 +91,25 @@ export class UserEditComponent implements OnInit {
     this.router.navigate(['..'], {relativeTo: this.route});
   }
 
-  updateModel(user) {
-    this.updatedUser.id = this.user.id;
-    this.updatedUser.username = user.username;
-    this.updatedUser.firstname = user.firstName;
-    this.updatedUser.surname = user.surname;
-    this.updatedUser.email = user.email;
-    this.updatedUser.phone = user.phone;
-    this.updatedUser.gender = user.gender;
-    this.updatedUser.dob = user.dob;
-    this.updatedUser.emergency_firstname = user.emergencyFirstName;
-    this.updatedUser.emergency_surname = user.emergencySurname;
-    this.updatedUser.emergency_phone = user.emergencyPhone;
-    this.updatedUser.emergency_email = user.emergencyEmail;
-  }
+
 
   save() {
     console.log('save');
+
+    this.updatedUser.id = this.user.id;
+    this.updatedUser.username = this.userForm.get('username').value;
+    this.updatedUser.firstname = this.userForm.get('firstName').value;
+    this.updatedUser.surname = this.userForm.get('surname').value;
+    this.updatedUser.email = this.userForm.get('email').value;
+    this.updatedUser.phone = this.userForm.get('phone').value;
+    this.updatedUser.gender = this.userForm.get('gender').value;
+    this.updatedUser.dob = this.userForm.get('dob').value;
+    this.updatedUser.emergency_firstname = this.userForm.get('emergencyFirstName').value;
+    this.updatedUser.emergency_surname = this.userForm.get('emergencySurname').value;
+    this.updatedUser.emergency_phone = this.userForm.get('emergencyPhone').value;
+    this.updatedUser.emergency_email = this.userForm.get('emergencyEmail').value;
+
+    console.log(this.updatedUser);
 
     this.userService.update(this.updatedUser).subscribe((result: any) => {
       console.log(result);

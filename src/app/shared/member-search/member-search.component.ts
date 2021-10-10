@@ -15,6 +15,7 @@ export class MemberSearchComponent implements AfterViewInit, OnDestroy, OnInit {
   @Output() onMemberPicked = new EventEmitter<any>();
   @Input('searchPrefill') searchPrefill: string;
   @Input('showDob') showDob: Boolean;
+  @Input() clubPreset: string;
 
   @ViewChild(DataTableDirective, {static: false}) dtElement: DataTableDirective;
   dtOptions: any = {
@@ -63,6 +64,14 @@ export class MemberSearchComponent implements AfterViewInit, OnDestroy, OnInit {
       prefill = this.searchPrefill;
     }
 
+    let limitToClub = false;
+    if (this.clubPreset) {
+      limitToClub = true;
+      console.log('Limit to club: ' + this.clubPreset);
+    } else {
+      console.log('No preset club');
+    }
+
     this.memberSearchForm = this.fb.group({
       memberName: prefill
     });
@@ -101,13 +110,57 @@ export class MemberSearchComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   search() {
+    // Clear any previously selected member
+    this.onMemberPicked.emit(null);
+
     this.memberService.findMember(this.memberSearchForm.get('memberName').value).subscribe((results: any) => {
       this.results = results.results;
       this.resultRows = [];
       for (const resultRow of results.results) {
+        const dob = new Date(resultRow.dob);
+
+        const clubListCurrent = [];
+        const clubListPast = [];
+        const clubCodes = [];
+        let clubString = '';
+
+        // Convert membership date strings to dates
+        for (const membership of resultRow.memberships) {
+          membership.startdate = new Date(membership.startdate);
+          membership.enddate = new Date(membership.enddate);
+        }
+
+        resultRow.memberships.sort((a, b) => (a.enddate < b.enddate) ? 1 : -1);
+
+        for (const membership of resultRow.memberships) {
+          const clubCode = membership.club.code;
+
+          if (membership.enddate >= new Date()) {
+            if (!clubCodes.includes(clubCode)) {
+              clubListCurrent.push(membership.club);
+              clubCodes.push(clubCode);
+            }
+
+          } else {
+            if (!clubCodes.includes(clubCode)) {
+              clubListPast.push(membership.club);
+              clubCodes.push(clubCode);
+            }
+          }
+        }
+
+        for (const code of clubCodes) {
+          if (clubString.length === 0) {
+            clubString = code;
+          } else {
+            clubString += ', ' + code;
+          }
+        }
+
         const searchRow = {
           id: resultRow.id,
           surname: resultRow.surname,
+          dob: dob,
           firstname: resultRow.firstname,
           number: resultRow.number
         };
