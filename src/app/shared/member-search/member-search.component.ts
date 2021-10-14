@@ -73,7 +73,8 @@ export class MemberSearchComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     this.memberSearchForm = this.fb.group({
-      memberName: prefill
+      memberName: prefill,
+      limitToClub: limitToClub
     });
 
     if (prefill !== '') {
