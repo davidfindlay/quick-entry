@@ -166,10 +166,21 @@ export class MemberSearchComponent implements AfterViewInit, OnDestroy, OnInit {
           surname: resultRow.surname,
           dob: dob,
           firstname: resultRow.firstname,
-          number: resultRow.number
+          number: resultRow.number,
+          clubListCurrent: clubListCurrent,
+          clubListPast: clubListPast
         };
 
-        this.resultRows.push(searchRow);
+        // If results are to be limited to club members only, show only insert club members
+        if (this.clubPreset && this.memberSearchForm.get('limitToClub').value) {
+          for (const club of clubListCurrent)  {
+            if (club.id === parseInt(this.clubPreset, 10)) {
+              this.resultRows.push(searchRow);
+            }
+          }
+        } else {
+          this.resultRows.push(searchRow);
+        }
       }
       this.rerender();
     });
