@@ -133,6 +133,10 @@ export class MemberSearchComponent implements AfterViewInit, OnDestroy, OnInit {
         resultRow.memberships.sort((a, b) => (a.enddate < b.enddate) ? 1 : -1);
 
         for (const membership of resultRow.memberships) {
+          if (!membership.club) {
+            console.error('Member ship club details are not set!');
+            continue;
+          }
           const clubCode = membership.club.code;
 
           if (membership.enddate >= new Date()) {

@@ -32,6 +32,7 @@
           <th>ID</th>
           <th>Surname</th>
           <th>First Name</th>
+          <th *ngIf="showDob">Date of Birth</th>
           <th>MSA Number</th>
           <th>Clubs</th>
         </tr>
@@ -43,7 +44,17 @@
           <td>{{resultRow.firstname}}</td>
           <td *ngIf="showDob">{{resultRow.dob | date: 'd/M/yyyy'}}</td>
           <td>{{resultRow.number}}</td>
-          <td></td>
+          <td>
+            <span *ngFor="let club of resultRow.clubListCurrent; index as i">
+              <abbr title="{{club.clubname}}">{{club.code}}</abbr>
+              <span *ngIf="resultRow.clubListCurrent.length > 1 && i < resultRow.clubListCurrent.length - 1">, </span>
+            </span>
+            <span *ngIf="resultRow.clubListCurrent.length > 0 && resultRow.clubListPast.length > 0">, </span>
+            <span *ngFor="let club of resultRow.clubListPast; index as i">
+              <abbr title="{{club.clubname}}" class="font-italic">{{club.code}}</abbr>
+              <span *ngIf="resultRow.clubListPast.length > 1 && i < resultRow.clubListPast.length - 1">, </span>
+            </span>
+          </td>
         </tr>
         </tbody>
       </table>
