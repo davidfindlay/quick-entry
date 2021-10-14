@@ -161,7 +161,7 @@
     <h4 class="modal-title" id="modal6-basic-title">Add Club Administrator</h4>
   </div>
   <div class="modal-body">
-    <app-member-search (onMemberPicked)="addAccessMemberPicked($event)"></app-member-search>
+    <app-member-search (onMemberPicked)="addAccessMemberPicked($event)" [clubPreset]="clubId"></app-member-search>
     <hr />
     <div class="row">
       <div class="fieldName col-sm-3">
