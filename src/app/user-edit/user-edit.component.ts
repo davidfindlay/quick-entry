@@ -57,10 +57,6 @@ export class UserEditComponent implements OnInit {
 
     this.resetAlerts();
 
-    this.userForm.valueChanges.subscribe((user: any) => {
-      this.updateModel(user);
-    });
-
     this.generatePasswordForm.valueChanges.subscribe((pass: any) => {
       this.generatedPassword = pass.newPassword;
     });
