@@ -11,4 +11,6 @@ export class RegisterUser {
   emergency_surname: string;
   emergency_phone: string;
   emergency_email: string;
+  memberNumber: number;
+  memberType: string;
 }

@@ -76,7 +76,9 @@ export class RegisterComponent implements OnInit {
       emergency_firstname: this.userForm.controls.emergencyFirstName.value,
       emergency_surname: this.userForm.controls.emergencySurname.value,
       emergency_phone: this.userForm.controls.emergencyPhone.value,
-      emergency_email: this.userForm.controls.emergencyEmail.value
+      emergency_email: this.userForm.controls.emergencyEmail.value,
+      memberType: this.userForm.controls.memberType.value,
+      memberNumber: this.userForm.controls.memberNumber.value
     };
 
     console.log(userDetails);
