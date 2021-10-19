@@ -1,12 +1,13 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {UserService} from '../user.service';
+import {UserService} from '../../user.service';
 import {ActivatedRoute, Route, Router} from '@angular/router';
-import {User} from '../models/user';
+import {User} from '../../models/user';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NgxSpinnerService} from 'ngx-spinner';
-import {MemberService} from '../member.service';
-import {Member} from '../models/member';
+import {MemberService} from '../../member.service';
+import {Member} from '../../models/member';
+import {constructExclusionsMap} from 'tslint/lib/rules/completed-docs/exclusions';
 
 interface Alert {
   type: string;
@@ -20,22 +21,20 @@ interface Alert {
 })
 export class UserEditComponent implements OnInit {
 
-  @ViewChild('confirmPasswordReset', {static: false}) confirmPasswordReset;
-  @ViewChild('generateNewPassword', {static: false}) generateNewPassword;
   @ViewChild('linkMember', {static: true}) linkMember: ElementRef;
   @ViewChild('unlinkMember', {static: true}) unlinkMember: ElementRef;
 
   userForm: FormGroup;
-  generatePasswordForm: FormGroup;
   user: User;
   member: Member;
   updatedUser: User;
-  generatedPassword: string;
 
   prefillUser = '';
   linkMemberDetails = '';
   linkMemberDisabled = true;
   linkMemberNumber;
+
+  showClose = false;
 
   alerts: Alert[];
 
@@ -50,16 +49,11 @@ export class UserEditComponent implements OnInit {
   ngOnInit() {
 
     this.createForm();
-    this.createGenerateForm();
 
     const userId = this.route.snapshot.paramMap.get('userId');
     this.loadUser(userId);
 
     this.resetAlerts();
-
-    this.generatePasswordForm.valueChanges.subscribe((pass: any) => {
-      this.generatedPassword = pass.newPassword;
-    });
 
   }
 
@@ -121,80 +115,7 @@ export class UserEditComponent implements OnInit {
     });
   }
 
-  passwordGenerate() {
-    this.modalService.open(this.generateNewPassword, { size: 'lg' }).result.then((result) => {
-      if (result === 'save') {
-        const currentAdminUser = this.userService.getUsers();
-        this.changePassword(this.user, this.generatedPassword, currentAdminUser.id);
-      }
-    }, (reason) => {
-      // const closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
-  }
 
-  generateRandomPassword() {
-    this.userService.getRandomPassword().subscribe((randPass: any)  => {
-      console.log(randPass.password);
-      this.generatePasswordForm.patchValue({
-        newPassword: randPass.password
-      });
-    });
-  }
-
-  passwordReset() {
-    this.modalService.open(this.confirmPasswordReset, { size: 'lg' }).result.then((result) => {
-      if (result === 'send') {
-        const currentAdminUser = this.userService.getUsers();
-        this.sendPasswordReset(this.user.email, currentAdminUser.id);
-      }
-    }, (reason) => {
-      // const closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
-  };
-
-  changePassword(user, newPassword, adminUserId) {
-    console.log('Change password to ' + newPassword);
-
-    this.spinner.show();
-
-    this.userService.changePassword(user.id, newPassword, adminUserId).subscribe((resetRequest: any) => {
-      console.log(resetRequest);
-      if (resetRequest.success) {
-        this.alerts.push({
-          type: 'success',
-          message: 'Password has been changed and has been sent to ' + user.email + '.'
-        });
-      } else {
-        this.alerts.push({
-          type: 'danger',
-          message: resetRequest.message
-        });
-      }
-      this.spinner.hide();
-    });
-  }
-
-  sendPasswordReset(email, userId) {
-
-    this.spinner.show();
-
-    this.userService.sendPasswordResetRequest(email, userId).subscribe((resetRequest: any) => {
-      console.log(resetRequest);
-      if (resetRequest.success) {
-        this.alerts.push({
-          type: 'success',
-          message: 'Password reset email has been sent to ' + email + '.'
-        });
-      } else {
-        this.alerts.push({
-          type: 'danger',
-          message: resetRequest.message
-        });
-      }
-      this.spinner.hide();
-    });
-
-  }
 
   createForm() {
     this.userForm = this.fb.group( {
@@ -209,12 +130,6 @@ export class UserEditComponent implements OnInit {
       emergencySurname: '',
       emergencyPhone: '',
       emergencyEmail: '',
-    });
-  }
-
-  createGenerateForm() {
-    this.generatePasswordForm = this.fb.group({
-      newPassword: {value: '', disabled: true}
     });
   }
 
@@ -252,7 +167,8 @@ export class UserEditComponent implements OnInit {
         console.log('Link ' + this.linkMemberNumber);
         this.userService.linkMember(this.linkMemberNumber, this.user.id).subscribe((linkResult: any) => {
           console.log(linkResult);
-          this.loadUser(this.user.id)
+          this.loadUser(this.user.id);
+          this.showClose = true;
         });
       }
     }, (error: any) => {
@@ -268,6 +184,7 @@ export class UserEditComponent implements OnInit {
           console.log(unlinkResult);
           this.member = null;
           this.loadUser(this.user.id);
+          this.showClose = true;
         })
       }
     }, (error: any) => {

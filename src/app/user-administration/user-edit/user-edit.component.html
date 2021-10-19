@@ -13,7 +13,8 @@
   <div class="row">
     <div class="col-xs-12">
       <button class="btn btn-primary" (click)="save()">Save Changes</button>
-      <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      <button class="btn btn-secondary" (click)="cancel()" *ngIf="!showClose">Cancel</button>
+      <button class="btn btn-secondary" (click)="cancel()" *ngIf="showClose">Close</button>
     </div>
   </div>
   <form [formGroup]="userForm">
@@ -170,73 +171,13 @@
   <div class="row">
     <div class="col-xs-12">
       <button class="btn btn-primary" (click)="save()">Save Changes</button>
-      <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      <button class="btn btn-secondary" (click)="cancel()" *ngIf="!showClose">Cancel</button>
+      <button class="btn btn-secondary" (click)="cancel()" *ngIf="showClose">Close</button>
     </div>
   </div>
 
 
 </div>
-
-<ng-template #confirmPasswordReset let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="send-password-title">Send Password Reset</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <div class="card bg-info text-white">
-      <p>Sending a password reset email will not immediately change the user's password, but will send a token to the
-        user's email address that they can use change their own password.</p>
-      <p>If the user remembers their password before
-        resetting their password, they can still log in and continue to use their old password.</p>
-    </div>
-    <p>Are you sure you want to send a password reset email to {{user.firstname}} {{user.surname}}
-      &lt;{{user.email}}&gt;?</p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn-warning" (click)="modal.close('send')">Yes</button>
-    <button class="btn-primary" (click)="modal.close('cancel')">No</button>
-    <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
-  </div>
-</ng-template>
-
-<ng-template #generateNewPassword let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="generate-new-password">Generate New Password</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <div class="card bg-info text-white">
-      <div class="card-body">
-        <p>Clicking Generate Password will automatically create a random password. Please check that the new
-          password is appropriate before giving it to the user. </p>
-        <p>Clicking Save Changes will automatically change the password and send an email to {{user.firstname}}
-          {{user.surname}} with the new password details. </p>
-      </div>
-    </div>
-    <form [formGroup]="generatePasswordForm">
-      <div class="form-group">
-        <div class="row">
-          <label class="form-control-label col-sm-2" for="newPassword">New Password: </label>
-          <input class="form-control col-sm-6" type="text" formControlName="newPassword" id="newPassword"/>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="row">
-          <button class="btn btn-primary" (click)="generateRandomPassword()">Generate Password</button>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button class="btn-danger" (click)="modal.close('save')">Save Changes</button>
-    <button class="btn-primary" (click)="modal.close('cancel')">Cancel</button>
-    <!--    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>-->
-  </div>
-</ng-template>
 
 <ng-template #linkMember let-modal>
   <div class="modal-header">

@@ -1,12 +1,12 @@
 import {Component, OnInit, PipeTransform, QueryList, ViewChildren} from '@angular/core';
-import {UserService} from '../user.service';
-import {User} from '../models/user';
+import {UserService} from '../../user.service';
+import {User} from '../../models/user';
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {FormControl} from '@angular/forms';
 import {startWith} from 'rxjs-compat/operator/startWith';
 import {debounceTime, map, delay, switchMap, tap} from 'rxjs/operators';
-import {UserSearch} from '../user-search.service';
-import {NgbdSortableHeader, SortEvent} from '../sortable.directive';
+import {UserSearch} from '../../user-search.service';
+import {NgbdSortableHeader, SortEvent} from '../../sortable.directive';
 import {ActivatedRoute, Router} from '@angular/router';
 
 interface SearchResult {
