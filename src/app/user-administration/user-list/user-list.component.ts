@@ -8,6 +8,7 @@ import {debounceTime, map, delay, switchMap, tap} from 'rxjs/operators';
 import {UserSearch} from '../../user-search.service';
 import {NgbdSortableHeader, SortEvent} from '../../sortable.directive';
 import {ActivatedRoute, Router} from '@angular/router';
+import { DateTime } from 'luxon';
 
 interface SearchResult {
   users: User[];
@@ -22,9 +23,17 @@ interface SearchResult {
 export class UserListComponent implements OnInit {
 
   usersList: User[];
+  newUsersList: User[];
+  linkedUsersList: User[];
+  unlinkedUsersList: User[];
 
   users$: Observable<User[]>;
   total$: Observable<number>;
+
+  newUsers: number;
+  totalUsers: number;
+  linkedUsers: number;
+  unlinkedUsers: number;
 
   // searchTerm: string;
 
@@ -44,6 +53,19 @@ export class UserListComponent implements OnInit {
       console.log('Got user list: ' + users.length);
       this.usersList = users;
       this.userSearchService.userList = this.usersList;
+
+      this.totalUsers = this.usersList.length;
+
+      const days30 = DateTime.local().minus({days: 30});
+      console.log(this.usersList);
+      this.newUsersList = this.usersList.filter(x => DateTime.fromSQL(x.created_at.toString()) > days30);
+      this.newUsers = this.newUsersList.length;
+
+      this.linkedUsersList = this.usersList.filter(x => x.member);
+      this.linkedUsers = this.linkedUsersList.length;
+      this.unlinkedUsersList = this.usersList.filter(x => !x.member);
+      this.unlinkedUsers = this.unlinkedUsersList.length;
+
     });
 
     this.users$ = this.userSearchService.users$;
