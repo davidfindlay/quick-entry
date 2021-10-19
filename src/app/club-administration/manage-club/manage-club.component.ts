@@ -110,16 +110,9 @@ export class ManageClubComponent implements OnInit {
   }
 
   addAccessMemberPicked(memberPicked) {
-    console.log(memberPicked);
-    if (memberPicked) {
-      this.addAccessMemberPickedDetails = memberPicked.surname + ', ' + memberPicked.firstname + '(' + memberPicked.number + ')';
-      this.addAccessMemberPickedId = memberPicked.id;
-      this.addAccessPersonDisabled = false;
-    } else {
-      this.addAccessMemberPickedDetails = '';
-      this.addAccessMemberPickedId = null;
-      this.addAccessPersonDisabled = true;
-    }
+    this.addAccessMemberPickedDetails = memberPicked.surname +  ', ' + memberPicked.firstname + '(' + memberPicked.number + ')';
+    this.addAccessMemberPickedId = memberPicked.id;
+    this.addAccessPersonDisabled = false;
   }
 
 }
