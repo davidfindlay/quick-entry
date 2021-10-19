@@ -68,9 +68,9 @@ import {PendingEntriesComponent} from './meet-organiser/pending-entries/pending-
 import {EntryListComponent} from './meet-organiser/entry-list/entry-list.component';
 import { MeetSelectorComponent } from './meet-selector/meet-selector.component';
 import { PostalTimeEntryComponent } from './postal-time-entry/postal-time-entry.component';
-import { UserListComponent } from './user-list/user-list.component';
+import { UserListComponent } from './user-administration/user-list/user-list.component';
 import {NgbdSortableHeader} from './sortable.directive';
-import { UserEditComponent } from './user-edit/user-edit.component';
+import { UserEditComponent } from './user-administration/user-edit/user-edit.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { RegisterComponent } from './register/register.component';
 import {MeetAdministrationModule} from './meet-administration/meet-administration.module';
@@ -85,6 +85,8 @@ import { ClubRelayStatusComponent } from './club-relay-status/club-relay-status.
 import { RelayGuestComponent } from './relay-guest/relay-guest.component';
 import {DataTablesModule} from 'angular-datatables';
 import {ClubAdministrationModule} from './club-administration/club-administration.module';
+import { UserViewComponent } from './user-administration/user-view/user-view.component';
+import {UserAdministrationModule} from './user-administration/user-administration.module';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -132,8 +134,6 @@ const appRoutes: Routes = [
   { path: 'meet-organiser/:meetId/pending-entries', component: PendingEntriesComponent },
   { path: 'meet-organiser/:meetId/entry-list', component: EntryListComponent },
   { path: 'meet-organiser/:meetId/dashboard', component: MeetDashboardComponent },
-  { path: 'user-list', component: UserListComponent },
-  { path: 'user-list/:userId', component: UserEditComponent },
   { path: 'calendar', component: MeetCalendarComponent },
   { path: 'guest-relay', component: RelayGuestComponent },
     { path: '**', component: MeetListComponent }
@@ -188,9 +188,7 @@ export class SentryErrorHandler implements ErrorHandler {
     EntryMerchandiseItemComponent,
     MeetSelectorComponent,
     PostalTimeEntryComponent,
-    UserListComponent,
     NgbdSortableHeader,
-    UserEditComponent,
     PasswordResetComponent,
     RegisterComponent,
     MeetCalendarComponent,
@@ -217,6 +215,7 @@ export class SentryErrorHandler implements ErrorHandler {
     MeetOrganiserModule,
     MeetAdministrationModule,
     ClubAdministrationModule,
+    UserAdministrationModule,
     SharedModule,
     NgxPayPalModule,
     DataTablesModule
