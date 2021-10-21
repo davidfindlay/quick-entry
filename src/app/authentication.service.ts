@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import {Subject} from 'rxjs/Subject';
+import {Observable} from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import {Subject} from 'rxjs';
 import {User} from './models/user';
 import { AuthService } from 'ngx-auth';
 import {HttpClient, HttpErrorResponse, HttpResponse} from '@angular/common/http';
 
 import { environment } from '../environments/environment';
+import { of, throwError } from 'rxjs';
 
 
 @Injectable()
@@ -36,7 +36,7 @@ export class AuthenticationService implements AuthService {
   login(username: string, password: string): Observable<boolean> {
     return this.http.post(environment.api + 'auth/login',
         JSON.stringify({username: username, password: password}))
-        .map((response: any) => {
+      .pipe(map((response: any) => {
         // Login successful if there's a JWT in the response
             console.log(response);
 
@@ -64,18 +64,18 @@ export class AuthenticationService implements AuthService {
           console.log('Failed log in');
           return false;
         }
-      })
-        .catch(e => {
+      }),
+        catchError(e => {
             if (e.status === 401) {
                 console.log('401 Unauthorised');
-                return Observable.throw('Unauthorised');
+                return throwError('Unauthorised');
             }
-        });
+        }));
   }
 
   logout(): void {
     // clear token remove user from local storage to log user out
-    console.log('log out requested')
+    console.log('log out requested');
     this.token = null;
     this.user = null;
     localStorage.removeItem('currentUser');
@@ -93,13 +93,13 @@ export class AuthenticationService implements AuthService {
     public isAuthorized(): Observable<boolean> {
         const isAuthorized: boolean = !!localStorage.getItem('accessToken');
 
-        return Observable.of(isAuthorized);
+        return of(isAuthorized);
     }
 
     public getAccessToken(): Observable<string> {
         const accessToken: string = localStorage.getItem('accessToken');
 
-        return Observable.of(accessToken);
+        return of(accessToken);
     }
 
     public refreshToken(): Observable<any> {
