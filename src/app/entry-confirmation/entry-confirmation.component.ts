@@ -84,7 +84,7 @@ export class EntryConfirmationComponent implements OnInit {
   mealFee = 0;
   totalFee = 0;
 
-  previousScreen = '/enter/' + this.meet_id + '/step4';
+  previousScreen;
 
   showPaymentChoice = true;
 
@@ -107,6 +107,7 @@ export class EntryConfirmationComponent implements OnInit {
   ngOnInit() {
     this.ngxSpinner.show();
     this.meet_id = +this.route.snapshot.paramMap.get('meet');
+    this.previousScreen = '/enter/' + this.meet_id + '/step4';
     this.pending_entry_code = this.route.snapshot.paramMap.get('pendingId');
     this.meet_entry_code = this.route.snapshot.paramMap.get('entryId');
 

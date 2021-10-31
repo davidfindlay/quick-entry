@@ -1,12 +1,10 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import {Observable} from 'rxjs';
 
 import {AuthenticationService} from './authentication/authentication.service';
 import {User} from './models/user';
-import {Subject} from 'rxjs/Subject';
-import {Subscription} from 'rxjs/Subscription';
+import {Subject} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import * as moment from 'moment';
 import {BehaviorSubject} from 'rxjs';

@@ -1,7 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {AuthenticationService} from '../authentication/authentication.service';
-import 'rxjs/add/operator/catch';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UserService} from '../user.service';
