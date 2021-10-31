@@ -82,10 +82,10 @@
         <ngb-highlight [result]="user.firstname" [term]="userSearchService.searchTerm"></ngb-highlight>
       </td>
       <td class="text-center">
-        {{ user.created_at }}
+        {{ user.created_at | date: 'd/M/yyyy h:mm a' }}
       </td>
       <td class="text-center">
-        {{ user.last_active}}
+        {{ user.last_active | date: 'd/M/yyyy h:mm a'}}
       </td>
       <td class="text-center">
         <span *ngIf="user.member">Yes</span>

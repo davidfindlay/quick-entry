@@ -45,22 +45,27 @@ export class UserListComponent implements OnInit {
   constructor(private userService: UserService,
               public userSearchService: UserSearch,
               private router: Router,
-              private route: ActivatedRoute) {
-  }
+              private route: ActivatedRoute) { }
 
   ngOnInit() {
-    console.log('test');
 
     this.userService.getUserList().subscribe((users: User[]) => {
       console.log('Got user list: ' + users.length);
+
+      for (const user of users) {
+        if (user.created_at) { user.created_at = new Date(user.created_at); }
+        if (user.updated_at) { user.updated_at = new Date(user.updated_at); }
+        if (user.last_active) { user.last_active = new Date(user.last_active); }
+        if (user.last_login) { user.last_login = new Date(user.last_login); }
+      }
+
       this.usersList = users;
       this.userSearchService.userList = this.usersList;
 
       this.totalUsers = this.usersList.length;
 
       const days30 = DateTime.local().minus({days: 30});
-      console.log(this.usersList);
-      this.newUsersList = this.usersList.filter(x => DateTime.fromSQL(x.created_at.toString()) > days30);
+      this.newUsersList = this.usersList.filter(x => DateTime.fromJSDate(x.created_at) > days30);
       this.newUsers = this.newUsersList.length;
 
       this.linkedUsersList = this.usersList.filter(x => x.member);
