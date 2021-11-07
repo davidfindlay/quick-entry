@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MeetService} from '../meet.service';
 import {TimeService} from '../time.service';
@@ -7,6 +7,8 @@ import {environment} from '../../environments/environment';
 import {ICreateOrderRequest, IPayPalConfig} from 'ngx-paypal';
 import {RelayService} from '../relay.service';
 import {Alert} from '../models/alert';
+import {ActivatedRoute, Router} from '@angular/router';
+import {MeetEvent} from '../models/meet-event';
 
 @Component({
   selector: 'app-relay-guest',
@@ -15,26 +17,69 @@ import {Alert} from '../models/alert';
 })
 export class RelayGuestComponent implements OnInit {
 
+  meet: Meet;
+  meetEvent: MeetEvent;
+  meetId;
+
   relayForm: FormGroup;
   relayEvents = [];
   numberOfTeams = 1;
   paymentAlerts: Alert[];
-  meetId = 200;
   totalAge = 0;
 
-  showSuccess;
+  eventFee;
+  eventFeeNonMember;
+  membersOnly = false;
+
+  showSuccess = false;
 
   public payPalConfig ?: IPayPalConfig;
 
   constructor(private meetService: MeetService,
               private relayService: RelayService,
-              private fb: FormBuilder) { }
+              private fb: FormBuilder,
+              private cdRef: ChangeDetectorRef,
+              private route: ActivatedRoute,
+              private router: Router) { }
 
   ngOnInit() {
+
+    this.route.params.subscribe((routeParams) => {
+      if (routeParams.meetId && parseInt(routeParams.meetId, 10) !== 0) {
+        this.meetId = parseInt(routeParams.meetId, 10);
+        this.loadMeet(parseInt(routeParams.meetId, 10))
+      }
+    });
+
     this.initConfig();
     this.createForm();
+    this.resetAlerts();
 
-    this.meetService.getSingleMeet(200).subscribe((meetDetails: Meet) => {
+    this.relayForm.valueChanges.subscribe((change) => {
+      this.updateAge(change)
+    });
+
+    this.relayForm.controls['relayEvent'].valueChanges.subscribe((change) => {
+      this.meetEvent = this.meet.events.find(x => x.id === parseInt(change, 10));
+      if (this.meetEvent) {
+        this.eventFee = this.meetEvent.eventfee;
+        this.eventFeeNonMember = this.meetEvent.eventfee_non_member;
+      }
+    });
+
+    this.relayForm.controls['memberRelay'].valueChanges.subscribe((change) => {
+      if (change.toString() === 'yes') {
+        this.membersOnly = true;
+      } else {
+        this.membersOnly = false;
+      }
+    });
+
+  }
+
+  loadMeet(meetId) {
+    this.meetService.getSingleMeet(meetId).subscribe((meetDetails: Meet) => {
+      this.meet = meetDetails;
       for (const meetEvent of meetDetails.events) {
         if (meetEvent.legs > 1) {
           this.relayEvents.push(meetEvent);
@@ -42,16 +87,11 @@ export class RelayGuestComponent implements OnInit {
       }
       console.log(this.relayEvents);
     });
-
-    this.relayForm.valueChanges.subscribe((change) => {
-      this.updateAge(change)
-    });
-
   }
 
   createForm() {
     this.relayForm = this.fb.group({
-      relayMeet: 200,
+      meetId: this.meetId,
       relayEvent: ['', Validators.required],
       contactFirstName: ['', Validators.required],
       contactSurname: ['', Validators.required],
@@ -74,7 +114,8 @@ export class RelayGuestComponent implements OnInit {
       swimmer4Surname: ['', Validators.required],
       swimmer4Age: ['', Validators.required],
       swimmer4Mobile: ['', Validators.required],
-      seedTime: ['']
+      seedTime: [''],
+      memberRelay: ['', Validators.required]
     });
   }
 
@@ -106,13 +147,13 @@ export class RelayGuestComponent implements OnInit {
 
   resetForm() {
     this.relayForm.patchValue({
-      relayMeet: 200,
+      meetId: this.meetId,
       relayEvent: [''],
       contactFirstName: [''],
       contactSurname: [''],
       contactEmail: [''],
       contactMobile: [''],
-      teamName: [''],
+      newTeamName: [''],
       swimmer1FirstName: [''],
       swimmer1Surname: [''],
       swimmer1Age: [''],
@@ -132,7 +173,8 @@ export class RelayGuestComponent implements OnInit {
       seedTime: ['']
     });
 
-    this.resetAlerts();
+    this.meetEvent = null;
+
   }
 
   submitTeam() {
@@ -140,7 +182,15 @@ export class RelayGuestComponent implements OnInit {
   }
 
   getOwed() {
-    return 20;
+    if (!this.eventFeeNonMember) {
+      return this.eventFee;
+    } else {
+      if (this.relayForm.get('memberRelay').value === 'yes')  {
+        return this.eventFee;
+      }
+    }
+
+    return this.eventFeeNonMember;
   }
 
   private initConfig(): void {
@@ -168,7 +218,7 @@ export class RelayGuestComponent implements OnInit {
                 category: 'DIGITAL_GOODS',
                 unit_amount: {
                   currency_code: 'AUD',
-                  value: (this.getOwed() / this.numberOfTeams).toString(),
+                  value: (this.getOwed()).toString(),
                 },
               }
             ]
@@ -202,11 +252,13 @@ export class RelayGuestComponent implements OnInit {
           console.log(status);
           this.paymentAlerts.push({
             type: 'success',
-            message: 'Payment received.'
+            message: status.message
           });
 
           this.showSuccess = true;
           this.resetForm();
+          console.log('success');
+          this.cdRef.detectChanges();
 
         });
 

@@ -112,11 +112,13 @@
       <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && !hasEntry">Enter Meet</button>
       <button type="button" class="btn btn-warning mr-1" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry">Resume Incomplete Entry</button>
       <button type="button" class="btn btn-danger" (click)="cancelExistingEntry()" *ngIf="isOpen() && hasEntry">Cancel Incomplete Entry</button>
+      <button type="button" class="btn btn-primary" routerLink="/guest-relay/{{meet.id}" *ngIf="isGuestRelayOpen()">Relay Entry</button>
     </div>
     <div *ngIf="!meet.logged_in_only">
       <button type="button" class="btn btn-primary" routerLink="/enter/{{meet.id}}/step1" *ngIf="isOpen() && !hasEntry">Enter Meet</button>
       <button type="button" class="btn btn-warning mr-1" (click)="openExistingEntry()" *ngIf="isOpen() && hasEntry">Resume Incomplete Entry</button>
       <button type="button" class="btn btn-danger" (click)="cancelExistingEntry()" *ngIf="isOpen() && hasEntry">Cancel Incomplete Entry</button>
+      <button type="button" class="btn btn-primary ml-2" routerLink="/guest-relay/{{meet.id}}" *ngIf="isGuestRelayOpen()">Relay Entry</button>
     </div>
 
   </div>
