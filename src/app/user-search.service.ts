@@ -70,6 +70,8 @@ export class UserSearch {
     ).subscribe(result => {
       this._users$.next(result.users);
       this._total$.next(result.total);
+
+      console.log(result);
     });
 
     this._search$.next();

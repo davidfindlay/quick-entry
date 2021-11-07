@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Meet} from './models/meet';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import 'rxjs/Rx';
-import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
+import {Observable} from 'rxjs';
+import {Subject} from 'rxjs';
 import * as moment from 'moment';
 import {MeetEvent} from './models/meet-event';
 import {EntryEvent} from './models/entryevent';

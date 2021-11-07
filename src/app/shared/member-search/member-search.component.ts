@@ -61,7 +61,7 @@ export class MemberSearchComponent implements AfterViewInit, OnDestroy, OnInit {
     let prefill = '';
 
     if (this.searchPrefill && this.searchPrefill.trim() !== '') {
-      prefill = this.searchPrefill;
+      prefill = this.searchPrefill.replace('/\s\s+/g', ' ').trim();
     }
 
     let limitToClub = false;

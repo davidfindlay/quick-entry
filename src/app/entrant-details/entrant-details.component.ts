@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {PlatformLocation} from '@angular/common';
 import {UserService} from '../user.service';
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MeetService} from '../meet.service';
 import {AuthenticationService} from '../authentication/authentication.service';

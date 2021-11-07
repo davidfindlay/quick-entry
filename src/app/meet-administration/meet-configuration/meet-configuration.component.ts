@@ -85,7 +85,8 @@ export class MeetConfigurationComponent implements OnInit {
       mealsincluded: this.meet.mealsincluded,
       mealname: this.meet.mealname,
       location: this.meet.location,
-      logged_in_only: this.meet.logged_in_only
+      logged_in_only: this.meet.logged_in_only,
+      guest_relays: this.meet.guest_relays
     });
 
     this.paymentMethodForm = this.fb.group({
@@ -185,6 +186,7 @@ export class MeetConfigurationComponent implements OnInit {
     this.meet.mealname = this.editMeetForm.get('mealname').value;
     this.meet.location = this.editMeetForm.get('location').value;
     this.meet.logged_in_only = this.editMeetForm.get('logged_in_only').value;
+    this.meet.guest_relays = this.editMeetForm.get('guest_relays').value;
 
     console.log(this.meet);
 

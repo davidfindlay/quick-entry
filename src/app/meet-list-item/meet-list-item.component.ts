@@ -180,6 +180,15 @@ export class MeetListItemComponent implements OnInit {
     }
   }
 
+  isGuestRelayOpen(): boolean {
+    console.log(this.meet);
+    if (this.meet.guest_relays) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Determine how far along existing entry is before opening it
    */

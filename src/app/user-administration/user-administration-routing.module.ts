@@ -6,9 +6,9 @@ import {UserViewComponent} from './user-view/user-view.component';
 import {UserListComponent} from './user-list/user-list.component';
 
 const routes: Routes = [
+  { path: 'user-admin', component: UserListComponent, canActivate: [AdminGuard] },
   { path: 'user-admin/:userId', component: UserViewComponent, canActivate: [AdminGuard] },
-  { path: 'user-admin/:userId/edit', component: UserEditComponent, canActivate: [AdminGuard] },
-  { path: 'user-admin', component: UserListComponent, canActivate: [AdminGuard] }
+  { path: 'user-admin/:userId/edit', component: UserEditComponent, canActivate: [AdminGuard] }
 ];
 
 @NgModule({

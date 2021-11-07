@@ -135,7 +135,7 @@ const appRoutes: Routes = [
   { path: 'meet-organiser/:meetId/entry-list', component: EntryListComponent },
   { path: 'meet-organiser/:meetId/dashboard', component: MeetDashboardComponent },
   { path: 'calendar', component: MeetCalendarComponent },
-  { path: 'guest-relay', component: RelayGuestComponent },
+  { path: 'guest-relay/:meetId', component: RelayGuestComponent },
     { path: '**', component: MeetListComponent }
 ];
 
