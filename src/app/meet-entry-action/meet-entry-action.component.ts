@@ -44,6 +44,8 @@ export class MeetEntryActionComponent implements OnInit {
 
   paidAmount = 0;
   totalPayments = 0;
+  eventFees = 0;
+  totalFees = 0;
   owedAmount = 0;
   meetEntryId;
 
@@ -122,7 +124,10 @@ export class MeetEntryActionComponent implements OnInit {
           this.totalPayments += payment.amount;
         }
 
-        this.owedAmount = this.meetFee - this.paidAmount;
+        // Determine event fees
+        this.eventFees = this.getEventFees();
+        this.totalFees = this.meetFee + this.eventFees;
+        this.owedAmount = this.totalFees - this.paidAmount;
 
         this.cdref.detectChanges();
 
@@ -130,8 +135,43 @@ export class MeetEntryActionComponent implements OnInit {
 
     });
 
+  }
 
+  getEventFees() {
 
+    // TODO: this is a workaround - need to fix handling of non member entries
+    let member = true;
+    if (this.entry.membershipDetails.member_number.substr(0, 1) === 'X') {
+      member = false;
+    }
+
+    let eventFees = 0;
+
+    for (const eventDetails of this.entry.entryEvents) {
+      const eventFee = this.getEventFee(eventDetails.event_id, member);
+      eventFees += eventFee;
+    }
+
+    return eventFees;
+  }
+
+  getEventFee(event_id: number, member: boolean) {
+    const events = this.meet.events.filter(x => x.id === event_id);
+
+    if (events.length > 0) {
+      if (member) {
+        return events[0].eventfee;
+      } else {
+        if (events[0].eventfee_non_member) {
+          return events[0].eventfee_non_member;
+        } else {
+          return events[0].eventfee;
+        }
+      }
+
+    }
+
+    return 1;
   }
 
   getLegs(event_id) {
