@@ -156,16 +156,21 @@ export class MeetEntryActionComponent implements OnInit {
   }
 
   getEventFee(event_id: number, member: boolean) {
-    const events = this.meet.events.filter(x => x.id === event_id);
+    const eventDetails = this.meet.events.find(x => x.id === event_id);
 
-    if (events.length > 0) {
+    if (eventDetails) {
+      // If it's a relay event, don't return a cost for an individual.
+      if (eventDetails.legs > 1) {
+        return 0;
+      }
+
       if (member) {
-        return events[0].eventfee;
+        return eventDetails.eventfee;
       } else {
-        if (events[0].eventfee_non_member) {
-          return events[0].eventfee_non_member;
+        if (eventDetails.eventfee_non_member) {
+          return eventDetails.eventfee_non_member;
         } else {
-          return events[0].eventfee;
+          return eventDetails.eventfee;
         }
       }
 
