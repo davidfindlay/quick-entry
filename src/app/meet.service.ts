@@ -9,6 +9,7 @@ import {EntryEvent} from './models/entryevent';
 
 import { environment } from '../environments/environment';
 import {Subscription} from 'rxjs';
+import {MeetEntryInfo} from './models/meet-entry-info';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -191,6 +192,10 @@ export class MeetService {
     return this.http.get<Meet[]>(environment.api + 'meets/all');
   }
 
+  getMeetEntryInfo(meetIdList):  Observable<MeetEntryInfo[]> {
+    return this.http.get<MeetEntryInfo[]>(environment.api + 'meets/entryinfo?meets=' + meetIdList.join(','));
+  }
+
   createMerchandise(merchandiseItem): Observable<any> {
     console.log('createMerchandise');
     console.log(merchandiseItem);
@@ -227,5 +232,31 @@ export class MeetService {
 
   publishMeet(meetId, published) {
     return this.http.post(environment.api + 'meets_publish/' + meetId, { publish: published });
+  }
+
+  getMeetYears(meets: Meet[]): number[] {
+    const years = [];
+
+    meets.sort((a, b) => {
+      if (a.startdate > b.startdate) {
+        return -1;
+      }
+      if (b.startdate > a.startdate) {
+        return 1;
+      }
+    });
+
+    for (let i = 0, len = meets.length; i < len; i++) {
+      const meet = meets[i];
+      const startDate = new Date(meet.startdate);
+
+      const year = startDate.getFullYear();
+      if (!years.includes(year)) {
+        years.push(year);
+      }
+
+    }
+
+    return years;
   }
 }

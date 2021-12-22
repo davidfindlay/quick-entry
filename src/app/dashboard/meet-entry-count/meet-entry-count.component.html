@@ -1,0 +1,68 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card ">
+      <div class="card-header">
+        <h2>Meet Status</h2>
+      </div>
+      <div class="card-body">
+        <div class="row justify-content-end">
+          <div class="col-sm-12">
+            <form class="form-inline">
+              <div class="form-group">
+                Meet Filter:
+
+                <select class="form-control">
+                  <option>Current</option>
+                  <option *ngFor="let meetYear of meetYears; let index = i" value="{{meetYear}}">{{meetYear}}</option>
+                </select>
+              </div>
+            </form>
+          </div>
+        </div>
+        <table class="col-sm-12 table table-striped table-sm">
+
+          <thead>
+          <tr>
+            <th class="text-center">ID</th>
+            <th>Meet Name</th>
+            <th class="text-center">Published</th>
+            <th class="text-right">Start Date</th>
+            <th class="text-right">Deadline</th>
+            <th class="text-center">Entries</th>
+            <th class="text-center">Pending</th>
+            <th class="text-center">Access</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let meet of meetInfo; let i = index">
+            <td class="text-center">
+              <a [routerLink]="['/', 'meet-admin', meet.id]">{{meet.id}}</a>
+            </td>
+            <td>
+              <a [routerLink]="['/', 'meet-admin', meet.id]">{{meet.meetname}}</a>
+            </td>
+            <td class="text-center">
+              {{meet.status ? 'Yes' : 'No'}}
+            </td>
+            <td class="text-right">
+              {{meet.startdate | date: 'ccc d LLL YYYY'}}
+            </td>
+            <td class="text-right">
+              {{meet.deadline | date: 'ccc d LLL YYYY'}}
+            </td>
+            <td class="text-center">
+              <a [routerLink]="['/', 'meet-entries', meet.id]">{{meet.entries}}</a>
+            </td>
+            <td class="text-center">
+              <a [routerLink]="['/', 'pending-entries', meet.id]">{{meet.pending}}</a>
+            </td>
+            <td class="text-center">
+              <a [routerLink]="['/', 'meet-admin', meet.id]">{{meet.access}}</a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
