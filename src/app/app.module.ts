@@ -87,6 +87,7 @@ import {DataTablesModule} from 'angular-datatables';
 import {ClubAdministrationModule} from './club-administration/club-administration.module';
 import { UserViewComponent } from './user-administration/user-view/user-view.component';
 import {UserAdministrationModule} from './user-administration/user-administration.module';
+import {MembershipAdministrationModule} from './membership-administration/membership-administration.module';
 
 const appRoutes: Routes = [
     { path: '', component: MeetListComponent },
@@ -216,6 +217,7 @@ export class SentryErrorHandler implements ErrorHandler {
     MeetAdministrationModule,
     ClubAdministrationModule,
     UserAdministrationModule,
+    MembershipAdministrationModule,
     SharedModule,
     NgxPayPalModule,
     DataTablesModule

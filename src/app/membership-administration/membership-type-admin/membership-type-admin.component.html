@@ -1,0 +1,116 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>Membership Types</h1>
+  </div>
+</div>
+
+<div class="row">
+  <table datatable class="col-sm-12 table table-bordered" *ngIf="membershipTypes" #membersTypeTable>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Type Name</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Months</th>
+      <th>Weeks</th>
+      <th>Status</th>
+      <th>Active</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let membershipType of membershipTypes; let index = i">
+      <td>{{membershipType.id}}</td>
+      <td>{{membershipType.typename}}</td>
+      <td>{{membershipType.startdate}}</td>
+      <td>{{membershipType.enddate}}</td>
+      <td>{{membershipType.months}}</td>
+      <td>{{membershipType.weeks}}</td>
+      <td>{{membershipType.membership_status.desc}}</td>
+      <td>{{getActiveValue(membershipType.active)}}</td>
+      <td><button class="btn btn-primary" (click)="editType(membershipType)">Edit</button></td>
+    </tr>
+    </tbody>
+  </table>
+  <button class="btn btn-primary" (click)="addNewType()">Add Type</button>
+</div>
+
+<ng-template #configureType let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal5-basic-title">Add Type</h4>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="configureTypeForm">
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="typename">Type Name:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control col-sm-12" id="typename" formControlName="typename" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="startdate">Start Date:</label>
+        </div>
+        <div class="fieldValue">
+          <input class="form-control" placeholder="yyyy-mm-dd" id="startdate" formControlName="startdate" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="enddate">End Date:</label>
+        </div>
+        <div class="fieldValue">
+          <input class="form-control" placeholder="yyyy-mm-dd" id="enddate" formControlName="enddate" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="months">Months:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="months" formControlName="months" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="weeks">Weeks:</label>
+        </div>
+        <div class="fieldValue">
+          <input type="text" class="form-control" id="weeks" formControlName="weeks" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="status">Status:</label>
+        </div>
+        <div class="fieldValue">
+          <select class="form-control" formControlName="status" id="status">
+            <option value="1">Financial</option>
+            <option value="2">Unfinancial</option>
+            <option value="3">Inactive</option>
+            <option value="4">Guest</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="fieldName col-sm-3">
+          <label for="active">Active:</label>
+        </div>
+        <div class="fieldValue">
+          <select class="form-control" formControlName="active" id="active">
+            <option value="0">Inactive</option>
+            <option value="1">Active</option>
+            <option value="2">Archive</option>
+        </select>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Save Changes')">Save Changes</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('Cancel')">Cancel</button>
+  </div>
+</ng-template>
