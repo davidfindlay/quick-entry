@@ -5,11 +5,13 @@ import {MembershipAdministrationRoutingModule} from './membership-administration
 import {DataTablesModule} from 'angular-datatables';
 import {ReactiveFormsModule} from '@angular/forms';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { MembershipImportComponent } from './membership-import/membership-import.component';
 
 
 @NgModule({
   declarations: [
-    MembershipTypeAdminComponent
+    MembershipTypeAdminComponent,
+    MembershipImportComponent
   ],
   imports: [
     CommonModule,

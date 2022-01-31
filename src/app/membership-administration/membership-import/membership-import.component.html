@@ -1,0 +1,102 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h1>Membership Import</h1>
+  </div>
+</div>
+
+<div class="row mb-3">
+  <button class="btn btn-primary mr-1" (click)="requestAutoImport()">Request Automatic SportsTG Import</button>
+  <button class="btn btn-warning" (click)="uploadImport()">Upload SportsTG Member File</button>
+</div>
+
+<div class="row" *ngIf="importHistory && importHistory.length > 0">
+  <table datatable class="col-sm-12 table table-bordered" #membershipImportHistory>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Date/Time</th>
+      <th>Source</th>
+      <th>User</th>
+      <th>Members</th>
+      <th>New</th>
+      <th>Updated</th>
+      <th>Renewed</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let importRun of importHistory; let index = i">
+      <td>
+        {{importRun.id}}
+      </td>
+      <td>
+        {{getLocal(importRun.requested_at)}}
+      </td>
+      <td>
+        {{importRun.source}}
+      </td>
+      <td>
+        {{importRun.user.username}}
+      </td>
+      <td>
+        {{importRun.members}}
+      </td>
+      <td>
+        {{importRun.members_new}}
+      </td>
+      <td>
+        {{importRun.members_updated}}
+      </td>
+      <td>
+        {{importRun.members_renewed}}
+      </td>
+      <td>
+        <button class="btn btn-primary" (click)="viewLogs()">View Logs</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #requestConfirm let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal3-basic-title">Confirm Request Automatic SportsTG Import</h4>
+  </div>
+  <div class="modal-body">
+    <p>
+    <strong>Are you sure you want to request an automatic SportsTG import?</strong>
+    </p>
+    <p *ngIf="lastImportSecs < 300">
+      The last automatic import was requested less than 5 minutes ago. Please allow at least 5 minutes for each import.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Yes')">Yes</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('No')">No</button>
+  </div>
+</ng-template>
+
+<ng-template #importFile let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal2-basic-title">Import SportsTG File</h4>
+  </div>
+  <div class="modal-body">
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Import')">Import</button>
+    <button type="button" class="btn btn-secondary" (click)="modal.close('No')">No</button>
+  </div>
+</ng-template>
+
+<ng-template #logView let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal1-basic-title">Import Log Viewer</h4>
+  </div>
+  <div class="modal-body">
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close('Close')">Close</button>
+  </div>
+</ng-template>
