@@ -131,6 +131,30 @@
     </div>
   </div>
 
+  <div *ngIf="runners === 6">
+    <div class="form-group row">
+      <label for="newTeamSwimmer5" class="col-sm-2 col-form-label text-right"
+             id="lblSwimmer5">Swimmer 5:</label>
+      <div class="col-sm-10">
+        <select name="newTeamSwimmer5" id="newTeamSwimmer5" class="newTeamSwimmer form-control"  formControlName="swimmer5">
+          <option value=""></option>
+          <option value="{{member.id}}" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="newTeamSwimmer6" class="col-sm-2 col-form-label text-right"
+             id="lblSwimmer6">Swimmer 6:</label>
+      <div class="col-sm-10">
+        <select name="newTeamSwimmer6" id="newTeamSwimmer6" class="newTeamSwimmer form-control"  formControlName="swimmer5">
+          <option value=""></option>
+          <option value="{{member.id}}" *ngFor="let member of this.availableSwimmers">{{member.surname}}, {{member.firstname}} ({{getDisplayAge(member)}})</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
   <div class="form-group row">
     <div class="col-sm-2 col-form-label text-right">Total Age:</div>
     <div class="col-sm-10">

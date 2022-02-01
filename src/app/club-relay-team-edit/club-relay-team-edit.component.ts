@@ -39,6 +39,7 @@ export class ClubRelayTeamEditComponent implements OnInit {
 
   totalAge;
 
+  runners;
 
   constructor(private meetService: MeetService,
               private clubService: ClubsService,
@@ -144,6 +145,8 @@ export class ClubRelayTeamEditComponent implements OnInit {
       swimmer2: ['', Validators.required],
       swimmer3: ['', Validators.required],
       swimmer4: ['', Validators.required],
+      swimmer5: ['', Validators.required],
+      swimmer6: ['', Validators.required],
       seedTime: ''
     });
 
@@ -154,6 +157,8 @@ export class ClubRelayTeamEditComponent implements OnInit {
         this.relayForm.controls.swimmer2.setValidators(null);
         this.relayForm.controls.swimmer3.setValidators(null);
         this.relayForm.controls.swimmer4.setValidators(null);
+        this.relayForm.controls.swimmer5.setValidators(null);
+        this.relayForm.controls.swimmer6.setValidators(null);
 
       } else {
         console.log('require validators');
@@ -161,11 +166,15 @@ export class ClubRelayTeamEditComponent implements OnInit {
         this.relayForm.controls.swimmer2.setValidators([Validators.required]);
         this.relayForm.controls.swimmer3.setValidators([Validators.required]);
         this.relayForm.controls.swimmer4.setValidators([Validators.required]);
+        this.relayForm.controls.swimmer5.setValidators([Validators.required]);
+        this.relayForm.controls.swimmer6.setValidators([Validators.required]);
       }
       this.relayForm.controls.swimmer1.updateValueAndValidity();
       this.relayForm.controls.swimmer2.updateValueAndValidity();
       this.relayForm.controls.swimmer3.updateValueAndValidity();
       this.relayForm.controls.swimmer4.updateValueAndValidity();
+      this.relayForm.controls.swimmer5.updateValueAndValidity();
+      this.relayForm.controls.swimmer6.updateValueAndValidity();
 
     });
 
@@ -178,6 +187,12 @@ export class ClubRelayTeamEditComponent implements OnInit {
       }
       if (this.relayForm.controls.swimmer4.value === change) {
         this.relayForm.controls.swimmer4.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer5.value === change) {
+        this.relayForm.controls.swimmer5.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer6.value === change) {
+        this.relayForm.controls.swimmer6.patchValue('', {emitEvent: false});
       }
       this.calculateAge();
     });
@@ -192,6 +207,12 @@ export class ClubRelayTeamEditComponent implements OnInit {
       if (this.relayForm.controls.swimmer4.value === change) {
         this.relayForm.controls.swimmer4.patchValue('', {emitEvent: false});
       }
+      if (this.relayForm.controls.swimmer5.value === change) {
+        this.relayForm.controls.swimmer5.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer6.value === change) {
+        this.relayForm.controls.swimmer6.patchValue('', {emitEvent: false});
+      }
       this.calculateAge();
     });
 
@@ -205,6 +226,12 @@ export class ClubRelayTeamEditComponent implements OnInit {
       if (this.relayForm.controls.swimmer4.value === change) {
         this.relayForm.controls.swimmer4.patchValue('', {emitEvent: false});
       }
+      if (this.relayForm.controls.swimmer5.value === change) {
+        this.relayForm.controls.swimmer5.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer6.value === change) {
+        this.relayForm.controls.swimmer6.patchValue('', {emitEvent: false});
+      }
       this.calculateAge();
     });
 
@@ -217,6 +244,50 @@ export class ClubRelayTeamEditComponent implements OnInit {
       }
       if (this.relayForm.controls.swimmer3.value === change) {
         this.relayForm.controls.swimmer3.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer5.value === change) {
+        this.relayForm.controls.swimmer5.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer6.value === change) {
+        this.relayForm.controls.swimmer6.patchValue('', {emitEvent: false});
+      }
+      this.calculateAge();
+    });
+
+    this.relayForm.controls.swimmer5.valueChanges.subscribe((change) => {
+      if (this.relayForm.controls.swimmer1.value === change) {
+        this.relayForm.controls.swimmer1.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer2.value === change) {
+        this.relayForm.controls.swimmer2.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer3.value === change) {
+        this.relayForm.controls.swimmer3.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer4.value === change) {
+        this.relayForm.controls.swimmer4.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer6.value === change) {
+        this.relayForm.controls.swimmer6.patchValue('', {emitEvent: false});
+      }
+      this.calculateAge();
+    });
+
+    this.relayForm.controls.swimmer6.valueChanges.subscribe((change) => {
+      if (this.relayForm.controls.swimmer1.value === change) {
+        this.relayForm.controls.swimmer1.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer2.value === change) {
+        this.relayForm.controls.swimmer2.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer3.value === change) {
+        this.relayForm.controls.swimmer3.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer4.value === change) {
+        this.relayForm.controls.swimmer4.patchValue('', {emitEvent: false});
+      }
+      if (this.relayForm.controls.swimmer5.value === change) {
+        this.relayForm.controls.swimmer5.patchValue('', {emitEvent: false});
       }
       this.calculateAge();
     });
@@ -244,6 +315,14 @@ export class ClubRelayTeamEditComponent implements OnInit {
     }
     if (this.relayForm.controls.swimmer4.value) {
       const member = this.swimmers.find(x => x.id === parseInt(this.relayForm.controls.swimmer4.value, 10));
+      age += this.getAge(member);
+    }
+    if (this.relayForm.controls.swimmer5.value) {
+      const member = this.swimmers.find(x => x.id === parseInt(this.relayForm.controls.swimmer5.value, 10));
+      age += this.getAge(member);
+    }
+    if (this.relayForm.controls.swimmer6.value) {
+      const member = this.swimmers.find(x => x.id === parseInt(this.relayForm.controls.swimmer6.value, 10));
       age += this.getAge(member);
     }
 
@@ -396,6 +475,20 @@ export class ClubRelayTeamEditComponent implements OnInit {
       swimmer4.member_id = parseInt(this.relayForm.controls.swimmer4.value, 10);
       swimmer4.leg = 4;
       relayTeam.members.push(swimmer4);
+    }
+
+    if (this.relayForm.controls.swimmer5.value !== '') {
+      const swimmer5 = new RelayTeamMember();
+      swimmer5.member_id = parseInt(this.relayForm.controls.swimmer5.value, 10);
+      swimmer5.leg = 5;
+      relayTeam.members.push(swimmer5);
+    }
+
+    if (this.relayForm.controls.swimmer4.value !== '') {
+      const swimmer6 = new RelayTeamMember();
+      swimmer6.member_id = parseInt(this.relayForm.controls.swimmer6.value, 10);
+      swimmer6.leg = 6;
+      relayTeam.members.push(swimmer6);
     }
 
     if (this.relayForm.controls.ageGroup.value !== '') {
