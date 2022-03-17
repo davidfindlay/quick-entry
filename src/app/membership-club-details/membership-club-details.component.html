@@ -1,4 +1,4 @@
-<h1>Enter {{meetName}}</h1>
+<h1 xmlns="http://www.w3.org/1999/html">Enter {{meetName}}</h1>
 <h2>Membership and Club Details</h2>
 
 <form [formGroup]="memberDetailsForm">
@@ -121,6 +121,27 @@
             </option>
           </optgroup>
         </select>
+      </div>
+
+      <div class="card mb-3 bg-warning" *ngIf="isPreviousClub">
+        <div class="card-body">
+          <p class="card-text">
+            <strong>You are not currently recorded as a financial member of this club in Quick Entry.</strong>
+              Possible reasons:
+            </p>
+          <ul>
+            <li>You haven't renewed your membership yet</li>
+            <li>You've recently renewed and your membership data hasn't loaded into Quick Entry yet</li>
+            <li>Your Club Registrar hasn't yet activated your membership or renewal</li>
+            <li>You're an interstate or international member</li>
+          </ul>
+          <p class="card-text">
+            <strong>You can still submit your entry and your membership information will be checked by an administrator.</strong>
+          </p>
+          <p class="card-text">
+            If you have not yet renewed your membership of this club, please do so prior to the meet entry deadline.
+          </p>
+        </div>
       </div>
 
       <div *ngIf="!isMemberEntry || isThirdPartyEntry || this.memberDetailsForm.controls.club_selector.value === 'other'">

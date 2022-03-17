@@ -38,6 +38,7 @@ export class MembershipClubDetailsComponent implements OnInit {
   isAnonymousEntry = true;
   isGuestEntry = false;
   isMemberEntry = false;
+  isPreviousClub = false;
 
   showMemberNumberField = true;
   showClubDetailsSection = true;
@@ -166,6 +167,14 @@ export class MembershipClubDetailsComponent implements OnInit {
           club_name: clubDetails.clubname
         });
       }
+
+      // Check if this is a previous membership
+      if (this.previousMemberships.find(x => x.club_id === clubId)) {
+        this.isPreviousClub = true;
+      } else {
+        this.isPreviousClub = false;
+      }
+
     });
 
     // Supply initial values
