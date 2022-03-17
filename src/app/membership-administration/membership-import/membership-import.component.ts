@@ -2,6 +2,12 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {MembershipImportService} from '../membership-import.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DateTime} from 'luxon';
+import {DataTableDirective} from 'angular-datatables';
+
+interface Alert {
+  type: string;
+  message: string;
+}
 
 @Component({
   selector: 'app-membership-import',
@@ -10,13 +16,15 @@ import {DateTime} from 'luxon';
 })
 export class MembershipImportComponent implements OnInit {
 
-  @ViewChild('membershipImportHistory', {static: true}) membershipImportHistory: ElementRef;
+  // @ViewChild(DataTableDirective, {static: true}) membershipImportHistory: ElementRef;
   @ViewChild('requestConfirm', {static: true}) requestConfirm: ElementRef;
   @ViewChild('importFile', {static: true}) importFile: ElementRef;
   @ViewChild('logView', {static: true}) logView: ElementRef;
 
   importHistory;
+  alerts: Alert[];
 
+  lastTime;
   lastImportSecs = 0;
 
   constructor(private membershipImportService: MembershipImportService,
@@ -24,6 +32,7 @@ export class MembershipImportComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadImports();
+    this.resetAlerts();
   }
 
   loadImports() {
@@ -32,26 +41,24 @@ export class MembershipImportComponent implements OnInit {
       console.log(imports);
       this.importHistory = imports.membershipImports;
 
-      let lastTime;
-      let lastRequest;
       for (const hist of this.importHistory) {
-        const histRequested = DateTime.fromSQL(hist.requested_at);
+        const histRequested = DateTime.fromSQL(hist.requested_at, {zone: 'UTC'} );
 
-        if (lastTime) {
-          if (histRequested > lastTime) {
-            lastTime = histRequested;
-            lastRequest = hist;
+        if (this.lastTime) {
+          if (histRequested > this.lastTime) {
+            this.lastTime = histRequested;
           }
         } else {
-          lastTime = histRequested;
-          lastRequest = hist;
+          this.lastTime = histRequested;
         }
       }
+      //
+      // this.membershipImportHistory.nativeElement.dtInstance.then((dtInstance: DataTables.Api) => {
+      //   dtInstance.order([1, 'asc']);
+      //   dtInstance.draw();
+      // });
 
-      console.log(lastTime);
-
-      this.lastImportSecs = DateTime.now().diff(lastTime, 'seconds').as('seconds');
-      console.log(this.lastImportSecs);
+      console.log(this.lastTime);
     });
   }
 
@@ -64,12 +71,19 @@ export class MembershipImportComponent implements OnInit {
   }
 
   requestAutoImport() {
+    this.lastImportSecs = DateTime.utc().diff(this.lastTime, 'seconds').as('seconds');
+    console.log(this.lastImportSecs);
     this.modal.open(this.requestConfirm).result.then((approved: any) => {
       if (approved === 'Yes') {
         this.membershipImportService.requestAutoImport().subscribe((results: any) => {
           if (results.success) {
             console.log('Successfully requested');
             console.log(results);
+            this.alerts.push({
+              type: 'success',
+              message: 'Membership data import successfully requested. Please be aware this may take up to 5 minutes to be completed.'
+            });
+            this.loadImports();
           } else {
             console.log('Not successful');
           }
@@ -87,6 +101,14 @@ export class MembershipImportComponent implements OnInit {
   getLocal(tsString) {
     const tsDt = DateTime.fromSQL(tsString, { zone: 'UTC' });
     return tsDt.setZone('Australia/Brisbane').toFormat('d/L/yyyy h:m a');
+  }
+
+  resetAlerts() {
+    this.alerts = [];
+  }
+
+  closeAlert(alert: Alert) {
+    this.alerts.splice(this.alerts.indexOf(alert), 1);
   }
 
 }

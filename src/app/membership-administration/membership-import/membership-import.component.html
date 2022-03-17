@@ -4,13 +4,19 @@
   </div>
 </div>
 
+<div *ngIf="alerts && alerts.length > 0">
+  <p *ngFor="let alert of alerts">
+    <ngb-alert [type]="alert.type" (close)="closeAlert(alert)">{{ alert.message }}</ngb-alert>
+  </p>
+</div>
+
 <div class="row mb-3">
   <button class="btn btn-primary mr-1" (click)="requestAutoImport()">Request Automatic SportsTG Import</button>
   <button class="btn btn-warning" (click)="uploadImport()">Upload SportsTG Member File</button>
 </div>
 
 <div class="row" *ngIf="importHistory && importHistory.length > 0">
-  <table datatable class="col-sm-12 table table-bordered" #membershipImportHistory>
+  <table class="col-sm-12 table table-bordered">
     <thead>
     <tr>
       <th>ID</th>
@@ -64,7 +70,7 @@
   </div>
   <div class="modal-body">
     <p>
-    <strong>Are you sure you want to request an automatic SportsTG import?</strong>
+      <strong>Are you sure you want to request an automatic SportsTG import?</strong>
     </p>
     <p *ngIf="lastImportSecs < 300">
       The last automatic import was requested less than 5 minutes ago. Please allow at least 5 minutes for each import.

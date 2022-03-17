@@ -17,4 +17,8 @@ export class MembershipImportService {
     return this.http.post(environment.api + 'membership/autoImport', {});
   }
 
+  getSportsTGMembers() {
+    return this.http.get(environment.api + 'membership/sportstg');
+  }
+
 }

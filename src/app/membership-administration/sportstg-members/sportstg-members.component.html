@@ -17,6 +17,33 @@
     </tr>
 
     </thead>
+    <tbody>
+    <tr *ngFor="let sportstg of members; let i = index">
+      <td>
+        {{sportstg.external_id}}
+      </td>
+      <td>
+        {{sportstg.surname}}
+      </td>
+      <td>
+        {{sportstg.firstname}}
+      </td>
+      <td>
+        {{sportstg.number}}
+      </td>
+      <td>
+        <span *ngIf="sportstg.member_id">
+          {{sportstg.member_id}}
+        </span>
+        <span *ngIf="!sportstg.member_id">
+          No
+        </span>
+      </td>
+      <td>
+        {{getLocal(sportstg.updated_at)}}
+      </td>
+    </tr>
+    </tbody>
 
   </table>
 
