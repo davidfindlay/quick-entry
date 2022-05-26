@@ -1,0 +1,5 @@
+<form [formGroup]="statusCodeForm">
+  <select class="form-control" *ngIf="statusCodes">
+    <option *ngFor="let statusCode of statusCodes; let index = i" formControlName="updateStatus">{{statusCode.label}}</option>
+  </select>
+</form>

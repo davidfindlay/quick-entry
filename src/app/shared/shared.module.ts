@@ -9,6 +9,7 @@ import {MeetListComponent} from '../meet-list/meet-list.component';
 import { MemberSearchComponent } from './member-search/member-search.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DataTablesModule} from 'angular-datatables';
+import { EntryStatusSelectorComponent } from './entry-status-selector/entry-status-selector.component';
 
 const appRoutes: Routes = [{ path: 'not-authorised', component: NotAuthorisedComponent }];
 
@@ -16,7 +17,8 @@ const appRoutes: Routes = [{ path: 'not-authorised', component: NotAuthorisedCom
   declarations: [
     MeetCalendarViewComponent,
     NotAuthorisedComponent,
-    MemberSearchComponent
+    MemberSearchComponent,
+    EntryStatusSelectorComponent
   ],
   imports: [
     NgbModule,
@@ -31,7 +33,8 @@ const appRoutes: Routes = [{ path: 'not-authorised', component: NotAuthorisedCom
   ],
   exports: [
     MeetCalendarViewComponent,
-    MemberSearchComponent
+    MemberSearchComponent,
+    EntryStatusSelectorComponent
   ]
 })
 export class SharedModule { }

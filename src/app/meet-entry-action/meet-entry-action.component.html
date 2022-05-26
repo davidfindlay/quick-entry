@@ -41,7 +41,7 @@
       <button class="btn btn-primary" (click)="edit()" *ngIf="!editing">Edit</button>
       <button class="btn btn-success" (click)="update()" *ngIf="editing">Update</button>
       <button class="btn btn-danger" (click)="cancel()" *ngIf="editing">Cancel</button>
-      <button class="btn btn-warning" (click)="cancelEntry()">Cancel Entry</button>
+<!--      <button class="btn btn-warning" (click)="cancelEntry()">Cancel Entry</button>-->
       <button class="btn btn-primary" (click)="resendEmail()">Resend Confirmation Email</button>
       <button class="btn btn-primary" (click)="payEmail()" *ngIf="owedAmount > 0">Send Payment Link</button>
     </div>
@@ -74,12 +74,20 @@
             </a>
           </div>
         </div>
-        <div class="row">
+        <div class="row" *ngIf="!editing">
           <div class="fieldName col-sm-3">
             Entry Status:
           </div>
           <div class="fieldValue">
             {{statusLabel}}: {{statusText}}
+          </div>
+        </div>
+        <div class="row" *ngIf="editing">
+          <div class="fieldName col-sm-3">
+            Entry Status:
+          </div>
+          <div class="fieldValue">
+            <app-entry-status-selector [existingStatus]="entryStatus"></app-entry-status-selector>
           </div>
         </div>
         <div class="row">
@@ -349,13 +357,12 @@
       </div>
     </div>
 
-
   <div class="card mb-1" *ngIf="entry !== undefined && entry !== null">
     <div class="card-header">
       <h3>Events Selected</h3>
     </div>
     <div class="card-body">
-      <table class="col-sm-12">
+      <table class="col-sm-12" *ngIf="!editing">
         <thead>
         <tr>
           <th class="pr-4">Event</th>
@@ -377,10 +384,40 @@
           Relay
         </span>
           </td>
-          <td class="seedtimeCol">
-        <span *ngIf="getLegs(event.event_id) === 1">
-          {{event.seedtime | time}}
+          <td class="seedtimeCol" *ngIf="!editing">
+            <span *ngIf="getLegs(event.event_id) === 1">
+              {{event.seedtime | time}}
+            </span>
+          </td>
+        </tr>
+      </table>
+      <table class="col-sm-12" *ngIf="editing">
+        <thead>
+        <tr>
+          <th class="pr-4">Event</th>
+          <th class="pr-4">Description</th>
+          <th class="pr-4">Selected</th>
+          <th class="text-right">Seed Time</th>
+        </tr>
+        </thead>
+        <tr *ngFor="let event of meet.events">
+          <td class="pr-4">
+            {{event.prognumber}}
+          </td>
+          <td class="pr-4">
+        <span *ngIf="getEventName(event.id) !== ''">
+          {{getEventName(event.id)}}:
         </span>
+            <span *ngIf="getLegs(event.id) > 1">
+          {{getLegs(event.id)}}x</span>{{event.distance}} {{event.discipline}}
+            <span *ngIf="getLegs(event.id) > 1">
+          Relay
+        </span>
+          </td>
+          <td class="seedtimeCol" *ngIf="!editing">
+            <span *ngIf="getLegs(event.id) === 1">
+              
+            </span>
           </td>
         </tr>
       </table>
@@ -661,6 +698,19 @@
   </div>
   <div class="modal-body">
     <p>Are you sure you want to send a payment link?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Yes')">Yes</button>
+    <button type="button" class="btn btn-success" (click)="modal.close('No')">No</button>
+  </div>
+</ng-template>
+
+<ng-template #cancelConfirm let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal4-basic-title">Confirm Cancel Entry</h4>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to cancel this entry?</p>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-danger" (click)="modal.close('Yes')">Yes</button>

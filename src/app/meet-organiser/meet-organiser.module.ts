@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, CurrencyPipe, DatePipe} from '@angular/common';
 import { MeetDashboardComponent } from './meet-dashboard/meet-dashboard.component';
 import { MeetMerchandiseComponent } from './meet-merchandise/meet-merchandise.component';
 import { MeetMerchandiseItemComponent } from './meet-merchandise-item/meet-merchandise-item.component';
@@ -15,6 +15,8 @@ import { EntryListComponent } from './entry-list/entry-list.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {RouterModule} from '@angular/router';
 import {DataTablesModule} from 'angular-datatables';
+import {AgGridModule} from 'ag-grid-angular';
+import {MerchandiseService} from './services/merchandise.service';
 
 @NgModule({
   declarations: [
@@ -27,14 +29,21 @@ import {DataTablesModule} from 'angular-datatables';
     EmergencyContactsComponent,
     ContactsComponent,
     PendingEntriesComponent,
-    EntryListComponent],
+    EntryListComponent
+    ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     NgxDatatableModule,
     NgbModule,
     RouterModule,
-    DataTablesModule
+    DataTablesModule,
+    AgGridModule
+  ],
+  providers: [
+    DatePipe,
+    CurrencyPipe,
+    MerchandiseService
   ]
 })
 export class MeetOrganiserModule { }

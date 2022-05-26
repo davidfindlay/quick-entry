@@ -10,6 +10,7 @@ import {NgbAlert, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subject} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
 import {Alert} from '../models/alert';
+import {TimeService} from '../time.service';
 
 @Component({
   selector: 'app-meet-entry-action',
@@ -23,6 +24,7 @@ export class MeetEntryActionComponent implements OnInit {
   @ViewChild('transferPayment', {static: true}) transferPayment: ElementRef;
   @ViewChild('emailConfirm', {static: true}) emailConfirm: ElementRef;
   @ViewChild('paymentLinkConfirm', {static: true}) paymentLinkConfirm: ElementRef;
+  @ViewChild('cancelConfirm', {static: true}) cancelConfirm: ElementRef;
 
   meet_id;
   meet: Meet;
@@ -33,6 +35,9 @@ export class MeetEntryActionComponent implements OnInit {
   incompleteEntry;
   eventEntries: EntryEvent[];
 
+  updatedEntry;
+
+  entryStatus;
   statusLabel = '';
   statusText = '';
 
@@ -107,6 +112,7 @@ export class MeetEntryActionComponent implements OnInit {
         this.meet = this.meetService.getMeet(this.meet_id);
         this.meetName = this.meet.meetname;
         this.meetFee = this.meet.meetfee;
+        this.entryStatus = entry.status_id;
         this.statusLabel = entry.status_label;
         this.statusText = entry.status_description;
         this.eventEntries = entry.entrydata.entryEvents;
@@ -322,6 +328,63 @@ export class MeetEntryActionComponent implements OnInit {
 
   closeAlert(alert: Alert) {
     this.alerts.splice(this.alerts.indexOf(alert), 1);
+  }
+
+  edit() {
+    this.editing = true;
+    this.cdref.detectChanges();
+  }
+
+  cancel() {
+    this.editing = false;
+    this.updatedEntry = null;
+    this.cdref.detectChanges();
+  }
+
+  // cancelEntry() {
+  //   this.modal.open(this.cancelConfirm).result.then((approved: any) => {
+  //     if (approved === 'Yes') {
+  //       this.spinner.show();
+  //       console.log('cancelEntry: Yes');
+  //       this.entryService.cancel(this.meetEntryId).subscribe((response: any) => {
+  //         if (response.success) {
+  //           this.alerts.push({
+  //             type: 'success',
+  //             message: response.message
+  //           });
+  //         } else {
+  //           this.alerts.push({
+  //             type: 'danger',
+  //             message: response.message
+  //           });
+  //         }
+  //         this.spinner.hide();
+  //
+  //       }, (error) => {
+  //         console.error(error);
+  //         this.alerts.push({
+  //           type: 'danger',
+  //           message: 'Unable to cancel entry for unknown reason. Please contact the system administrator. '
+  //         });
+  //         this.spinner.hide();
+  //       });
+  //     }
+  //
+  //   }, (error: any) => {
+  //     console.log(error);
+  //   });
+  //   this.appref.tick();
+  // }
+
+  update() {
+    console.log('update entry');
+  }
+
+  formatSeedTime(seedTime) {
+    console.log('formatSeedTime');
+    const correctedSeedTime = TimeService.formatTime(seedTime);
+    console.log(correctedSeedTime);
+    return correctedSeedTime;
   }
 
 }
