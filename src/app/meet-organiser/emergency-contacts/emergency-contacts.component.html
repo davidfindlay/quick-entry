@@ -4,15 +4,34 @@
     <h2>Emergency Contact List</h2>
   </div>
 </div>
-<div class="card mb-3 bg-info text-white">
+<div class="row">
+  <div class="col-sm-12">
+    <ag-grid-angular
+      style="width: 100%; height: 40em"
+      class="ag-theme-alpine"
+      [rowData]="emergencyContactRows"
+      [columnDefs]="emergencyContactFields"
+      [paginationAutoPageSize]="true"
+      [pagination]="true"
+      (gridReady)="onGridReady($event)"
+      (firstDataRendered)="onFirstDataRendered($event)"
+      #orderTable>
+    </ag-grid-angular>
+  </div>
+</div>
+
+<div class="row mt-2">
+<div class="col-sm-4 text-right">
+  <button class="btn btn-primary ml-1" (click)="exportExportEmergencyContacts()">Export as CSV</button>
+</div>
+</div>
+
+<div class="row mt-2">
+<div class="card col-sm-12 mb-3 bg-info text-white">
   <div class="card-body">
     <p>
       Emergency Contacts from pending entries will not be shown.
     </p>
   </div>
 </div>
-<div class="row">
-  <div class="col-sm-12">
-    <ngx-datatable [rows]="contactTable" [columns]="contactColumns" rowHeight="auto"></ngx-datatable>
-  </div>
 </div>

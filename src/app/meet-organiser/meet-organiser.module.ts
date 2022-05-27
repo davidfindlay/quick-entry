@@ -17,6 +17,7 @@ import {RouterModule} from '@angular/router';
 import {DataTablesModule} from 'angular-datatables';
 import {AgGridModule} from 'ag-grid-angular';
 import {MerchandiseService} from './services/merchandise.service';
+import {EmergencyContactsService} from './services/emergency-contacts.service';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import {MerchandiseService} from './services/merchandise.service';
   providers: [
     DatePipe,
     CurrencyPipe,
-    MerchandiseService
+    MerchandiseService,
+    EmergencyContactsService
   ]
 })
 export class MeetOrganiserModule { }

@@ -4,6 +4,8 @@ import {MeetService} from '../../meet.service';
 import {HttpClient} from '@angular/common/http';
 import {Meet} from '../../models/meet';
 import {environment} from '../../../environments/environment';
+import {FirstDataRenderedEvent} from 'ag-grid-community';
+import {EmergencyContactsService} from '../services/emergency-contacts.service';
 
 @Component({
   selector: 'app-emergency-contacts',
@@ -11,6 +13,9 @@ import {environment} from '../../../environments/environment';
   styleUrls: ['./emergency-contacts.component.css']
 })
 export class EmergencyContactsComponent implements OnInit {
+
+  tableApi;
+  columnApi;
 
   meetId;
   meet;
@@ -26,9 +31,29 @@ export class EmergencyContactsComponent implements OnInit {
     { name: 'Email', prop: 'email'}
   ];
 
+  emergencyContactFields = [
+    { headerName: 'Entry ID', field: 'meet_entries_id', resizable: true, width: 100, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Entrant', field: 'member_name', resizable: true, width: 150, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'MSA Number', field: 'member_number', resizable: true, width: 120, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Club Code', field: 'club_code', resizable: true, width: 100, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Club Name', field: 'club_name', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Emergency Contact Name', field: 'contact_name', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Emergency Contact Phone', field: 'contact_phone', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+  ];
+
+  emergencyContactRows = [];
+
   constructor(private activatedRoute: ActivatedRoute,
               private router: Router,
               private meetService: MeetService,
+              private emergencyContactService: EmergencyContactsService,
               private http: HttpClient) { }
 
 
@@ -44,52 +69,23 @@ export class EmergencyContactsComponent implements OnInit {
       }
     });
 
-    this.http.get(environment.api + 'meet_entries/' + this.meetId).subscribe((entries: any) => {
-      this.entries = entries.meet_entries;
-
-      for (let i = 0; i < this.entries.length; i++) {
-
-        let updated = '';
-
-        if (this.entries[i].updated_at !== undefined && this.entries[i].updated_at !== null) {
-          updated = this.entries[i].updated_at;
-        }
-
-        const member_details = this.entries[i].member.surname + ', ' + this.entries[i].member.firstname + ' (' + this.entries[i].member.number + ')';
-        let emergency_details = 'n/a';
-        let emergency_phone = 'n/a';
-        let emergency_email = 'n/a';
-        if (this.entries[i].member.emergency !== undefined && this.entries[i].member.emergency !== null) {
-          emergency_details = this.entries[i].member.emergency.surname + ', ' + this.entries[i].member.emergency.firstname;
-
-          if (this.entries[i].member.emergency.phone !== undefined && this.entries[i].member.emergency.phone !== null) {
-            emergency_phone = this.entries[i].member.emergency.phone.phonenumber;
-          }
-
-          emergency_email = 'n/a';
-        }
-
-        let club_details = 'n/a';
-
-        if (this.entries[i].club !== undefined && this.entries[i].club !== null) {
-          club_details = this.entries[i].club.clubname + ' (' + this.entries[i].club.code + ')';
-        }
-
-        const row = {
-          meet_entries_id: this.entries[i].id,
-          entrant_details: member_details,
-          emergency_details: emergency_details,
-          club: club_details,
-          phone: emergency_phone,
-          email: emergency_email
-        }
-
-        this.contactTable.push(row);
-      }
-
-      this.contactTable = [...this.contactTable];
-
+    this.emergencyContactService.getEmergencyContactsFromMeetEntries(this.meetId).subscribe((emergencyContacts: any) => {
+      // console.log(emergencyContacts);
+      this.emergencyContactRows = emergencyContacts;
     });
+  }
+
+  onGridReady($event) {
+    this.tableApi = $event.api;
+    this.columnApi = $event.columnApi;
+  }
+
+  onFirstDataRendered(params: FirstDataRenderedEvent) {
+    params.api.sizeColumnsToFit();
+  }
+
+  exportExportEmergencyContacts() {
+    this.tableApi.exportDataAsCsv();
   }
 
 }
