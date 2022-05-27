@@ -18,6 +18,7 @@ import {DataTablesModule} from 'angular-datatables';
 import {AgGridModule} from 'ag-grid-angular';
 import {MerchandiseService} from './services/merchandise.service';
 import {EmergencyContactsService} from './services/emergency-contacts.service';
+import {ContactsService} from './services/contacts.service';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import {EmergencyContactsService} from './services/emergency-contacts.service';
     DatePipe,
     CurrencyPipe,
     MerchandiseService,
-    EmergencyContactsService
+    EmergencyContactsService,
+    ContactsService
   ]
 })
 export class MeetOrganiserModule { }

@@ -22,14 +22,6 @@ export class EmergencyContactsComponent implements OnInit {
   meetName;
   entries;
   contactTable = [];
-  contactColumns = [
-    { name: 'Entry ID', prop: 'meet_entries_id' },
-    { name: 'Entrant', prop: 'entrant_details' },
-    { name: 'Club', prop: 'club' },
-    { name: 'Emergency Contact', prop: 'emergency_details' },
-    { name: 'Phone', prop: 'phone'},
-    { name: 'Email', prop: 'email'}
-  ];
 
   emergencyContactFields = [
     { headerName: 'Entry ID', field: 'meet_entries_id', resizable: true, width: 100, sortable: true,
@@ -44,8 +36,7 @@ export class EmergencyContactsComponent implements OnInit {
       filter: true, floatingFilter: true },
     { headerName: 'Emergency Contact Name', field: 'contact_name', resizable: true, sortable: true,
       filter: true, floatingFilter: true },
-    { headerName: 'Emergency Contact Phone', field: 'contact_phone', resizable: true, sortable: true,
-      filter: true, floatingFilter: true },
+    { headerName: 'Emergency Contact Phone', field: 'contact_phone', resizable: true },
   ];
 
   emergencyContactRows = [];
@@ -84,7 +75,7 @@ export class EmergencyContactsComponent implements OnInit {
     params.api.sizeColumnsToFit();
   }
 
-  exportExportEmergencyContacts() {
+  exportEmergencyContacts() {
     this.tableApi.exportDataAsCsv();
   }
 

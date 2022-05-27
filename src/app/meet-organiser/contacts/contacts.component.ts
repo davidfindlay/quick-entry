@@ -4,6 +4,8 @@ import {MeetService} from '../../meet.service';
 import {HttpClient} from '@angular/common/http';
 import {Meet} from '../../models/meet';
 import {environment} from '../../../environments/environment';
+import {FirstDataRenderedEvent} from 'ag-grid-community';
+import {ContactsService} from '../services/contacts.service';
 
 @Component({
   selector: 'app-contacts',
@@ -12,32 +14,41 @@ import {environment} from '../../../environments/environment';
 })
 export class ContactsComponent implements OnInit {
 
+  tableApi;
+  columnApi;
+
   meetId;
   meet;
   meetName;
   entries;
-  contactTable = [];
-  contactColumns = [
-    { name: 'Entry ID', prop: 'meet_entries_id' },
-    { name: 'Entrant', prop: 'entrant_details' },
-    { name: 'Club', prop: 'club' },
-    { name: 'Phone', prop: 'phone'},
-    { name: 'Email', prop: 'email'}
+
+  contactFields = [
+    { headerName: 'Entry ID', field: 'meet_entries_id', resizable: true, width: 100, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Entrant', field: 'member_name', resizable: true, width: 150, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'MSA Number', field: 'member_number', resizable: true, width: 120, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Club Code', field: 'club_code', resizable: true, width: 100, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Club Name', field: 'club_name', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Phone', field: 'contact_phone', resizable: true },
+    { headerName: 'Email', field: 'contact_email', resizable: true },
   ];
-  dtOptions: DataTables.Settings = {};
+
+  contactRows = [];
 
   constructor(private activatedRoute: ActivatedRoute,
               private router: Router,
               private meetService: MeetService,
+              private contactsService: ContactsService,
               private http: HttpClient) { }
 
   ngOnInit() {
-    this.dtOptions = {
-      pagingType: 'full_numbers'
-    };
-
     this.meetId = parseInt(this.activatedRoute.snapshot.params['meetId'], 10);
     console.log('Entrant Contacts meetId = ' + this.meetId);
+
     this.meetService.getMeetDetails(this.meetId).subscribe((meet: Meet) => {
       if (meet !== undefined && meet !== null) {
         this.meet = meet;
@@ -47,56 +58,22 @@ export class ContactsComponent implements OnInit {
       }
     });
 
-    this.http.get(environment.api + 'meet_entries/' + this.meetId).subscribe((entries: any) => {
-      this.entries = entries.meet_entries;
-      console.log(this.entries);
-
-      for (let i = 0; i < this.entries.length; i++) {
-
-        let updated = '';
-
-        if (this.entries[i].updated_at !== undefined && this.entries[i].updated_at !== null) {
-          updated = this.entries[i].updated_at;
-        }
-
-        const member_details = this.entries[i].member.surname + ', ' + this.entries[i].member.firstname + ' (' + this.entries[i].member.number + ')';
-        let entrant_phone = 'n/a';
-        let entrant_email = 'n/a';
-
-        if (this.entries[i].member.phones !== undefined && this.entries[i].member.phones !== null) {
-          if (this.entries[i].member.phones.length > 0) {
-            const latest_phone = this.entries[i].member.phones.length - 1;
-            entrant_phone = this.entries[i].member.phones[latest_phone].phonenumber;
-          }
-        }
-
-        if (this.entries[i].member.emails !== undefined && this.entries[i].member.emails !== null) {
-          if (this.entries[i].member.emails.length > 0) {
-            const latest_email = this.entries[i].member.emails.length - 1;
-            entrant_email = this.entries[i].member.emails[latest_email].address;
-          }
-        }
-
-        let club_details = 'n/a';
-
-        if (this.entries[i].club !== undefined && this.entries[i].club !== null) {
-          club_details = this.entries[i].club.clubname + ' (' + this.entries[i].club.code + ')';
-        }
-
-        const row = {
-          meet_entries_id: this.entries[i].id,
-          entrant_details: member_details,
-          club: club_details,
-          phone: '<a href=\"tel:' + entrant_phone + '\">' + entrant_phone + '</a>',
-          email: '<a href=\"mailto:' + entrant_email + '\">' + entrant_email + '</a>'
-        };
-
-        this.contactTable.push(row);
-      }
-
-      this.contactTable = [...this.contactTable];
-
+    this.contactsService.getContactsFromMeetEntries(this.meetId).subscribe((res: any) => {
+      this.contactRows = res;
     });
+  }
+
+  onGridReady($event) {
+    this.tableApi = $event.api;
+    this.columnApi = $event.columnApi;
+  }
+
+  onFirstDataRendered(params: FirstDataRenderedEvent) {
+    params.api.sizeColumnsToFit();
+  }
+
+  exportContacts() {
+    this.tableApi.exportDataAsCsv();
   }
 
 }
