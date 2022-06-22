@@ -1,6 +1,51 @@
 <div class="row">
   <div class="col-xs-12">
     <h1>{{meetName}}</h1>
-    <h2>Dashboard</h2>
+    <h2>Meet Dashboard</h2>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-sm-4 d-flex align-items-stretch">
+    <div class="card col-sm-12">
+      <div class="card-body text-center align-items-center justify-content-center">
+        <div class="dashboard-number col-sm-12">
+          {{totalProcessedEntries}}
+        </div>
+        <div class="dashboard-caption col-sm-12">
+          Total Processed Entries
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4 d-flex align-items-stretch">
+    <div class="card col-sm-12">
+      <div class="card-body text-center align-items-center justify-content-center">
+        <div class="dashboard-number col-sm-12">
+          {{totalPendingEntries}}
+        </div>
+        <div class="dashboard-caption col-sm-12">
+          Pending Entries
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4 d-flex align-items-stretch">
+    <div class="card col-sm-12">
+      <div class="card-body text-center align-items-center justify-content-center">
+<!--        <div class="dashboard-number col-sm-12">-->
+<!--          <countdown #deadlineCountdown [config]="deadlineCountdownConfig" *ngIf="deadline"></countdown>-->
+<!--        </div>-->
+        <div class="dashboard-caption col-sm-12">
+          <div *ngIf="deadline">{{deadline | date: 'EEEE d LLLL YYYY'}}</div>
+          <div id="deadlineTime">Midnight</div>
+          <div>Entry Deadline</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>Entry Summary</h3>
+
+<app-summary [meetId]="meetId" [clubEntries]="clubEntries"></app-summary>

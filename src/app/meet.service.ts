@@ -100,6 +100,7 @@ export class MeetService {
       this.loadMeetDetails(meet_id);
       this.meetsChanged.subscribe(changed => {
         observer.next(this.getMeet(meet_id));
+
       });
     });
   }

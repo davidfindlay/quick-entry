@@ -51,6 +51,7 @@
     "moment": "^2.24.0",
     "ng2-date-countdown": "1.0.3",
     "ngx-auth": "^5.0.0",
+    "ngx-countdown": "^13.0.0",
     "ngx-mask": "^7.9.10",
     "ngx-paypal": "^5.0.0",
     "ngx-spinner": "^7.0.0",

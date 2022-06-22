@@ -7,6 +7,8 @@ import {HttpClient} from '@angular/common/http';
 import {NgxSpinnerService} from 'ngx-spinner';
 import {Meet} from '../../models/meet';
 import {environment} from '../../../environments/environment';
+import {FirstDataRenderedEvent} from 'ag-grid-community';
+import {EntryListService} from '../services/entry-list.service';
 
 @Component({
   selector: 'app-entry-list',
@@ -15,29 +17,64 @@ import {environment} from '../../../environments/environment';
 })
 export class EntryListComponent implements OnInit {
 
-  @ViewChild('table', { static: false }) table: DatatableComponent;
+  active = 1;
 
-  tableControl: FormGroup;
+  tableApi;
+  columnApi;
 
   meetId;
   meet;
   meetName;
-  entries;
-  entryTable = [];
-  entryTableUnfiltered = [];
 
-  entryColumns = [
-    { name: 'Entry ID', prop: 'meet_entries_id', summaryFunc: () => null, headerClass: 'text-center', cellClass: 'text-center', flexGrow: 1.5},
-    { name: 'Date/Time', prop: 'updated_at', flexGrow: 4 },
-    { name: 'Entrant', prop: 'member_details', flexGrow: 4 },
-    { name: 'Club', prop: 'club_details', headerClass: 'text-center', cellClass: 'text-center', flexGrow: 1 },
-    { name: 'Events', prop: 'events', headerClass: 'text-center', cellClass: 'text-center', flexGrow: 1},
-    { name: 'Classification', prop: 'classification', headerClass: 'text-center', cellClass: 'text-center', flexGrow: 1},
-    { name: 'Entry Status', prop: 'entry_status', headerClass: 'text-center', cellClass: 'text-center', flexGrow: 2},
-    { name: 'Total Ex GST', prop: 'ex_gst', headerClass: 'text-center', cellClass: 'text-right', flexGrow: 2},
-    { name: 'Total Inc GST', prop: 'inc_gst', headerClass: 'text-center', cellClass: 'text-right', flexGrow: 2},
-    { name: 'Paid', prop: 'paid', headerClass: 'text-center', cellClass: 'text-right', flexGrow: 2}
+  entryFields = [
+    { headerName: 'Entry ID', field: 'meet_entries_id', resizable: true, width: 100, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Entrant', field: 'member_name', resizable: true, width: 150, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'MSA Number', field: 'member_number', resizable: true, width: 120, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Club Code', field: 'club_code', resizable: true, width: 100, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Club Name', field: 'club_name', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Classification', field: 'classification', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Status', field: 'entry_status', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+    // { headerName: 'Total Ex GST', field: 'ex_gst', resizable: true, sortable: true,
+    //   filter: true, floatingFilter: true },
+    { headerName: 'Total Inc GST', field: 'inc_gst', resizable: true, sortable: true,
+      filter: true, floatingFilter: true, type: 'numericColumn' },
+    { headerName: 'Paid', field: 'paid', resizable: true, sortable: true,
+      filter: true, floatingFilter: true, type: 'numericColumn' }
   ];
+
+  pendingFields = [
+    { headerName: 'Entry ID', field: 'pending_id', resizable: true, width: 100, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Entrant', field: 'entrant_name', resizable: true, width: 150, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Club Code', field: 'club_code', resizable: true, width: 100, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Club Name', field: 'club_name', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Status', field: 'entry_status', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+    { headerName: 'Reason', field: 'pending_reason', resizable: true, sortable: true,
+      filter: true, floatingFilter: true },
+    //
+    // TODO:  Add pending entry cost and payments
+    //
+    // { headerName: 'Total Ex GST', field: 'ex_gst', resizable: true, sortable: true,
+    //   filter: true, floatingFilter: true },
+    // { headerName: 'Total Inc GST', field: 'inc_gst', resizable: true, sortable: true,
+    //   filter: true, floatingFilter: true, type: 'numericColumn' },
+    // { headerName: 'Paid', field: 'paid', resizable: true, sortable: true,
+    //   filter: true, floatingFilter: true, type: 'numericColumn' }
+  ];
+
+  entryRows = [];
+  pendingRows = [];
 
   limit = 10;
   totalProcessedEntries;
@@ -47,26 +84,13 @@ export class EntryListComponent implements OnInit {
   constructor(private activatedRoute: ActivatedRoute,
               private router: Router,
               private meetService: MeetService,
+              private entryListService: EntryListService,
               private http: HttpClient,
               private spinner: NgxSpinnerService,
               private fb: FormBuilder) { }
 
   ngOnInit() {
     this.spinner.show();
-
-    this.tableControl = this.fb.group({
-      filter: '',
-      limit: '10'
-    });
-
-    this.tableControl.valueChanges.subscribe(val => {
-      if (val.limit === 'all') {
-        this.limit = undefined;
-      } else {
-        this.limit = val.limit;
-      }
-      console.log('Limited updated to: ' + this.limit);
-    });
 
     this.activatedRoute.params.subscribe((params) => {
       if (params['meetId'] !== undefined && params['meetId'] !== null && params['meetId'] !== this.meetId) {
@@ -82,8 +106,6 @@ export class EntryListComponent implements OnInit {
   }
 
   loadMeet() {
-    this.entries = [];
-    this.entryTable = [];
     this.meetService.getAllMeets().subscribe((meets: Meet[]) => {
       const meet = meets.filter(x => x.id === this.meetId)[0];
       if (meet !== undefined && meet !== null) {
@@ -96,120 +118,35 @@ export class EntryListComponent implements OnInit {
       console.log(err);
     });
 
-    this.http.get(environment.api + 'meet_entries/' + this.meetId).subscribe((entries: any) => {
-      this.entryTable = [];
-      this.totalProcessedEntries = 0;
-      if (entries.success !== undefined && entries.success !== null && entries.success !== false) {
-        this.entries = entries.meet_entries;
-
-        for (let i = 0; i < this.entries.length; i++) {
-
-          let updated = '';
-
-          if (this.entries[i].updated_at !== undefined && this.entries[i].updated_at !== null) {
-            updated = this.entries[i].updated_at;
-          }
-
-          const member_details = this.entries[i].member.surname + ', ' + this.entries[i].member.firstname + ' (' + this.entries[i].member.number + ')';
-
-          let club_details = 'n/a';
-          let club_name = 'n/a';
-          let club_code = 'n/a';
-
-          if (this.entries[i].club !== undefined && this.entries[i].club !== null) {
-            club_details = '<abbr title="' + this.entries[i].club.clubname + '">' + this.entries[i].club.code + '</abbr>';
-            club_name = this.entries[i].club.clubname;
-            club_code = this.entries[i].club.code;
-          }
-
-          let status = 'n/a';
-          if (this.entries[i].status !== undefined && this.entries[i].status !== null) {
-            if (this.entries[i].status.status !== undefined && this.entries[i].status.status !== null) {
-              status = this.entries[i].status.status.label;
-            }
-          }
-
-          const ex_gst = this.entries[i].cost - (this.entries[i].cost / 11);
-
-          let paid = 0;
-          if (this.entries[i].payments !== undefined && this.entries[i].payments !== null) {
-            for (let x = 0; x < this.entries[i].payments.length; x++) {
-              if (this.entries[i].payments[x].amount !== undefined && this.entries[i].payments[x].amount !== null) {
-                paid += this.entries[i].payments[x].amount;
-              }
-            }
-          }
-
-          let numEvents = 0;
-          if (this.entries[i].events !== undefined && this.entries[i].payments !== null) {
-            for (let x = 0; x < this.entries[i].events.length; x++) {
-              if (this.entries[i].events[x].cancelled !== undefined && this.entries[i].events[x].cancelled !== null && this.entries[i].events[x].cancelled === 0) {
-                numEvents++;
-              }
-            }
-          }
-
-          const classifications = [];
-          if (this.entries[i].disability_s !== undefined && this.entries[i].disability_s !== null) {
-            classifications.push(this.entries[i].disability_s.classification);
-          }
-          if (this.entries[i].disability_sb !== undefined && this.entries[i].disability_sb !== null) {
-            classifications.push(this.entries[i].disability_sb.classification);
-          }
-          if (this.entries[i].disability_sm !== undefined && this.entries[i].disability_sm !== null) {
-            classifications.push(this.entries[i].disability_sm.classification);
-          }
-
-          const classifications_text = classifications.join(' - ');
-
-          const row = {
-            meet_entries_id: this.entries[i].id,
-            updated_at: updated,
-            member_details: member_details,
-            club_details: club_details,
-            club_name: club_name,
-            club_code: club_code,
-            events: numEvents,
-            medical: this.entries[i].medical,
-            medical_condition: this.entries[i].medical_condition,
-            medical_safety: this.entries[i].medical_safety,
-            medical_details: this.entries[i].medical_details,
-            notes: this.entries[i].notes,
-            classification: classifications_text,
-            entry_status: status,
-            ex_gst: ex_gst,
-            inc_gst: this.entries[i].cost,
-            paid: paid
-          };
-
-          this.totalProcessedEntries++;
-
-          this.entryTable.push(row);
-        }
-
-        this.entryTableUnfiltered = [...this.entryTable];
-        this.entryTable = this.entryTableUnfiltered;
-        this.table.recalculate();
-      }
+    this.entryListService.getMeetEntriesList(this.meetId).subscribe((res: any) => {
+      this.entryRows = res;
       this.spinner.hide();
     }, (err) => {
       console.error(err);
       this.spinner.hide();
     });
-  }
 
-  updateFilter(event) {
-    const val = event.target.value.toLowerCase();
-
-    // filter our data
-    const temp = this.entryTableUnfiltered.filter(function(d) {
-      return d.member_details.toLowerCase().indexOf(val) !== -1 || !val;
+    this.entryListService.getPendingEntries(this.meetId).subscribe((res: any) => {
+      this.pendingRows = res;
+      this.spinner.hide();
+    }, (err) => {
+      console.error(err);
+      this.spinner.hide();
     });
 
-    // update the rows
-    this.entryTable = temp;
-    // Whenever the filter changes, always go back to the first page
-    this.table.offset = 0;
+  }
+
+  onGridReady($event) {
+    this.tableApi = $event.api;
+    this.columnApi = $event.columnApi;
+  }
+
+  onFirstDataRendered(params: FirstDataRenderedEvent) {
+    params.api.sizeColumnsToFit();
+  }
+
+  exportEntries() {
+    this.tableApi.exportDataAsCsv();
   }
 
 }

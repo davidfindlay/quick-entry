@@ -19,6 +19,8 @@ import {AgGridModule} from 'ag-grid-angular';
 import {MerchandiseService} from './services/merchandise.service';
 import {EmergencyContactsService} from './services/emergency-contacts.service';
 import {ContactsService} from './services/contacts.service';
+import { SummaryComponent } from './summary/summary.component';
+import {CountdownModule} from 'ngx-countdown';
 
 @NgModule({
   declarations: [
@@ -31,7 +33,8 @@ import {ContactsService} from './services/contacts.service';
     EmergencyContactsComponent,
     ContactsComponent,
     PendingEntriesComponent,
-    EntryListComponent
+    EntryListComponent,
+    SummaryComponent
     ],
   imports: [
     CommonModule,
@@ -40,7 +43,8 @@ import {ContactsService} from './services/contacts.service';
     NgbModule,
     RouterModule,
     DataTablesModule,
-    AgGridModule
+    AgGridModule,
+    CountdownModule
   ],
   providers: [
     DatePipe,
