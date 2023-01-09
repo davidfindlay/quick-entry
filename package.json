@@ -45,7 +45,7 @@
     "fsevents": "^2.3.2",
     "jquery": "^3.4.1",
     "jwt-decode": "^2.2.0",
-    "luxon": "^2.0.2",
+    "luxon": "^2.5.2",
     "moment": "^2.24.0",
     "ng2-date-countdown": "1.0.3",
     "ngx-auth": "^5.0.0",
